@@ -1,0 +1,54 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Routes File
+|--------------------------------------------------------------------------
+|
+| Here is where you will register all of the routes in an application.
+| It's a breeze. Simply tell Laravel the URIs it should respond to
+| and give it the controller to call when that URI is requested.
+|
+*/
+
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| This route group applies the "web" middleware group to every route
+| it contains. The "web" middleware group is defined in your HTTP
+| kernel and includes session state, CSRF protection, and more.
+|
+*/
+
+Route::get('/scripts/i18n.js', ['uses' => 'ScriptController@i18n']);
+Route::get('/scripts/globals.js', ['uses' => 'ScriptController@globals']);
+
+Route::group(['middleware' => 'web'], function () {
+    Route::get('/', ['middleware' => 'auth', 'uses' => 'HomeController@index']);
+    Route::get('/logout', ['middleware' => 'auth', 'uses' => 'AuthController@logout']);
+    Route::match(['get', 'post'], '/login', ['middleware' => 'guest', 'uses' => 'AuthController@login']);
+
+    // Campaigns
+    Route::get('/campaigns', ['middleware' => 'auth', 'uses' => 'CampaignController@index']);
+    Route::get('/campaigns/json', ['middleware' => 'auth', 'uses' => 'CampaignController@json']);
+    Route::match(['get', 'post'], '/campaigns/add', ['middleware' => 'auth', 'uses' => 'CampaignController@add']);
+    Route::match(['get', 'post'], '/campaigns/edit/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@edit', 'as' => 'campaigns.edit']);
+    Route::delete('/campaigns/delete/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@delete']);
+
+    // Users
+    Route::get('/users', ['middleware' => 'auth', 'uses' => 'UserController@index']);
+    Route::get('/users/json', ['middleware' => 'auth', 'uses' => 'UserController@json']);
+    Route::match(['get', 'post'], '/users/add', ['middleware' => 'auth', 'uses' => 'UserController@add']);
+    Route::match(['get', 'post'], '/users/edit/{id}', ['middleware' => 'auth', 'uses' => 'UserController@edit', 'as' => 'users.edit']);
+    Route::delete('/users/delete/{id}', ['middleware' => 'auth', 'uses' => 'UserController@delete']);
+    Route::match(['get', 'post'], '/change-password', ['middleware' => 'auth', 'uses' => 'UserController@changePassword']);
+
+    // I18n
+    Route::get('/i18n', ['middleware' => 'auth', 'uses' => 'I18nController@index']);
+    Route::get('/i18n/json', ['middleware' => 'auth', 'uses' => 'I18nController@json']);
+    Route::match(['get', 'post'], '/i18n/add', ['middleware' => 'auth', 'uses' => 'I18nController@add']);
+    Route::match(['get', 'post'], '/i18n/edit/{id}', ['middleware' => 'auth', 'uses' => 'I18nController@edit', 'as' => 'i18n.edit']);
+    Route::delete('/i18n/delete/{id}', ['middleware' => 'auth', 'uses' => 'I18nController@delete']);
+});
