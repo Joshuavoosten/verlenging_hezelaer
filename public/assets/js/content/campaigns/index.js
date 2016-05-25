@@ -11,8 +11,20 @@ var actions = {
 }
 $(function(){
     // Table
-    $('#table_campaigns').bootstrapTable({
-        url: '/campaigns/json',
+    $('#table_campaigns_planned').bootstrapTable({
+        url: '/campaigns/json/planned',
+        queryParams: function(params){
+            return {
+                limit: params.limit,
+                offset: params.offset,
+                order: params.order,
+                search: params.search,
+                sort: params.sort
+            };
+        }
+    });
+    $('#table_campaigns_sent').bootstrapTable({
+        url: '/campaigns/json/sent',
         queryParams: function(params){
             return {
                 limit: params.limit,

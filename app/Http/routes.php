@@ -32,10 +32,13 @@ Route::group(['middleware' => 'web'], function () {
 
     // Campaigns
     Route::get('/campaigns', ['middleware' => 'auth', 'uses' => 'CampaignController@index']);
-    Route::get('/campaigns/json', ['middleware' => 'auth', 'uses' => 'CampaignController@json']);
+    Route::get('/campaigns/json/planned', ['middleware' => 'auth', 'uses' => 'CampaignController@jsonPlanned']);
+    Route::get('/campaigns/json/sent', ['middleware' => 'auth', 'uses' => 'CampaignController@jsonSent']);
     Route::match(['get', 'post'], '/campaigns/add', ['middleware' => 'auth', 'uses' => 'CampaignController@add']);
     Route::match(['get', 'post'], '/campaigns/edit/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@edit', 'as' => 'campaigns.edit']);
     Route::delete('/campaigns/delete/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@delete']);
+    Route::get('/campaigns/csv/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@csv']);
+    Route::get('/campaigns/details/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@details']);
 
     // Users
     Route::get('/users', ['middleware' => 'auth', 'uses' => 'UserController@index']);

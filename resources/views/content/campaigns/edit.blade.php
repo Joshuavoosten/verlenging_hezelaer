@@ -28,7 +28,7 @@
                             {{ Form::text('name', old('name'), ['class' => 'form-control']) }}
                         </div>
                         <div style="height: 15px"></div>
-                        {{ Form::submit(__('Creating Customer List'), ['class' => 'btn btn-success']) }}
+                        {{ Form::submit(__('Edit Campaign'), ['class' => 'btn btn-success']) }}
                     {!! Form::close() !!}
                 </div>
             </div>

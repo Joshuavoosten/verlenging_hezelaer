@@ -18,11 +18,16 @@
         </h3>
     </div>
     <div class="panel-body bg-concrete">
-        <a href="/users/add" class="btn btn-success">
-            <i class="fa fa-plus" style="margin-right: 5px"></i>
-            {{ __('Add User') }}
-        </a>
-        <div style="height: 15px"></div>
+        <div class="pull-left">
+            <h3>{{ __('Overview') }}</h3>
+        </div>
+        <div class="pull-right">
+            <a href="/users/add" class="btn btn-default">
+                <i class="fa fa-plus" style="margin-right: 5px"></i>
+                {{ __('Add User') }}
+            </a>
+        </div>
+        <div class="clearfix"></div>
         @include('alerts.success')
         @include('alerts.delete')
         <table id="table_users" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">

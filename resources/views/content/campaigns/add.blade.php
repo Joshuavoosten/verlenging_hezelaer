@@ -30,22 +30,25 @@
                         </div>
                     </div>
                     <hr />
-                    <h4>Huidige contract(en)</h4>
+                    <h4>{{ __('Current Contracts') }}</h4>
+                    <div class="alert alert-warning">
+                        De filters worden nog niet toegepast!
+                    </div> 
                     <div class="row">
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('segment') ? 'has-error' : '') }}">
-                                {{ Form::label('segment', __('Segment')) }}
-                                {{ Form::select('segment', $aSegments, old('segment'), ['id' => 'segment', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                            <div class="form-group {{ ($errors->first('current_segment') ? 'has-error' : '') }}">
+                                {{ Form::label('current_segment', __('Segment')) }}
+                                {{ Form::select('current_segment', $aCurrentSegments, old('current_segment'), ['id' => 'current_segment', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('in_a_group') ? 'has-error' : '') }}">
+                            <div class="form-group {{ ($errors->first('current_in_a_group') ? 'has-error' : '') }}">
                                 {{ Form::label('in_a_group', __('In a group')) }}
                                 <br />@todo
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('under an agent') ? 'has-error' : '') }}">
+                            <div class="form-group {{ ($errors->first('current_under_an_agent') ? 'has-error' : '') }}">
                                 {{ Form::label('under an agent', __('Under an agent')) }}
                                 <br />@todo
                             </div>
@@ -53,46 +56,47 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('code') ? 'has-error' : '') }}">
-                                {{ Form::label('code', __('Profile Code')) }}
-                                <br />@todo
+                            <div class="form-group {{ ($errors->first('current_profile_code') ? 'has-error' : '') }}">
+                                {{ Form::label('current_profile_code', __('Profile Code')) }}
+                                {{ Form::select('current_profile_code', $aCurrentProfileCodes, old('current_profile_codes'), ['id' => 'current_profile_codes', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('similarities') ? 'has-error' : '') }}">
-                                {{ Form::label('code', __('Similarities')) }}
-                                <br />@todo
+                            <div class="form-group {{ ($errors->first('current_agreement') ? 'has-error' : '') }}">
+                                {{ Form::label('current_agreement', __('Agreement')) }}
+                                {{ Form::select('current_agreement', $aCurrentAgreements, old('current_agreement'), ['id' => 'current_agreement', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('expiry_date') ? 'has-error' : '') }}">
-                                {{ Form::label('expiry_date', __('Expiry Date')) }}
-                                <br />@todo
+                            <div class="form-group {{ ($errors->first('current_expiration_date') ? 'has-error' : '') }}">
+                                {{ Form::label('current_expiration_date', __('Expiration Date')) }}
+                                {{ Form::select('current_expiration_date', $aCurrentExpirationDate, old('current_expiration_date'), ['id' => 'current_expiration_date', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                             </div>
                         </div>
                     </div>
-                    <h4>Nieuw contract aanbod</h4>
+                    <h4>{{ __('New Contract Offer') }}</h4>
                     <div class="row">
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('agreement') ? 'has-error' : '') }}">
-                                {{ Form::label('agreement', __('Agreement')) }}
-                                <br />@todo
+                            <div class="form-group {{ ($errors->first('new_agreement') ? 'has-error' : '') }}">
+                                {{ Form::label('new_agreement', __('Agreement')) }}
+                                {{ Form::select('new_agreement', $aNewAgreements, old('new_agreement'), ['id' => 'new_agreement', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('term_offer') ? 'has-error' : '') }}">
-                                {{ Form::label('term_offer', __('Term Offer')) }}
-                                <br />@todo
+                            <div class="form-group {{ ($errors->first('new_term_offer') ? 'has-error' : '') }}">
+                                {{ Form::label('new_term_offer', __('Term Offer')) }}
+                                {{ Form::select('new_term_offer', $aNewTermOffers, old('new_term_offer'), ['id' => 'new_term_offer', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group {{ ($errors->first('percentage') ? 'has-error' : '') }}">
-                                {{ Form::label('percentage', __('Prijs opslag percentage')) }}
-                                <br />@todo
+                            <div class="form-group {{ ($errors->first('new_percentage') ? 'has-error' : '') }}">
+                                {{ Form::label('new_percentage', __('Prijs opslag percentage')) }}
+                                {{ Form::select('new_percentage', $aNewPercentages, old('new_percentage'), ['id' => 'new_percentage', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                             </div>
                         </div>
                     </div>
-                    {{ Form::submit(__('Creating Customer List'), ['class' => 'btn btn-success']) }}
+                    <div style="height: 15px"></div>
+                    {{ Form::submit(__('Add Campaign'), ['class' => 'btn btn-success']) }}
                 {!! Form::close() !!}
             </div>
     </div>

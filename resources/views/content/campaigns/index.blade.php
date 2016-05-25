@@ -5,6 +5,8 @@
 <script src="{{ URL::asset('assets/js/actions/delete.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/delete.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/edit.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/campaignDetails.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/campaignCsv.js') }}"></script>
 @endsection
 
 @section('content')
@@ -22,38 +24,43 @@
             <p>Contract verlengingen aangeboden via deze wizard</p>
         </div>
         <div class="pull-right">
-            <a href="/campaigns/add" class="btn btn-success">
+            <a href="/campaigns/add" class="btn btn-default">
                 <i class="fa fa-plus" style="margin-right: 5px"></i>
                 {{ __('Add Campaign') }}
             </a>
         </div>
         <div class="clearfix"></div>
-        <div style="height: 15px"></div>
         @include('alerts.success')
         @include('alerts.delete')
         <h4><strong>{{ __('Planned') }}</strong> ({{ $iCountPlannedCampaigns }} {{ __('campaigns') }})</h4>
-        <table id="table_campaigns" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
+        <table id="table_campaigns_planned" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
             <thead>
                 <tr>
-                    <th data-field="name" data-sortable="true">{{ __('Name') }}</th>
-                    <th data-field="segment">{{ __('Segment') }}</th>
-                    <th data-field="agreement">{{ __('Agreement') }}</th>
-                    <th data-field="term_offer">{{ __('Term Offer') }}</th>
-                    <th data-field="csv">CSV</th>
+                    <th data-field="name" data-formatter="campaignDetailsFormatter" data-sortable="true">{{ __('Name') }}</th>
+                    <th data-field="current_segment">{{ __('Segment') }}</th>
+                    <th data-field="current_profile_code">{{ __('Profile Code') }}</th>
+                    <th data-field="current_agreement">{{ __('Agreement') }}</th>
+                    <th data-field="current_expiration_date" data-align="center">{{ __('Expiration Date') }}</th>
+                    <th data-field="count_customers" data-align="center">{{ __('Customers') }}</th>
+                    <th data-field="planned_at" data-align="center">{{ __('Planned') }}</th>
+                    <th data-field="csv" data-align="center" data-formatter="campaignCsvFormatter">CSV</th>
                     <th data-field="action_edit" data-sortable="false" data-formatter="editFormatter" data-align="center" class="col-md-1"></th>
                     <th data-field="action_delete" data-sortable="false" data-formatter="deleteFormatter" data-align="center" class="col-md-1"></th>
                 </tr>
             </thead>
         </table>
         <h4><strong>{{ __('Sent') }}</strong> ({{ $iCountSentCampaigns }} {{ __('campaigns') }})</h4>
-        <table id="table_campaigns" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
+        <table id="table_campaigns_sent" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
             <thead>
                 <tr>
                     <th data-field="name" data-sortable="true">{{ __('Name') }}</th>
-                    <th data-field="segment">{{ __('Segment') }}</th>
-                    <th data-field="agreement">{{ __('Agreement') }}</th>
-                    <th data-field="term_offer">{{ __('Term Offer') }}</th>
-                    <th data-field="csv">CSV</th>
+                    <th data-field="current_segment">{{ __('Segment') }}</th>
+                    <th data-field="current_profile_code">{{ __('Profile Code') }}</th>
+                    <th data-field="current_agreement">{{ __('Agreement') }}</th>
+                    <th data-field="current_expiration_date" data-align="center">{{ __('Expiration Date') }}</th>
+                    <th data-field="count_customers" data-align="center">{{ __('Customers') }}</th>
+                    <th class="col-md-1"></th>
+                    <th data-field="csv" data-align="center" data-formatter="campaignCsvFormatter">CSV</th>
                     <th class="col-md-1"></th>
                     <th class="col-md-1"></th>
                 </tr>
