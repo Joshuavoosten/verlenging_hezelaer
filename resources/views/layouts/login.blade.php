@@ -9,6 +9,8 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="{{ URL::asset('assets/css/master.css') }}">
+        <link rel="stylesheet" href="{{ URL::asset('assets/css/button.css') }}">
+        <link rel="stylesheet" href="{{ URL::asset('assets/css/navbar.css') }}">
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:100,300,400,700">
