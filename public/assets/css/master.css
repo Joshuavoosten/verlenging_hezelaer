@@ -30,6 +30,9 @@ nav i {
     width: 15px;
     margin-right: 6px;
 }
+hr {
+    border-color: #C0C0C0;
+}
 ol.breadcrumb i {
     margin-right: 6px;
 }

@@ -30,9 +30,6 @@
             </div>
             <hr />
             <h4>{{ __('Current Contracts') }}</h4>
-            <div class="alert alert-warning">
-                De filters worden nog niet toegepast!
-            </div> 
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_segment') ? 'has-error' : '') }}">
@@ -42,14 +39,14 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_in_a_group') ? 'has-error' : '') }}">
-                        {{ Form::label('in_a_group', __('In a group')) }}
-                        <br />@todo
+                        {{ Form::label('current_in_a_group', __('In a group')) }}
+                        {{ Form::select('current_in_a_group', $aCurrentInAGroup, old('current_in_a_group'), ['id' => 'current_in_a_group', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_under_an_agent') ? 'has-error' : '') }}">
-                        {{ Form::label('under an agent', __('Under an agent')) }}
-                        <br />@todo
+                        {{ Form::label('current_under_an_agent', __('Under an agent')) }}
+                        {{ Form::select('current_under_an_agent', $aCurrentUnderAnAgent, old('current_under_an_agent'), ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
             </div>

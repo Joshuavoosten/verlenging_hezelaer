@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\User as ModelUser;
 use Auth;
 use DB;
-use Session;
-use Validator;
-use View;
-use App\User as ModelUser;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
+use Session;
+use Validator;
+use View;
 
 class UserController extends Controller
 {

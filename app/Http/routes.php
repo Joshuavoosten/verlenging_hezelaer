@@ -39,6 +39,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::delete('/campaigns/delete/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@delete']);
     Route::get('/campaigns/csv/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@csv']);
     Route::get('/campaigns/details/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@details']);
+    Route::get('/campaigns/details/json/customers_without_saving/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@detailsJsonCustomersWithoutSaving']);
+    Route::get('/campaigns/details/json/customers_with_savings/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@detailsJsonCustomersWithSavings']);
+    Route::get('/campaigns/details/json/customers_with_current_offer/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@detailsJsonCustomersWithCurrentOffer']);
 
     // Users
     Route::get('/users', ['middleware' => 'auth', 'uses' => 'UserController@index']);
