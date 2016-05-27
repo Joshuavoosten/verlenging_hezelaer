@@ -12,7 +12,7 @@
     <div class="panel-heading">
         <h3 class="panel-title">{{ __('Change Password') }}</h3>
     </div>
-    <div class="panel-body bg-concrete">
+    <div class="panel-body">
         @if (isset($success))
             <p class="bg-success" style="padding: 10px">{{ $success }}</p>
         @endif

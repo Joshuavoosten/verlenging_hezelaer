@@ -17,7 +17,7 @@
         </a>
         <div class="clearfix"></div>
     </div>
-    <div class="panel-body bg-concrete">
+    <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
                 {!! Form::open(['url' => '/users/add', 'method' => 'post']) !!}

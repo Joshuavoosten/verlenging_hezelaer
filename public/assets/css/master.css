@@ -4,7 +4,7 @@ html {
 }
 body {
     padding: 80px 0 85px 0;
-    background-color: #FFF;
+    background-color: #EFEFEF;
     font-family: 'Lato';
 }
 a.edit,
@@ -24,7 +24,7 @@ a.list-group-item:last-child {
     border-bottom-right-radius: 0px;
 }
 a.list-group-item:hover {
-    background-color: #FFB;
+    background-color: #DDE6E7;
 }
 nav i {
     width: 15px;
@@ -40,7 +40,7 @@ table {
     background-color: #EFEFEF;
 }
 table tr:hover td {
-    background-color: #FFB;
+    background-color: #DDE6E7;
 }
 div#delete-alert {
     display: none;
@@ -50,17 +50,6 @@ div.list-group a.active {
     background-image: none;
     background-color: #76999B !important;
 }
-/*
-div.panel {
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-}
-div.panel-heading {
-    border-radius: 0;
-    border: none;
-}
-*/
 div.panel-heading i {
     margin-right: 6px;
 }

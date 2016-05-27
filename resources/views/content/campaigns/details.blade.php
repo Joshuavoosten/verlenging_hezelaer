@@ -23,7 +23,7 @@
         </a>
         <div class="clearfix"></div>
     </div>
-    <div class="panel-body bg-concrete">
+    <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
                 <h4>{{ __('Current Contract(s)') }}</h4>
@@ -108,7 +108,7 @@
     <div class="panel-heading">
         <h3 class="panel-title">{{ __('Customer List') }} ({{ $oCampaign->countCustomers() }} {{ __('customers') }})</h3>
     </div>
-    <div class="panel-body bg-concrete">
+    <div class="panel-body">
         <div class="row">
             <div class="col-md-12">
             <h4>{{ __('Customers without saving') }}</h4>
@@ -155,35 +155,81 @@
         </div>
     </div>
 </div>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">{{ __('Schedule Campaign') }}</h3>
+@if($oCampaign->status == \App\Models\Campaign::STATUS_SCHEDULED)
+    {{ Form::open(['url' => '/campaigns/details/'.$oCampaign->id, 'method' => 'post']) }}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ __('Schedule Campaign') }}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-1 text-center">
+                        {{ Form::radio('schedule', 'now', (!$oCampaign->scheduled)) }}
+                    </div>
+                    <div class="col-md-11">
+                        {{ Form::label('schedule', __('Send the campaign immediately')) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1 text-center">
+                        {{ Form::radio('schedule', 'planned', ($oCampaign->scheduled)) }}
+                    </div>
+                    <div class="col-md-11">
+                        {{ Form::label('schedule', __('Schedule the campaign at ...')) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-11">
+                        <div class="row">
+                            <div class="col-md-1">{{ __('Day') }}</div>
+                            <div class="col-md-2">{{ __('Month') }}</div>
+                            <div class="col-md-1">{{ __('Year') }}</div>
+                            <div class="col-md-1">{{ __('Hour') }}</div>
+                            <div class="col-md-1">{{ __('Minute') }}</div>
+                        </div>
+                        <div style="height: 10px"></div>
+                        <div class="row">
+                            <div class="col-md-1">
+                                {{ Form::selectRange('day', 1, 31, $iScheduleDay) }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ Form::selectMonth('month', $iScheduleMonth) }}
+                            </div>
+                            <div class="col-md-1">
+                                {{ Form::selectYear('year', date('Y'), date('Y') + 1), $iScheduleYear }}
+                            </div>
+                            <div class="col-md-1">
+                                {{ Form::select('hour', $aHours, $sScheduleHour) }}
+                            </div>
+                            <div class="col-md-1">
+                                {{ Form::select('minute', $aMinutes, $sScheduleMinute) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="height: 10px"></div>
+        {{ Form::submit(__('Campaign confirm and finalize'), ['class' => 'btn btn-custom']) }}
+    {!! Form::close() !!}
+@else
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ __('Campaign Sent') }}</h3>
+        </div>
+        <div class="panel-body bg-concrete">
+            <div class="row">
+                <div class="col-md-1">
+                    <i class="fa fa-calendar" style="margin-right: 5px"></i>
+                    {{ __('Date') }}
+                </div>
+                <div class="col-md-11">
+                    {{ date('d-m-Y H:i', strtotime($oCampaign->scheduled_at)) }}
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="panel-body bg-concrete">
-        <div class="row">
-            <div class="col-md-1 text-center">
-                {{ Form::radio('schedule', 'now') }}
-            </div>
-            <div class="col-md-11">
-                {{ Form::label('schedule', __('Send the campaign immediately')) }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-1 text-center">
-                {{ Form::radio('schedule', 'planned') }}
-            </div>
-            <div class="col-md-11">
-                {{ Form::label('schedule', __('Schedule the campaign at ...')) }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-1"></div>
-            <div class="col-md-11">
-                @todo
-            </div>
-        </div>
-    </div>
-</div>
-<div style="height: 10px"></div>
-{{ Form::submit(__('Campaign confirm and finalize'), ['class' => 'btn btn-custom']) }}
+    <div style="height: 10px"></div>
+@endif
 @endsection

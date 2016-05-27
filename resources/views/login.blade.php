@@ -6,7 +6,7 @@
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading">{{ __('Login') }}</div>
-                <div class="panel-body bg-concrete">
+                <div class="panel-body">
                     {!! Form::open(['url' => '/login', 'method' => 'post', 'class' => 'form-horizontal', 'role' => 'form']) !!}
                         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                             {{ Form::label('email', __('Email'), ['class' => 'col-md-4 control-label']) }}

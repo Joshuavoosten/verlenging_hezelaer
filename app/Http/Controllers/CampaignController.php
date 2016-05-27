@@ -20,17 +20,17 @@ class CampaignController extends Controller
 {
     public function index()
     {
-        $iCountPlanned = ModelCampaign::countPlanned();
+        $iCountScheduled = ModelCampaign::countScheduled();
         $iCountSent = ModelCampaign::countSent();
 
         return view('content.campaigns.index', [
-            'iCountPlanned' => $iCountPlanned,
+            'iCountScheduled' => $iCountScheduled,
             'iCountSent' => $iCountSent,
             'success' => Session::get('success'),
         ]);
     }
 
-    public function jsonPlanned()
+    public function jsonScheduled()
     {
         $oDB = DB::table('campaigns')
             ->select(
@@ -40,12 +40,12 @@ class CampaignController extends Controller
                 'current_profile_code',
                 'current_agreement',
                 'current_expiration_date',
-                'planned_at',
+                'scheduled_at',
                 'created_at',
                 'updated_at',
                 DB::RAW('(SELECT COUNT(id) FROM deals AS d WHERE d.campaign_id = campaigns.id) AS count_customers') 
             )
-            ->where('status', '=', ModelCampaign::STATUS_PLANNED)
+            ->where('status', '=', ModelCampaign::STATUS_SCHEDULED)
         ;
 
         if (Input::get('search')) {
@@ -80,7 +80,7 @@ class CampaignController extends Controller
                     'current_agreement' => $o->current_agreement,
                     'current_expiration_date' => ($o->current_expiration_date ? date('d-m-Y', strtotime($o->current_expiration_date)) : ''),
                     'count_customers' => $o->count_customers,
-                    'planned_at' => ($o->planned_at ? date('d-m-Y H:i', strtotime($o->planned_at)) : ''),
+                    'scheduled_at' => ($o->scheduled_at ? date('d-m-Y H:i', strtotime($o->scheduled_at)) : ''),
                     'created_at' => ($o->created_at ? date('d-m-Y H:i', strtotime($o->created_at)) : ''),
                     'updated_at' => ($o->updated_at ? date('d-m-Y H:i', strtotime($o->updated_at)) : ''),
                 ];

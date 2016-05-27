@@ -17,7 +17,7 @@
             {{ __('Users') }}
         </h3>
     </div>
-    <div class="panel-body bg-concrete">
+    <div class="panel-body">
         <div class="pull-left">
             <h3>{{ __('Overview') }}</h3>
         </div>

@@ -6,7 +6,7 @@
         <i class="fa fa-dashboard"></i>
         Dashboard
     </div>
-    <div class="panel-body bg-concrete">
+    <div class="panel-body">
         Welkom in het Dashboard van Hezelaer .
     </div>
 </div>

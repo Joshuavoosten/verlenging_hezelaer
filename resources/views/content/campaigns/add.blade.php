@@ -17,7 +17,7 @@
         </a>
         <div class="clearfix"></div>
     </div>
-    <div class="panel-body bg-concrete">
+    <div class="panel-body">
         {!! Form::open(['url' => '/campaigns/add', 'method' => 'post']) !!}
             @include('errors.validation')
             <div class="row">
