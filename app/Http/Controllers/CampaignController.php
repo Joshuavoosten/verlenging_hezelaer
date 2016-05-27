@@ -395,6 +395,15 @@ class CampaignController extends Controller
                         foreach ($a as $o) {
                             $oDeal = new ModelDeal;
 
+                            $iCalculation = ModelPrice::getCalculation($aPrices);
+
+                            $estimate_price_1_year = ModelDeal::calculateCosts($iCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_saving_1_year = ModelDeal::calculateSaving($iCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_price_2_year = ModelDeal::calculateCosts($iCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_saving_2_year = ModelDeal::calculateSaving($iCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_price_3_year = ModelDeal::calculateCosts($iCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_saving_3_year = ModelDeal::calculateSaving($iCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+
                             $oDeal->campaign_id = $oCampaign->id;
                             $oDeal->client_name = $o->client_name;
                             $oDeal->client_code =  $o->client_code;
@@ -419,8 +428,14 @@ class CampaignController extends Controller
                             $oDeal->label = $o->label;
                             $oDeal->agent = $o->agent;
                             $oDeal->groep = $o->groep;
-                            $oDeal->price_normal = $o->new_price_normal;
-                            $oDeal->price_low = $o->new_price_low;
+                            $oDeal->price_normal = $o->price_normal;
+                            $oDeal->price_low = $o->price_low;
+                            $oDeal->estimate_price_1_year = $estimate_price_1_year;
+                            $oDeal->estimate_saving_1_year = $estimate_saving_1_year;
+                            $oDeal->estimate_price_2_year = $estimate_price_2_year;
+                            $oDeal->estimate_saving_2_year = $estimate_saving_2_year;
+                            $oDeal->estimate_price_3_year = $estimate_price_3_year;
+                            $oDeal->estimate_saving_3_year = $estimate_saving_3_year;
                             $oDeal->new_price_enkel = null;
                             $oDeal->new_price_normal = null;
                             $oDeal->new_price_low = null;
@@ -505,7 +520,7 @@ class CampaignController extends Controller
     {
         $oCampaign = new ModelCampaign();
 
-        $oCampaign = $Campaign->findOrFail($id);
+        $oCampaign = $oCampaign->findOrFail($id);
 
         $aResponse = [
             'status' => 'OK',
@@ -517,6 +532,8 @@ class CampaignController extends Controller
         ];
 
         $oCampaign->delete();
+
+        DB::table('deals')->where('campaign_id', '=', $id)->delete();
 
         return response()->json($aResponse);
     }
@@ -638,84 +655,5 @@ class CampaignController extends Controller
         fclose($fp);
 
         return response()->download($pathToFile)->deleteFileAfterSend(true);
-    }
-
-    public function detailsJsonCustomersWithoutSaving(Request $request, $id) {
-        $oDB = DB::table('deals')
-            ->select(
-                'id',
-                'client_name',
-                'client_code',
-                'code',
-                'end_agreement',
-                'aanhef_commercieel'
-            )
-            ->where('campaign_id', '=', $id)
-        ;
-
-        if (Input::get('search')) {
-            $oDB->whereRaw('MATCH(client_name,client_code,code,aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
-        }
-
-        if (Input::get('sort') && Input::get('order')) {
-            $oDB->orderBy(Input::get('sort'), Input::get('order'));
-        } else {
-            $oDB->orderBy('client_name');
-        }
-
-        $total = $oDB->count();
-
-        $offset = Input::get('offset', 0);
-
-        $limit = Input::get('limit', 25);
-
-        $oDB->skip($offset)->take($limit);
-
-        $a = $oDB->get();
-
-        $aRows = [];
-
-        if (count($a) > 0) {
-            foreach ($a as $o) {
-                $aRows[] = [
-                    'id' => $o->id,
-                    'client_name' => $o->client_name,
-                    'client_code' => $o->client_code,
-                    'code' => $o->code,
-                    'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
-                    'aanhef_commercieel' => $o->aanhef_commercieel
-                ];
-            }
-        }
-
-        $aResponse = [
-            'total' => $total,
-            'rows' => $aRows,
-        ];
-
-        return response()->json($aResponse);
-    }
-
-    public function detailsJsonCustomersWithSavings() {
-        // @todo
-    }
-
-    public function detailsJsonCustomersWithCurrentOffer() {
-        // @todo
-    }
-
-    public function details(Request $request, $id)
-    {
-         $oCampaign = new ModelCampaign();
-
-         $oCampaign = $oCampaign->find($id);
-
-         if (!$oCampaign) {
-             App::abort(404, 'Campaign Not Found.');
-         }
-
-         return View::make('content.campaigns.details', [
-             'oCampaign' => $oCampaign
-         ]);
     }
 }
