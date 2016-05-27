@@ -40,13 +40,13 @@
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_in_a_group') ? 'has-error' : '') }}">
                         {{ Form::label('current_in_a_group', __('In a group')) }}
-                        {{ Form::select('current_in_a_group', $aCurrentInAGroup, old('current_in_a_group'), ['id' => 'current_in_a_group', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                        {{ Form::select('current_in_a_group', $aCurrentInAGroup, old('current_in_a_group'), ['id' => 'current_in_a_group', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'disabled']) }}
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_under_an_agent') ? 'has-error' : '') }}">
                         {{ Form::label('current_under_an_agent', __('Under an agent')) }}
-                        {{ Form::select('current_under_an_agent', $aCurrentUnderAnAgent, old('current_under_an_agent'), ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                        {{ Form::select('current_under_an_agent', $aCurrentUnderAnAgent, old('current_under_an_agent'), ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'disabled']) }}
                     </div>
                 </div>
             </div>

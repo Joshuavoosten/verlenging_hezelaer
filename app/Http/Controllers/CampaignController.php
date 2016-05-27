@@ -303,11 +303,6 @@ class CampaignController extends Controller
                             'client_name',
                             'client_code',
                             'ean',
-                            'street',
-                            'number',
-                            'nr_conn',
-                            'zip',
-                            'city',
                             'code',
                             'super_contract_number',
                             'syu_normal',
@@ -316,34 +311,42 @@ class CampaignController extends Controller
                             'email_commercieel',
                             'telnr_commercieel',
                             'aanhef_commercieel',
+                            'fadr_street',
+                            'fadr_nr',
+                            'fadr_nr_conn',
+                            'fadr_zip',
+                            'fadr_city',
+                            'cadr_street',
+                            'cadr_nr',
+                            'cadr_nr_conn',
+                            'cadr_zip',
+                            'cadr_city',
                             'vastrecht',
-                            'accountmanager',
                             'auto_renewal',
-                            'segment',
-                            'label',
-                            'agent',
-                            'groep',
+                            'accountmanager',
+                            'klantsegment',
+                            'category1',
+                            'category2',
+                            'category3',
+                            'consument',
                             'price_normal',
-                            'price_low',
-                            'new_price_enkel',
-                            'new_price_normal',
-                            'new_price_low',
-                            'jaarlijkse_besparing'
+                            'price_low'
                         )
                     ;
 
                     // Segment
 
                     if (Input::get('current_segment')) {
-                        $oDB->where('segment', '=', Input::get('current_segment'));
+                        $oDB->where('klantsegment', '=', Input::get('current_segment'));
                         if (Input::get('current_segment') == 'Zakelijk') {
-                            $oDB->orWhereNull('segment');
-                            $oDB->orWhere('segment', '=', '');
+                            $oDB->orWhereNull('klantsegment');
+                            $oDB->orWhere('klantsegment', '=', '');
                         }
                     }
 
                     // In a group
 
+                    /*
                     if (Input::get('current_in_a_group') == 'Y') {
                         $oDB->whereNotNull('groep');
                         $oDB->where('groep', '!=', '');
@@ -353,9 +356,11 @@ class CampaignController extends Controller
                         $oDB->whereNull('groep');
                         $oDB->orWhere('groep', '=', '');
                     }
+                    */
 
                     // Under an agent
 
+                    /*
                     if (Input::get('current_under_an_agent') == 'Y') {
                         $oDB->whereNotNull('agent');
                         $oDB->where('agent', '!=', '');
@@ -365,6 +370,7 @@ class CampaignController extends Controller
                         $oDB->whereNull('agent');
                         $oDB->orWhere('agent', '=', '');
                     }
+                    */
 
                     // Profile Code
                     $oDB->where('code', '=', Input::get('current_profile_code'));
@@ -406,13 +412,8 @@ class CampaignController extends Controller
 
                             $oDeal->campaign_id = $oCampaign->id;
                             $oDeal->client_name = $o->client_name;
-                            $oDeal->client_code =  $o->client_code;
+                            $oDeal->client_code = $o->client_code;
                             $oDeal->ean = $o->ean;
-                            $oDeal->street = $o->street;
-                            $oDeal->number = $o->number;
-                            $oDeal->nr_conn = $o->nr_conn;
-                            $oDeal->zip = $o->zip;
-                            $oDeal->city = $o->city;
                             $oDeal->code = $o->code;
                             $oDeal->super_contract_number = $o->super_contract_number;
                             $oDeal->syu_normal = $o->syu_normal;
@@ -421,13 +422,24 @@ class CampaignController extends Controller
                             $oDeal->email_commercieel = $o->email_commercieel;
                             $oDeal->telnr_commercieel = $o->telnr_commercieel;
                             $oDeal->aanhef_commercieel = $o->aanhef_commercieel;
+                            $oDeal->fadr_street = $o->fadr_street;
+                            $oDeal->fadr_nr = $o->fadr_nr;
+                            $oDeal->fadr_nr_conn = $o->fadr_nr_conn;
+                            $oDeal->fadr_zip = $o->fadr_zip;
+                            $oDeal->fadr_city = $o->fadr_city;
+                            $oDeal->cadr_street = $o->cadr_street;
+                            $oDeal->cadr_nr = $o->cadr_nr;
+                            $oDeal->cadr_nr_conn = $o->cadr_nr_conn;
+                            $oDeal->cadr_zip = $o->cadr_zip;
+                            $oDeal->cadr_city = $o->cadr_city;
                             $oDeal->vastrecht = $o->vastrecht;
-                            $oDeal->accountmanager = $o->accountmanager;
                             $oDeal->auto_renewal = $o->auto_renewal;
-                            $oDeal->segment = $o->segment;
-                            $oDeal->label = $o->label;
-                            $oDeal->agent = $o->agent;
-                            $oDeal->groep = $o->groep;
+                            $oDeal->accountmanager = $o->accountmanager;
+                            $oDeal->klantsegment = $o->klantsegment;
+                            $oDeal->category1 = $o->category1;
+                            $oDeal->category2 = $o->category2;
+                            $oDeal->category3 = $o->category3;
+                            $oDeal->consument = $o->consument;
                             $oDeal->price_normal = $o->price_normal;
                             $oDeal->price_low = $o->price_low;
                             $oDeal->estimate_price_1_year = $estimate_price_1_year;
@@ -545,11 +557,6 @@ class CampaignController extends Controller
                 'client_name',
                 'client_code',
                 'ean',
-                'street',
-                'number',
-                'nr_conn',
-                'zip',
-                'city',
                 'code',
                 'super_contract_number',
                 'syu_normal',
@@ -558,13 +565,24 @@ class CampaignController extends Controller
                 'email_commercieel',
                 'telnr_commercieel',
                 'aanhef_commercieel',
+                'fadr_street',
+                'fadr_nr',
+                'fadr_nr_conn',
+                'fadr_zip',
+                'fadr_city',
+                'cadr_street',
+                'cadr_nr',
+                'cadr_nr_conn',
+                'cadr_zip',
+                'cadr_city',
                 'vastrecht',
-                'accountmanager',
                 'auto_renewal',
-                'segment',
-                'label',
-                'agent',
-                'groep',
+                'accountmanager',
+                'klantsegment',
+                'category1',
+                'category2',
+                'category3',
+                'consument',
                 'price_normal',
                 'price_low',
                 'new_price_enkel',
@@ -586,11 +604,6 @@ class CampaignController extends Controller
             'client_name',
             'client_code',
             'ean',
-            'street',
-            'number',
-            'nr_conn',
-            'zip',
-            'city',
             'code',
             'super_contract_number',
             'syu_normal',
@@ -599,13 +612,24 @@ class CampaignController extends Controller
             'email_commercieel',
             'telnr_commercieel',
             'aanhef_commercieel',
+            'fadr_street',
+            'fadr_nr',
+            'fadr_nr_conn',
+            'fadr_zip',
+            'fadr_city',
+            'cadr_street',
+            'cadr_nr',
+            'cadr_nr_conn',
+            'cadr_zip',
+            'cadr_city',
             'vastrecht',
-            'accountmanager',
             'auto_renewal',
-            'segment',
-            'label',
-            'agent',
-            'groep',
+            'accountmanager',
+            'klantsegment',
+            'category1',
+            'category2',
+            'category3',
+            'consument',
             'price_normal',
             'price_low',
             'new_price_enkel',
@@ -621,11 +645,6 @@ class CampaignController extends Controller
                 'client_name' => $v->client_name,
                 'client_code' => $v->client_code,
                 'ean' => $v->ean,
-                'street' => $v->street,
-                'number' => $v->number,
-                'nr_conn' => $v->nr_conn,
-                'zip' => $v->zip,
-                'city' => $v->city,
                 'code' => $v->code,
                 'super_contract_number' => $v->super_contract_number,
                 'syu_normal' => $v->syu_normal,
@@ -634,13 +653,24 @@ class CampaignController extends Controller
                 'email_commercieel' => $v->email_commercieel,
                 'telnr_commercieel' => $v->telnr_commercieel,
                 'aanhef_commercieel' => $v->aanhef_commercieel,
+                'fadr_street' => $v->fadr_street,
+                'fadr_nr' => $v->fadr_nr,
+                'fadr_nr_conn' => $v->fadr_nr_conn,
+                'fadr_zip' => $v->fadr_zip,
+                'fadr_city' => $v->fadr_city,
+                'cadr_street' => $v->cadr_street,
+                'cadr_nr' => $v->cadr_nr,
+                'cadr_nr_conn' => $v->cadr_nr_conn,
+                'cadr_zip' => $v->cadr_zip,
+                'cadr_city' => $v->cadr_city,
                 'vastrecht' => $v->vastrecht,
-                'accountmanager' => $v->accountmanager,
                 'auto_renewal' => $v->auto_renewal,
-                'segment' => $v->segment,
-                'label' => $v->label,
-                'agent' => $v->agent,
-                'groep' => $v->groep,
+                'accountmanager' => $v->accountmanager,
+                'klantsegment' => $v->klantsegment,
+                'category1' => $v->category1,
+                'category2' => $v->category2,
+                'category3' => $v->category3,
+                'consument' => $v->consument,
                 'price_normal' => $v->price_normal,
                 'price_low' => $v->price_low,
                 'new_price_enkel' => $v->new_price_enkel,
