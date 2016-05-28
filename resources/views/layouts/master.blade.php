@@ -34,10 +34,12 @@
     <body>
         <div class="container-fluid">
             @include('partials.nav')
+            <!--
             <div class="menu col-md-2">
                 @include('partials.menu')
             </div>
-            <div class="content col-md-10">
+            -->
+            <div class="content col-md-12">
                 @yield('content')
             </div>
             <div class="clearfix">

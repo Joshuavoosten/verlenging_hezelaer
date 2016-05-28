@@ -6,6 +6,20 @@
             </a>
         </div>
         @if (Auth::check())
+            <ul class="nav navbar-nav navbar-left">
+                <li>
+                    <a href="/campaigns">
+                        <i class="fa fa-refresh"></i>
+                        {{ __('Campaigns') }}
+                    </a>
+                </li>
+                <li>
+                    <a href="/users">
+                        <i class="fa fa-users"></i>
+                        {{ __('Users') }}
+                    </a>
+                </li>
+            </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
