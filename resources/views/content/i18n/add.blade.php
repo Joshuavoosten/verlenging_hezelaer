@@ -39,20 +39,8 @@
                             {{ Form::label('destination_string', __('Destination String')) }}
                             {{ Form::textarea('destination_string', old('destination_string'), ['class' => 'form-control', 'rows' => 3]) }}
                         </div>
-                        <div class="form-group">
-                            {{ Form::checkbox('website', 1, old('website'), ['id' => 'website', 'style' => 'margin-right: 10px']) }}
-                            {{ Form::label('website', 'Website') }}
-                        </div>
-                        <div class="form-group">
-                            {{ Form::checkbox('cms', 1, old('cms'), ['id' => 'cms', 'style' => 'margin-right: 10px']) }}
-                            {{ Form::label('cms', 'CMS') }}
-                        </div>
-                        <div class="form-group">
-                            {{ Form::checkbox('javascript', 1, old('javascript'), ['id' => 'javascript', 'style' => 'margin-right: 10px']) }}
-                            {{ Form::label('javascript', 'JavaScript') }}
-                        </div>
                         <div style="height: 15px"></div>
-                        {{ Form::submit(__('Save'), ['class' => 'btn btn-success']) }}
+                        {{ Form::submit(__('Save'), ['class' => 'btn btn-custom']) }}
                     {!! Form::close() !!}
                 </div>
             </div>

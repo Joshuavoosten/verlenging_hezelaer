@@ -1,26 +1,15 @@
 @extends('layouts.master')
 
 @section('content')
-<ol class="breadcrumb">
-    <li>
-        <i class="fa fa-folder-open" style="margin-right: 5px"></i>
-        <a href="/users">{{ __('Users') }}</a>
-    </li>
-    <li class="active">{{ __('Edit User') }}</li>
-</ol>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title pull-left">{{ __('Edit User') }}</h3>
-        <a href="/users" class="btn btn-default pull-right">
-            <i class="fa fa-chevron-left" style="margin-right: 5px"></i>
-            {{ __('Back') }}
-        </a>
-        <div class="clearfix"></div>
+        <h3 class="panel-title">{{ __('My Account') }}</h3>
     </div>
     <div class="panel-body">
+        @include('alerts.success')
         <div class="row">
             <div class="col-md-6">
-                {{ Form::model($oUser, ['route' => ['users.edit', $oUser->id]]) }}
+                {{ Form::model($oUser, ['route' => ['account.edit', $oUser->id]]) }}
                     @include('errors.validation')
                     <div class="form-group {{ ($errors->first('name') ? 'has-error' : '') }}">
                         {{ Form::label('name', __('Name')) }}

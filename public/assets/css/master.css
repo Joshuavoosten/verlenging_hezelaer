@@ -31,7 +31,7 @@ nav i {
     margin-right: 6px;
 }
 hr {
-    border-color: #C0C0C0;
+    border-color: #DFDFDF;
 }
 ol.breadcrumb i {
     margin-right: 6px;
@@ -71,4 +71,7 @@ span.label {
 }
 .odd {
     background-color: #EFEFEF;
+}
+.label-custom {
+    background-color: #76999b;
 }

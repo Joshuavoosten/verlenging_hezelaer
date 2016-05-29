@@ -261,7 +261,59 @@ class DetailsController extends Controller
     }
 
     public function jsonCustomersWithCurrentOffer(Request $request, $id) {
-        
+        $oDB = DB::table('deals')
+            ->select(
+                'id',
+                'client_name',
+                'client_code',
+                'code',
+                'end_agreement',
+                'aanhef_commercieel'
+            )
+            ->where('campaign_id', '!=', $id)
+        ;
+
+        if (Input::get('search')) {
+            $oDB->whereRaw('MATCH(client_name,client_code,code,aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
+        }
+
+        if (Input::get('sort') && Input::get('order')) {
+            $oDB->orderBy(Input::get('sort'), Input::get('order'));
+        } else {
+            $oDB->orderBy('client_name');
+        }
+
+        $total = $oDB->count();
+
+        $offset = Input::get('offset', 0);
+
+        $limit = Input::get('limit', 25);
+
+        $oDB->skip($offset)->take($limit);
+
+        $a = $oDB->get();
+
+        $aRows = [];
+
+        if (count($a) > 0) {
+            foreach ($a as $o) {
+                $aRows[] = [
+                    'id' => $o->id,
+                    'client_name' => $o->client_name,
+                    'client_code' => $o->client_code,
+                    'code' => $o->code,
+                    'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
+                    'aanhef_commercieel' => $o->aanhef_commercieel
+                ];
+            }
+        }
+
+        $aResponse = [
+            'total' => $total,
+            'rows' => $aRows,
+        ];
+
+        return response()->json($aResponse);
     }
 
 }

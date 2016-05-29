@@ -30,7 +30,7 @@ class Deal extends Model
             case ModelPrice::CALCULATION_GAS_1_RATE:
                 $new_price_gas = $aPrices['normal'];
 
-                // Kosten = ((suy_gas * new_price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
+                // Kosten = ((syu_gas * new_price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
                 $fCosts = (($syu_normal * $new_price_gas) * $iYears) + ($vastrecht * $iMonths);
 
                 return $fCosts;
@@ -41,8 +41,8 @@ class Deal extends Model
                 $new_price_low = $aPrices['low'];
                 $new_price_high = $aPrices['normal'];
 
-                // Kosten = (((suy_low * new_price_low) + (suy_high * new_price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
-                $fCosts = ((($tsyu_low * $new_price_low) + ($suy_normal * $new_price_high)) * $iYears) + ($vastrecht * $iMonths);
+                // Kosten = (((syu_low * new_price_low) + (syu_high * new_price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
+                $fCosts = ((($syu_low * $new_price_low) + ($syu_normal * $new_price_high)) * $iYears) + ($vastrecht * $iMonths);
 
                 return $fCosts;
 
@@ -51,7 +51,7 @@ class Deal extends Model
             case ModelPrice::CALCULATION_ENERGY_3_RATES:
                 $new_price_enkel = $aPrices['enkel'];
 
-                // Kosten = ((suy_normal * new_price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
+                // Kosten = ((syu_normal * new_price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
                 $fCosts = (($syu_normal * $new_price_enkel) * $iYears) + ($vastrecht * $iMonths);
 
                 return $fCosts;
@@ -79,8 +79,8 @@ class Deal extends Model
             case ModelPrice::CALCULATION_GAS_1_RATE:
                 $new_price_gas = $aPrices['normal'];
 
-                // Besparing = (((suy_gas * new_price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
-                //           - (((suy_gas * price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
+                // Besparing = (((syu_gas * new_price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
+                //           - (((syu_gas * price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
 
                 $fCostsOld = ((($syu_normal * $new_price_gas) * $iYears) + ($vastrecht * $iMonths));
                 $fCostsNew = ((($syu_normal * $price_normal) * $iYears) + ($vastrecht * $iMonths));
@@ -98,10 +98,10 @@ class Deal extends Model
                 $new_price_low = $aPrices['low'];
                 $new_price_high = $aPrices['normal'];
 
-                // Besparing = ((((suy_low * price_low) + (suy_high * price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
-                // - ((((suy_low * new_price_low) + (suy_high * new_price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
+                // Besparing = ((((syu_low * price_low) + (syu_high * price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
+                // - ((((syu_low * new_price_low) + (syu_high * new_price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
 
-                $fCostsOld = (((($syu_low * $price_low) + ($suy_normal * $price_normal)) * $iYears) + ($vastrecht * $iMonths));
+                $fCostsOld = (((($syu_low * $price_low) + ($syu_normal * $price_normal)) * $iYears) + ($vastrecht * $iMonths));
                 $fCostsNew = ((($syu_low * $new_price_low) + ($syu_normal * $new_price_high) * $iYears) + ($vastrecht * $iMonths));
                 $fSaving = $fCostsOld - $fCostsNew;
 
@@ -116,8 +116,8 @@ class Deal extends Model
             case ModelPrice::CALCULATION_ENERGY_3_RATES:
                 $new_price_enkel = $aPrices['enkel'];
 
-                // Besparing = (((suy_normal * new_price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
-                //           - (((suy_normal * price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
+                // Besparing = (((syu_normal * new_price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
+                //           - (((syu_normal * price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
 
                 $fCostsOld = ((($syu_normal * $new_price_enkel) * $iYears) + ($vastrecht * $iMonths));
                 $fCostsNew = ((($syu_normal * $price_normal) * $iYears) + ($vastrecht * $iMonths));

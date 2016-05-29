@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App;
+use App\Models\Language AS ModelLanguage;
 use View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

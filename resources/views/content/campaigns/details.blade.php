@@ -139,7 +139,6 @@
                 </table>
                 <div style="height: 10px"></div>
                 <h4>{{ __('Customers with a current offer') }}</h4>
-                @todo
                 <table id="table_customers_with_current_offer" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>

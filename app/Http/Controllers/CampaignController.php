@@ -166,8 +166,10 @@ class CampaignController extends Controller
 
         // Segments (current)
         $aCurrentSegments = [
-            'Zakelijk' => 'Zakelijk',
-            'Consument' => 'Consument'
+            'A' => 'A',
+            'B' => 'B',
+            'C' => 'C',
+            'D' => 'D'
         ];
 
         // In a group (current)
@@ -452,6 +454,7 @@ class CampaignController extends Controller
                             $oDeal->new_price_normal = null;
                             $oDeal->new_price_low = null;
                             $oDeal->jaarlijkse_besparing = null;
+                            $oDeal->token = sha1(openssl_random_pseudo_bytes(32));
 
                             $oDeal->save();
                         }

@@ -29,6 +29,12 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
+                            <a href="/my-account">
+                                <i class="fa fa-user"></i>
+                                {{ __('My Account') }}
+                            </a>
+                        </li>
+                        <li>
                             <a href="/change-password">
                                 <i class="fa fa-lock"></i>
                                 {{ __('Change Password') }}

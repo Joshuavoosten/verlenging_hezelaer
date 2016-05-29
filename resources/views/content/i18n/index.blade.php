@@ -9,18 +9,19 @@
 
 @section('content')
 {!! csrf_field() !!}
-<div class="panel panel-primary">
+<div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
             <i class="fa fa-flag"></i>
             {{ __('I18n') }}
         </h3>
     </div>
-    <div class="panel-body bg-concrete">
-        <a href="/i18n/add" class="btn btn-success">
+    <div class="panel-body">
+        <a href="/i18n/add" class="btn btn-default pull-right">
             <i class="fa fa-plus" style="margin-right: 5px"></i>
             {{ __('Add I18n') }}
         </a>
+        <div class="clearfix"></div>
         <div style="height: 15px"></div>
         @include('alerts.success')
         @include('alerts.delete')

@@ -6,6 +6,7 @@
 <script src="{{ URL::asset('assets/js/formatters/delete.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/edit.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/email.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/language.js') }}"></script>
 @endsection
 
 @section('content')
@@ -34,9 +35,11 @@
             <thead>
                 <tr>
                     <th data-field="name" data-sortable="true">{{ __('Name') }}</th>
+                    <th data-field="gender" data-sortable="true">{{ __('Gender') }}</th>
                     <th data-field="email" data-formatter="emailFormatter" data-sortable="true">{{ __('Email') }}</th>
-                    <th data-field="created_at" data-sortable="true" data-align="center">{{ __('Created') }}</th>
-                    <th data-field="updated_at" data-sortable="true" data-align="center">{{ __('Updated') }}</th>
+                    <th data-field="language" data-formatter="languageFormatter" data-align="center" data-sortable="true" class="col-md-1">{{ __('Language') }}</th>
+                    <th data-field="created_at" data-sortable="true" data-align="center" class="col-md-2">{{ __('Created') }}</th>
+                    <th data-field="updated_at" data-sortable="true" data-align="center" class="col-md-2">{{ __('Updated') }}</th>
                     <th data-field="action_edit" data-sortable="false" data-formatter="editFormatter" data-align="center" class="col-md-1"></th>
                     <th data-field="action_delete" data-sortable="false" data-formatter="deleteFormatter" data-align="center" class="col-md-1"></th>
                 </tr>

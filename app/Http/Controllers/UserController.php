@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Language as ModelLanguage;
 use App\User as ModelUser;
 use Auth;
 use DB;
@@ -25,25 +26,44 @@ class UserController extends Controller
 
     public function json()
     {
-        $oDB = DB::table('users')
+        $oDB = DB::table('users AS u')
             ->select(
-                'id',
-                'name',
-                'email',
-                'admin',
-                'created_at',
-                'updated_at'
+                'u.id',
+                'u.name',
+                'u.gender',
+                'u.email',
+                'u.admin',
+                'u.created_at',
+                'u.updated_at',
+                'l.flag AS language'
             )
+            ->join('languages AS l', 'l.id', '=', 'u.language_id')
         ;
 
         if (Input::get('search')) {
-            $oDB->whereRaw('MATCH(name,email) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
+            $oDB->whereRaw('MATCH(u.name,u.email) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
 
         if (Input::get('sort') && Input::get('order')) {
-            $oDB->orderBy(Input::get('sort'), Input::get('order'));
+            switch(Input::get('sort')) {
+                case 'name':
+                    $oDB->orderBy('u.name', Input::get('order'));
+                    break;
+                case 'gender':
+                    $oDB->orderBy('u.gender', Input::get('order'));
+                    break;
+                case 'email':
+                    $oDB->orderBy('u.email', Input::get('order'));
+                    break;
+                case 'created_at':
+                    $oDB->orderBy('u.created_at', Input::get('order'));
+                    break;
+                case 'updated_at':
+                    $oDB->orderBy('u.updated_at', Input::get('order'));
+                    break;
+            }
         } else {
-            $oDB->orderBy('name');
+            $oDB->orderBy('u.name');
         }
 
         $total = $oDB->count();
@@ -60,13 +80,29 @@ class UserController extends Controller
 
         if (count($a) > 0) {
             foreach ($a as $o) {
+                $sGender = null;
+
+                switch ($o->gender) {
+                    case ModelUser::GENDER_UNKNOWN:
+                        $sGender = __('Unknown');
+                        break;
+                    case ModelUser::GENDER_MALE:
+                        $sGender = __('Male');
+                        break;
+                    case ModelUser::GENDER_FEMALE:
+                        $sGender = __('Female');
+                        break;
+                }
+
                 $aRows[] = [
                     'id' => $o->id,
                     'name' => $o->name,
+                    'gender' => $sGender,
                     'email' => $o->email,
                     'admin' => $o->admin,
-                    'created_at' => ($o->created_at ? date('d-m-Y H:i', strtotime($o->created_at)) : ''),
-                    'updated_at' => ($o->updated_at ? date('d-m-Y H:i', strtotime($o->updated_at)) : ''),
+                    'created_at' => ($o->created_at ? date(Auth::user()->date_format.' H:i', strtotime($o->created_at)) : ''),
+                    'updated_at' => ($o->updated_at ? date(Auth::user()->date_format.' H:i', strtotime($o->updated_at)) : ''),
+                    'language' => $o->language
                 ];
             }
         }
@@ -85,16 +121,35 @@ class UserController extends Controller
 
         $aErrors = [];
 
+        $aGenders = [
+            ModelUser::GENDER_UNKNOWN => __('Unknown'),
+            ModelUser::GENDER_MALE => __('Male'),
+            ModelUser::GENDER_FEMALE => __('Female'),
+        ];
+
+        $aLanguages = DB::table('languages')->pluck('name', 'id');
+
+        foreach ($aLanguages as $k => $v) {
+            $aLanguages[$k] = __($v);
+        }
+
         if ($request->isMethod('post')) {
             $aMessages = [
                 'name.required' => sprintf(__('%s is required.'), __('Name')),
+                'gender.required' => sprintf(__('%s is required.'), __('Gender')),
                 'email.required' => sprintf(__('%s is required.'), __('Email')),
                 'email.email' => sprintf(__('%s is invalid.'), __('Email')),
+                'email.unique' => sprintf(__('Email is already registered.'), __('Email')),
+                'date_format.required' => sprintf(__('%s is required.'), __('Date Format')),
+                'language.required' => sprintf(__('%s is required.'), __('Language')),
             ];
 
             $oValidator = Validator::make(Input::all(), [
                 'name' => 'required',
+                'gender' => 'required',
                 'email' => 'required|email|unique:users',
+                'date_format' => 'required',
+                'language' => 'required',
             ], $aMessages);
 
             if ($oValidator->fails()) {
@@ -106,12 +161,16 @@ class UserController extends Controller
 
                 $oUser = new ModelUser();
 
+                $oUser->language_id = Input::get('language_id');
                 $oUser->name = Input::get('name');
+                $oUser->gender = Input::get('gender');
                 $oUser->email = Input::get('email');
 
                 if ($password) {
                     $oUser->password = Hash::make($password);
                 }
+
+                $oUser->date_format = Input::get('date_format');
 
                 $oUser->save();
 
@@ -126,7 +185,11 @@ class UserController extends Controller
             }
         }
 
-        return View::make('content.users.add')->withErrors($aErrors);
+        return View::make('content.users.add', [
+            'aGenders' => $aGenders,
+            'aDateFormats' => ModelUser::$aDateFormats,
+            'aLanguages' => $aLanguages
+        ])->withErrors($aErrors);
     }
 
     public function edit(Request $request, $id)
@@ -137,10 +200,25 @@ class UserController extends Controller
 
         $aErrors = [];
 
+        $aGenders = [
+            ModelUser::GENDER_UNKNOWN => __('Unknown'),
+            ModelUser::GENDER_MALE => __('Male'),
+            ModelUser::GENDER_FEMALE => __('Female'),
+        ];
+
+        $aLanguages = DB::table('languages')->pluck('name', 'id');
+
+        foreach ($aLanguages as $k => $v) {
+            $aLanguages[$k] = __($v);
+        }
+
         if ($request->isMethod('post')) {
             $aRules = [
                 'name' => 'required',
-                'email' => 'required|email',
+                'gender' => 'required',
+                'email' => 'required|email|unique:users,email,'.$oUser->id,
+                'date_format' => 'required',
+                'language_id' => 'required',
             ];
 
             if (Input::get('email') != $oUser->email) {
@@ -149,8 +227,12 @@ class UserController extends Controller
 
             $aMessages = [
                 'name.required' => sprintf(__('%s is required.'), __('Name')),
+                'gender.required' => sprintf(__('%s is required.'), __('Gender')),
                 'email.required' => sprintf(__('%s is required.'), __('Email')),
                 'email.email' => sprintf(__('%s is invalid.'), __('Email')),
+                'email.unique' => sprintf(__('Email is already registered.'), __('Email')),
+                'date_format.required' => sprintf(__('%s is required.'), __('Date Format')),
+                'language_id.required' => sprintf(__('%s is required.'), __('Language')),
             ];
 
             $oValidator = Validator::make(Input::all(), $aRules, $aMessages);
@@ -163,10 +245,22 @@ class UserController extends Controller
                 $password = Input::get('password');
 
                 $oUser->name = Input::get('name');
+                $oUser->gender = Input::get('gender');
                 $oUser->email = Input::get('email');
 
                 if ($password) {
                     $oUser->password = Hash::make($password);
+                }
+
+                $oUser->date_format = Input::get('date_format');
+
+                if ($oUser->language_id != Input::get('language_id')) {
+                    $oUser->language_id = Input::get('language_id');
+                    $oLanguage = new ModelLanguage();
+                    $oLanguage = $oLanguage->find(Input::get('language_id'));
+                    if ($oUser->id == Auth::user()->id) {
+                        Session::set('locale', $oLanguage->locale);
+                    }
                 }
 
                 $oUser->save();
@@ -183,6 +277,9 @@ class UserController extends Controller
         }
 
         return View::make('content.users.edit', [
+            'aGenders' => $aGenders,
+            'aDateFormats' => ModelUser::$aDateFormats,
+            'aLanguages' => $aLanguages,
             'oUser' => $oUser,
         ])->withErrors($aErrors);
     }

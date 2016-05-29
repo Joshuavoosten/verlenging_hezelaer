@@ -29,6 +29,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/', ['middleware' => 'auth', 'uses' => 'HomeController@index']);
     Route::get('/logout', ['middleware' => 'auth', 'uses' => 'AuthController@logout']);
     Route::match(['get', 'post'], '/login', ['middleware' => 'guest', 'uses' => 'AuthController@login']);
+    Route::match(['get', 'post'], '/my-account', ['middleware' => 'auth', 'uses' => 'AccountController@edit', 'as' => 'account.edit']);
 
     // Campaigns
     Route::get('/campaigns', ['middleware' => 'auth', 'uses' => 'CampaignController@index']);
@@ -42,6 +43,10 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/campaigns/details/json/customers_without_saving/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithoutSaving']);
     Route::get('/campaigns/details/json/customers_with_savings/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithSavings']);
     Route::get('/campaigns/details/json/customers_with_current_offer/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithCurrentOffer']);
+
+    // Prices
+    Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PricesController@index']);
+    Route::get('/prices/json', ['middleware' => 'auth', 'uses' => 'PricesController@json']);
 
     // Users
     Route::get('/users', ['middleware' => 'auth', 'uses' => 'UserController@index']);
