@@ -11,8 +11,8 @@ var actions = {
 }
 $(function(){
     // Table
-    $('#table_campaigns_scheduled').bootstrapTable({
-        url: '/campaigns/json/scheduled',
+    $('#table_campaigns_planned').bootstrapTable({
+        url: '/campaigns/json/planned',
         queryParams: function(params){
             return {
                 limit: params.limit,

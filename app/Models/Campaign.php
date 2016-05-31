@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Campaign extends Model
 {
-    const STATUS_SCHEDULED = 1;
+    const STATUS_PLANNED = 1;
     const STATUS_SENT = 2;
 
     protected $table = 'campaigns';
 
-    public static function countScheduled() {
-        return DB::table('campaigns')->where('status', '=', self::STATUS_SCHEDULED)->count();
+    public static function countPlanned() {
+        return DB::table('campaigns')->where('status', '=', self::STATUS_PLANNED)->count();
     }
 
     public static function countSent() {

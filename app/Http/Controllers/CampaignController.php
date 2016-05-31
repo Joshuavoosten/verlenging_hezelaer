@@ -20,17 +20,17 @@ class CampaignController extends Controller
 {
     public function index()
     {
-        $iCountScheduled = ModelCampaign::countScheduled();
+        $iCountPlanned = ModelCampaign::countPlanned();
         $iCountSent = ModelCampaign::countSent();
 
         return view('content.campaigns.index', [
-            'iCountScheduled' => $iCountScheduled,
+            'iCountPlanned' => $iCountPlanned,
             'iCountSent' => $iCountSent,
             'success' => Session::get('success'),
         ]);
     }
 
-    public function jsonScheduled()
+    public function jsonPlanned()
     {
         $oDB = DB::table('campaigns')
             ->select(
@@ -45,7 +45,7 @@ class CampaignController extends Controller
                 'updated_at',
                 DB::RAW('(SELECT COUNT(id) FROM deals AS d WHERE d.campaign_id = campaigns.id) AS count_customers') 
             )
-            ->where('status', '=', ModelCampaign::STATUS_SCHEDULED)
+            ->where('status', '=', ModelCampaign::STATUS_PLANNED)
         ;
 
         if (Input::get('search')) {
@@ -490,6 +490,10 @@ class CampaignController extends Controller
         $oCampaign = new ModelCampaign();
 
         $oCampaign = $oCampaign->findOrFail($id);
+
+        if ($oCampaign->status == ModelCampaign::STATUS_SENT) {
+             App::abort(500, 'The campaign has status "sent" and cannot be edited.');
+        }
 
         $aErrors = [];
 

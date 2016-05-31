@@ -33,8 +33,8 @@
         @include('alerts.success')
         @include('alerts.delete')
         @include('errors.validation')
-        <h4><strong>{{ __('Planned') }}</strong> ({{ $iCountScheduled }} {{ __('campaigns') }})</h4>
-        <table id="table_campaigns_scheduled" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
+        <h4><strong>{{ __('Planned') }}</strong> ({{ $iCountPlanned }} {{ __('campaigns') }})</h4>
+        <table id="table_campaigns_planned" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
             <thead>
                 <tr>
                     <th data-field="name" data-formatter="campaignDetailsFormatter" data-sortable="true">{{ __('Name') }}</th>

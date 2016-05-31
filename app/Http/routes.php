@@ -33,7 +33,7 @@ Route::group(['middleware' => 'web'], function () {
 
     // Campaigns
     Route::get('/campaigns', ['middleware' => 'auth', 'uses' => 'CampaignController@index']);
-    Route::get('/campaigns/json/scheduled', ['middleware' => 'auth', 'uses' => 'CampaignController@jsonScheduled']);
+    Route::get('/campaigns/json/planned', ['middleware' => 'auth', 'uses' => 'CampaignController@jsonPlanned']);
     Route::get('/campaigns/json/sent', ['middleware' => 'auth', 'uses' => 'CampaignController@jsonSent']);
     Route::match(['get', 'post'], '/campaigns/add', ['middleware' => 'auth', 'uses' => 'CampaignController@add']);
     Route::match(['get', 'post'], '/campaigns/edit/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@edit', 'as' => 'campaigns.edit']);

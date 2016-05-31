@@ -43,10 +43,12 @@
                     <div class="col-md-6">{{ __('Expiration Date') }}</div>
                     <div class="col-md-6">t/m {{ date('j-n-Y', strtotime($oCampaign->current_expiration_date)) }}</div>
                 </div>
-                <div style="height: 15px"></div>
-                <a href="/campaigns/edit/{{ $oCampaign->id }}" class="btn btn-default">
-                    {{ __('Edit Campaign') }}
-                </a>
+                @if($oCampaign->status == \App\Models\Campaign::STATUS_PLANNED)
+                    <div style="height: 15px"></div>
+                    <a href="/campaigns/edit/{{ $oCampaign->id }}" class="btn btn-default">
+                        {{ __('Edit Campaign') }}
+                    </a>
+                @endif
             </div>
             <div class="col-md-6">
                 <h4>{{ __('Offer Contract Extension') }}</h4>
@@ -154,7 +156,7 @@
         </div>
     </div>
 </div>
-@if($oCampaign->status == \App\Models\Campaign::STATUS_SCHEDULED)
+@if($oCampaign->status == \App\Models\Campaign::STATUS_PLANNED)
     {{ Form::open(['url' => '/campaigns/details/'.$oCampaign->id, 'method' => 'post']) }}
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -210,7 +212,7 @@
             </div>
         </div>
         <div style="height: 10px"></div>
-        {{ Form::submit(__('Campaign confirm and finalize'), ['class' => 'btn btn-custom']) }}
+        {{ Form::submit(__('Save'), ['class' => 'btn btn-custom']) }}
     {!! Form::close() !!}
 @else
     <div class="panel panel-default">

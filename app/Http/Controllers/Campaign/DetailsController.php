@@ -19,6 +19,24 @@ use View;
 
 class DetailsController extends Controller
 {
+    /**
+     * Deterime next quarter.
+     * 
+     * @return string $sNewDate
+     */
+    private function nextQuarter() {
+        $sCurrentDate = date('Y-m-d H:i:s');
+        $iCurrentTime = strtotime($sCurrentDate);
+
+        $iFrac = 900;
+        $r = $iCurrentTime % $iFrac;
+
+        $iNewTime = $iCurrentTime + ($iFrac-$r);
+        $sNewDate = date('Y-m-d H:i:s', $iNewTime);
+
+        return $sNewDate;
+    }
+
     public function index(Request $request, $id)
     {
          $aErrors = [];
@@ -70,6 +88,10 @@ class DetailsController extends Controller
          ];
 
          if ($request->isMethod('post')) {
+             if ($oCampaign->status == ModelCampaign::STATUS_SENT) {
+                  App::abort(500, 'The campaign has status "sent" and cannot be edited.');
+             }
+
              $aMessages = [
                  'schedule.required' => sprintf(__('%s is required.'), __('Schedule')),
                  'day.required' => sprintf(__('%s is required.'), __('Day')),
@@ -95,7 +117,7 @@ class DetailsController extends Controller
              if (count($aErrors) == 0) {
 
                  if (Input::get('schedule') == 'now') {
-                     $sScheduledAt = date('Y-m-d H:i', strtotime('+15 minutes'));
+                     $sScheduledAt = date('Y-m-d H:i:s', strtotime($this->nextQuarter()));
                  }
 
                  if (Input::get('schedule') == 'planned') {
@@ -108,7 +130,7 @@ class DetailsController extends Controller
                  $oCampaign->save();
 
                  // Add deal to queue
-                 DB::table('deals')->where('campaign_id', $oCampaign->id)->update(['queue' => 1]);
+                 DB::table('deals')->where('campaign_id', $oCampaign->id)->update(['status' => ModelDeal::STATUS_INVITE_EMAIL_SCHEDULED]);
 
                  return Redirect::to('/campaigns/details/'.$oCampaign->id)
                     ->with('success', sprintf(

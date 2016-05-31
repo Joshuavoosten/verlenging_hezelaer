@@ -9,6 +9,11 @@ class Deal extends Model
 {
     protected $table = 'deals';
 
+    const STATUS_PLANNED = 1;
+    const STATUS_INVITE_EMAIL_SCHEDULED = 2;
+    const STATUS_INVITE_EMAIL_QUEUED = 3;
+    const STATUS_INVITE_EMAIL_SENT = 4;
+
     /**
      * @param int $iCalc
      * @param int $iYears
