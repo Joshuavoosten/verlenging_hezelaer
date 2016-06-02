@@ -44,6 +44,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/campaigns/details/json/customers_with_savings/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithSavings']);
     Route::get('/campaigns/details/json/customers_with_current_offer/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithCurrentOffer']);
 
+    // Deal
+    Route::post('/deals/active/{id}', ['middleware' => 'auth', 'uses' => 'DealController@active']);
+
     // Prices
     Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PricesController@index']);
     Route::get('/prices/json', ['middleware' => 'auth', 'uses' => 'PricesController@json']);

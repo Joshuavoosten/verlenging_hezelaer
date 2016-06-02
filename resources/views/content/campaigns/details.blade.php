@@ -2,6 +2,7 @@
 
 @section('scripts')
 <script src="{{ URL::asset('assets/js/content/campaigns/details.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/dealActive.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/dealEndAgreement.js') }}"></script>
 @endsection
 
@@ -118,11 +119,13 @@
                 <table id="table_customers_without_saving" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
+                            <th data-field="active" data-formatter="dealActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
                             <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
                             <th data-field="code" data-sortable="true" class="col-md-1">{{ __('Profile Code') }}</th>
                             <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="true" class="col-md-2">{{ __('Expiration Date') }}</th>
                             <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
+                            <th data-field="status_format" data-align="center" data-sortable="true">{{ __('Status') }}</th>
                         </tr>
                     </thead>
                 </table>
@@ -131,11 +134,13 @@
                 <table id="table_customers_with_savings" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
+                            <th data-field="active" data-formatter="dealActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
                             <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
                             <th data-field="code" data-sortable="true" class="col-md-1">{{ __('Profile Code') }}</th>
                             <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="true" class="col-md-2">{{ __('Expiration Date') }}</th>
                             <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
+                            <th data-field="status_format" data-align="center" data-sortable="true">{{ __('Status') }}</th>
                         </tr>
                     </thead>
                 </table>

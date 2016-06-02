@@ -14,6 +14,22 @@ class Deal extends Model
     const STATUS_INVITE_EMAIL_QUEUED = 3;
     const STATUS_INVITE_EMAIL_SENT = 4;
 
+    // If the estimate saving is larger then this amount, the deal is saved with has_saving = 1.
+    const HAS_SAVING_PRICE = 50;
+
+    public static function statusFormat($sStatus) {
+        switch ($sStatus) {
+            case self::STATUS_PLANNED:
+                return null;
+            case self::STATUS_INVITE_EMAIL_SCHEDULED:
+                return __('Scheduled');
+            case self::STATUS_INVITE_EMAIL_QUEUED:
+                return __('Queued');
+            case self::STATUS_INVITE_EMAIL_SENT:
+                return __('Sent');
+        }
+    }
+
     /**
      * @param int $iCalc
      * @param int $iYears

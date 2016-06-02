@@ -166,10 +166,8 @@ class CampaignController extends Controller
 
         // Segments (current)
         $aCurrentSegments = [
-            'A' => 'A',
-            'B' => 'B',
-            'C' => 'C',
-            'D' => 'D'
+            'FALSE' => __('Zakelijk'),
+            'TRUE' => __('Consument')
         ];
 
         // In a group (current)
@@ -339,11 +337,7 @@ class CampaignController extends Controller
                     // Segment
 
                     if (Input::get('current_segment')) {
-                        $oDB->where('klantsegment', '=', Input::get('current_segment'));
-                        if (Input::get('current_segment') == 'Zakelijk') {
-                            $oDB->orWhereNull('klantsegment');
-                            $oDB->orWhere('klantsegment', '=', '');
-                        }
+                        $oDB->where('consument', '=', Input::get('current_segment'));
                     }
 
                     // In a group
@@ -412,6 +406,9 @@ class CampaignController extends Controller
                             $estimate_price_3_year = ModelDeal::calculateCosts($iCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
                             $estimate_saving_3_year = ModelDeal::calculateSaving($iCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
 
+                            $has_saving = (max($estimate_saving_1_year, $estimate_saving_2_year, $estimate_saving_3_year) > ModelDeal::HAS_SAVING_PRICE ? 1 : 0);
+                            $active = $has_saving;
+
                             $oDeal->campaign_id = $oCampaign->id;
                             $oDeal->client_name = $o->client_name;
                             $oDeal->client_code = $o->client_code;
@@ -455,6 +452,8 @@ class CampaignController extends Controller
                             $oDeal->new_price_low = null;
                             $oDeal->jaarlijkse_besparing = null;
                             $oDeal->token = sha1(openssl_random_pseudo_bytes(32));
+                            $oDeal->has_saving = $has_saving;
+                            $oDeal->active = $active;
 
                             $oDeal->save();
                         }
@@ -492,7 +491,7 @@ class CampaignController extends Controller
         $oCampaign = $oCampaign->findOrFail($id);
 
         if ($oCampaign->status == ModelCampaign::STATUS_SENT) {
-             App::abort(500, 'The campaign has status "sent" and cannot be edited.');
+             App::abort(500, 'The status is equal to "sent" therefore the campaign cannot be modified.');
         }
 
         $aErrors = [];
