@@ -13,11 +13,17 @@ class Deal extends Model
     const STATUS_INVITE_EMAIL_SCHEDULED = 2;
     const STATUS_INVITE_EMAIL_QUEUED = 3;
     const STATUS_INVITE_EMAIL_SENT = 4;
+    const STATUS_FORM_REQUESTED = 5;
+    const STATUS_FORM_SAVED = 6;
 
     // If the estimate saving is larger then this amount, the deal is saved with has_saving = 1.
     const HAS_SAVING_PRICE = 50;
 
-    public static function statusFormat($sStatus) {
+    /**
+     * @param string $sStatus
+     * @return mixed null | string
+     */
+    public static function statusFormatter($sStatus) {
         switch ($sStatus) {
             case self::STATUS_PLANNED:
                 return null;
@@ -27,11 +33,15 @@ class Deal extends Model
                 return __('Queued');
             case self::STATUS_INVITE_EMAIL_SENT:
                 return __('Sent');
+            case self::STATUS_FORM_REQUESTED:
+                return __('Form Requested');
+            case self::STATUS_FORM_SAVED:
+                return __('Form Saved');
         }
     }
 
     /**
-     * @param int $iCalc
+     * @param int $iPriceCalculation
      * @param int $iYears
      * @param int $iMonths
      * @param float $syu_normal
@@ -41,10 +51,10 @@ class Deal extends Model
      * @param float $price_low
      * @return float $fCosts
      */
-    public static function calculateCosts($iCalculation,$aPrices,$iYears,$iMonths,$syu_normal,$syu_low,$vastrecht,$price_normal,$price_low) {
+    public static function calculateCosts($iPriceCalculation,$aPrices,$iYears,$iMonths,$syu_normal,$syu_low,$vastrecht,$price_normal,$price_low) {
         $fCosts = 0;
 
-        switch ($iCalculation) {
+        switch ($iPriceCalculation) {
 
             // Gas met een tarief normaal
 
@@ -80,7 +90,7 @@ class Deal extends Model
     }
 
     /**
-     * @param int $iCalc
+     * @param int $iPriceCalculation
      * @param int $iYears
      * @param int $iMonths
      * @param float $syu_normal
@@ -90,10 +100,10 @@ class Deal extends Model
      * @param float $price_low
      * @return float $fSaving
      */
-    public static function calculateSaving($iCalculation,$aPrices,$iYears,$iMonths,$syu_normal,$syu_low,$vastrecht,$price_normal,$price_low) {
+    public static function calculateSaving($iPriceCalculation,$aPrices,$iYears,$iMonths,$syu_normal,$syu_low,$vastrecht,$price_normal,$price_low) {
         $fSaving = 0;
 
-        switch ($iCalculation) {
+        switch ($iPriceCalculation) {
 
             // Gas met een tarief normaal
 
@@ -150,6 +160,10 @@ class Deal extends Model
 
                 return $fSaving;
         }
+    }
+
+    public function cadrFormatter() {
+        return implode(' ', [$this->cadr_street, $this->cadr_nr.' '.$this->cadr_nr_conn, $this->cadr_zip, $this->cadr_city]);
     }
 
 }

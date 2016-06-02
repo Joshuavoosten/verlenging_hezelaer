@@ -1,0 +1,732 @@
+/*
+* Hezelaer HTML-to-PDF Contracten 2016 - V1
+*/
+        
+/* KLEUREN PALET START */
+
+.hezBlauw {
+    color: #76999b;
+}
+
+.hezOranje {
+    color: #f29421;
+}
+
+.hezGrijs {
+    color: #999899;
+}
+
+.hezRood {
+    color: #f06161;
+}
+
+/* KLEUREN PALET END */
+
+/* TYPOGRAFIE START */
+
+@font-face {
+    font-family: 'Hezelaer-Book';
+    src: url('/assets/fonts/Hezelaer-Book.eot?#iefix') format('embedded-opentype'),
+    url('/assets/fonts/Hezelaer-Book.otf')  format('opentype'),
+    url('/assets/fonts/Hezelaer-Book.woff') format('woff'),
+    url('/assets/fonts/Hezelaer-Book.ttf')  format('truetype'),
+    url('/assets/fonts/Hezelaer-BookItalic.svg#Hezelaer-Book') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Hezelaer-Bold';
+    src: url('/assets/fonts/Hezelaer-Bold.eot?#iefix') format('embedded-opentype'),
+    url('/assets/fonts/Hezelaer-Bold.otf')  format('opentype'),
+    url('/assets/fonts/Hezelaer-Bold.woff') format('woff'),
+    url('/assets/fonts/Hezelaer-Bold.ttf')  format('truetype'),
+    url('/assets/fonts/Hezelaer-BookItalic.svg#Hezelaer-Bold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Hezelaer-BookItalic';
+    src: url('/assets/fonts/Hezelaer-BookItalic.eot?#iefix') format('embedded-opentype'),
+    url('/assets/fonts/Hezelaer-BookItalic.otf')  format('opentype'),
+    url('/assets/fonts/Hezelaer-BookItalic.woff') format('woff'),
+    url('/assets/fonts/Hezelaer-BookItalic.ttf')  format('truetype'),
+    url('/assets/fonts/Hezelaer-BookItalic.svg#Hezelaer-BookItalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+i {
+    font-family: "Hezelaer-BookItalic",sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #58595b;
+    font-family: "Hezelaer-Bold",sans-serif;
+    font-weight: normal;
+    margin: 0px 0px 10px 0px;
+}
+
+h3 span {
+    font-family: 'Hezelaer-Book', sans-serif;
+}
+
+h1, h2 {
+    font-size: 23px;
+}
+
+h3, h4 {
+    font-size: 19px;
+}
+
+b {
+    font-family: "Hezelaer-Bold",sans-serif;
+}
+
+/* TYPOGRAFIE END */
+
+/* BASICS START */
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    width: 100%;
+    position: relative;
+    height: 100%;
+    min-height: 100%;
+    font-family: "Hezelaer-Book", sans-serif;
+    font-size: 11px;
+    line-height: 21px;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+
+.rounded {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
+
+ul {
+    list-style: none;
+    display: block;
+    margin: 0px;
+    padding: 0px;
+}
+
+ul li {
+    display: block;
+}
+
+/* BASIC END */
+
+/* CONTRACTEN STYLES START */
+
+td, td * {
+    vertical-align: top;
+}
+ 
+table {
+    width: 695px;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+tr {
+    margin: 0;
+}
+
+.table-content {
+    border-top: 2px solid #76999b;
+    border-bottom: 2px solid #76999b;
+}
+
+.table-content.noTop {
+    border-top: none;
+}
+
+.table-content.noBorder {
+    border: none;
+}
+
+.table-content td {
+    vertical-align: center;
+    padding: 3px;
+}
+
+td.narrowCell {
+    width: 99px;
+}
+
+.vTop {
+    vertical-align: top;
+}
+
+.tMid {
+    text-align: center;
+}
+
+.title {
+    font-weight:bold;
+}
+
+.align-left { text-align:left !important; }
+.align-center { text-align:center !important; }
+.align-right { text-align:right !important; }
+
+.blueWrap {
+    width: 20px;
+    display: inline-block;
+    color: #76999b;
+}
+
+.mildWrap {
+    display: inline-block;
+    color: #76999b;
+    margin: 0px 5px 0px 0px;
+}
+
+.underLine {
+    text-decoration: underline;
+}
+
+span.smallHeader {
+    display: block;
+    height: 22px;
+    line-height: 22px;
+}
+
+/* CONTRACTEN STYLES END */
+
+/* PORTAL STYLE START */
+
+#wrapper {
+    min-height: 100%;
+    position: relative;
+    font-size: 13px;
+    color: #58595b;
+}
+
+#header {
+    background: #76999b;
+    padding: 25px 0px 25px 0px;
+}
+
+#header ul {    
+    width: 960px;
+    margin: 0px auto;
+}   
+
+#header ul li.right {
+    display: block;
+    margin: 0px 0px 0px 50px;
+    text-align: right;
+}
+
+#header ul li.left {
+    width: 125px;
+    height: 68px;
+    background: url("/assets/images/deals/extend/he-logo.png") no-repeat scroll 0px 0px transparent;
+    display: block;
+}
+
+#header ul li span {
+    display: block;
+    clear: both;
+    color: white;
+}
+
+#content {
+    padding: 40px 0px 91px 0px;
+    width: 960px;
+    margin: 0px auto;
+}
+
+.topInfo {
+    display: block;
+    margin: 0px 0px 40px 0px;
+    float: left;
+    width: 960px;
+}
+
+.topInfo .left {}
+
+.topInfo .left h3 {
+    color: #f29421;
+    font-size: 21px;
+    margin: 0px 0px 5px 0px;
+}
+
+.topInfo .left h4 {
+    color: #76999b;
+    font-size: 16px;
+    margin: 0px;
+}
+
+.topInfo .right {}
+
+.topInfo .right a {
+    background: #f29421;
+    color: white;
+    padding: 10px 20px 10px 20px;
+    font-size: 18px;
+    text-decoration: none;
+    display: block;
+}
+
+.topInfo .right a:hover {}
+
+table.currentAgreement {
+    display: block;
+    float: left;
+    margin: 0px 0px 40px 0px;
+}
+
+b.tableTitle {
+    color: #58595b;
+    font-size: 18px;
+    display: block;
+    margin: 0px 0px 5px 0px;
+}
+
+table.currentAgreement tr {}
+
+table.currentAgreement td {
+    vertical-align: middle;
+    padding: 5px 10px 5px 10px;
+}
+
+table.currentAgreement td.morePad {
+    padding: 15px 10px 15px 10px;
+}
+
+table.currentAgreement td.infoCell1 {
+    background: url("/assets/images/deals/extend/he-icoon-info-groot.png") no-repeat scroll 37px 15px transparent;
+}
+
+span.newPrices {
+    margin: 0px 20px 0px 0px;
+}
+
+.roundTop {
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.roundBot {
+    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+form.contractVerlenging {
+    display: block;
+    float: left;
+}
+
+form.contractVerlenging h4{ 
+    display: block;
+    float: left;
+    clear: both;
+}
+
+span.subHead {
+    float: left;
+    display: block;
+    clear: both;
+    margin: 0px 0px 20px 0px;
+}
+
+ul.selectLooptijdBron {
+    margin: 0px 0px 40px 0px;
+    display: block;
+    width: 960px;
+}
+
+ul.selectLooptijdBron li{
+    display: block;
+}
+
+ul.selectLooptijdBron li label {
+    display: block;
+    margin: 0px 0px 5px 0px;
+    float: left;
+    clear: both;
+}
+
+ul.selectLooptijdBron li label input {
+    margin: 10px 10px 0px 0px;
+    display: block;
+    float: left;
+}
+
+ul.selectLooptijdBron li label span {
+    display: block;
+    float: left;
+    line-height: 32px;
+}
+
+label.commLabel {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 0px 0px 10px 0px;
+}
+
+label.commLabel.lastCom{
+    margin: 0px 0px 40px 0px;
+}
+
+span.preText1{
+    display: block;
+    float: left;
+    width: 300px;
+    line-height: 32px;
+}
+
+label.commLabel input, .adresField input, .signLabel input{
+    display: block;
+    float: left;
+    border: 1px solid #999899;
+    height: 30px;
+    padding: 0px 5px 0px 5px;
+    width: 300px;
+    margin: 0px 20px 0px 0px;
+}
+
+body input.redBorder {
+    border: 1px solid #f06161;
+}
+
+span.errorSpan {
+    display: block;
+    float: left;
+    color: #f06161;
+    line-height: 32px;
+}
+
+ul.betalingsGegevens {
+    display: block;
+    clear: both;
+    float: left;
+    margin: 0px 0px 20px 0px;
+}
+
+ul.betalingsGegevens li {
+    display: block;
+    float: left;
+    margin: 0px 40px 0px 0px;
+}
+
+ul.betalingsGegevens li label{
+    display: block;
+    float: left;
+}
+
+ul.betalingsGegevens li label input {
+    display: block;
+    float: left;
+    margin: 10px 10px 0px 0px;
+}
+
+ul.betalingsGegevens li label span {
+    display: block;
+    float: left;
+    line-height: 32px;
+}
+
+a.infoHolder {
+    background: url("/assets/images/deals/extend/he-icoon-info-klein.png") no-repeat scroll 0px 0px transparent;
+    height: 21px;
+    width: 21px;
+    display: block;
+    float: left;
+    margin: 4px 0px 0px 10px;
+    position: relative;
+    color: #9ab5b9;
+    text-decoration: none;
+    z-index: 1;
+}
+
+.holderText {
+    position: absolute;
+    width: 500px;
+    bottom: 30px;
+    left: -251px;
+    display: block;
+    background: url("/assets/images/deals/extend/img/he-icoon-info-klein.png") no-repeat scroll 10px 20px #f2fbfc;
+    border: 1px solid #9ab5b9;
+    z-index: 50;
+    padding: 20px 20px 20px 41px;
+}
+
+i.infoRow {
+    width: 200px;
+    display: block;
+    float: left;
+}
+
+.adresField {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 0px 0px 40px 0px;
+}
+
+label.straatnaamLabel {
+    display: block;
+    float: left;
+    width: auto;
+    margin: 0px 10px 0px 0px;
+}
+
+label.straatnaamLabel input {
+    margin: 0px;
+    width: 258px;
+    text-align: center;
+}
+
+label.huisnrLabel {
+    display: block;
+    float: left;
+    width: auto;
+    margin: 0px 10px 0px 0px;
+}
+
+label.huisnrLabel input {
+    margin: 0px;
+    width: 50px;
+    text-align: center;
+}
+
+label.toevoegingLabel {
+    display: block;
+    float: left;
+    width: auto;
+    margin: 0px 10px 0px 0px;
+}
+
+label.toevoegingLabel input {
+    margin: 0px;
+    width: 50px;
+    text-align: center;
+}
+
+label.postcodeLabel {
+    display: block;
+    float: left;
+    width: auto;
+    margin: 10px 10px 0px 150px;
+    clear: left;
+}
+
+label.postcodeLabel input {
+    margin: 0px;
+    width: 100px;
+    text-align: center;
+}
+
+label.stadLabel {
+    display: block;
+    float: left;
+    width: auto;
+    margin: 10px 10px 0px 0px;
+}
+
+label.stadLabel input {
+    margin: 0px;
+    width: 280px;
+    text-align: center;
+}
+
+label.ibanLabel {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 10px 0px 0px 0px;
+}
+
+span.preText2 {
+    display: block;
+    float: left;
+    line-height: 32px;
+    width: 150px;
+}
+
+label.ibanLabel input {
+    display: block;
+    float: left;    
+    width: 402px;
+}
+
+label.ibanLabel i {
+    display: block;
+    float: left;
+    clear: both;
+    line-height: 32px;
+    padding: 0px 0px 0px 150px;
+}
+
+label.algLabel {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 0px 0px 5px 0px;
+}
+
+label.algLabel.lastAlg {
+    margin: 0px 0px 40px 0px;
+}
+
+label.algLabel input {
+    display: block;
+    float: left;
+    margin: 10px 10px 0px 0px;
+}
+
+label.algLabel a {
+    display: block;
+    float: left;
+    line-height: 32px;
+    margin: 0px 20px 0px 0px;
+}
+
+label.signLabel {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 0px 0px 10px 0px;
+}
+
+span.preText3 {
+    display: block;
+    float: left;
+    width: 150px;
+    line-height: 32px;
+}
+
+label.signLabel input {
+    display: block;
+    float: left;
+    margin: 0px 20px 0px 0px;
+    width: 402px;
+}
+
+span.ingevuldeInfo {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 20px 0px 0px 0px;
+}
+
+label.submitLabel {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 20px 0px 0px 0px;
+}
+
+label.submitLabel input {
+    display: block;
+    float: left;
+    margin: 10px 10px 0px 0px;
+}
+
+label.submitLabel span {
+    display: block;
+    float: left;
+    line-height: 32px;
+}
+
+input.submitForm {
+    display: block;
+    float: left;
+    clear: both;
+    margin: 40px 0px 0px 0px;
+    background: #f29421;
+    color: white;
+    display: block;
+    font-size: 18px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+}
+
+input.submitForm:hover {
+    text-decoration: underline;
+}
+
+.succesMelding {
+    display: block;
+    float: left;
+}
+
+.succesMelding h3 {
+    color: #f29421;
+    font-size: 21px;
+    margin: 0px 0px 5px 0px;
+}
+
+.succesMelding h4 {
+    color: #76999b;
+    font-size: 16px;
+    margin: 0px;
+}
+
+.succesMelding b {
+    display: block;
+    margin: 40px 0px 0px 0px;
+}
+
+.succesMelding span {
+    display: block;
+    clear: both;
+    margin: 0px 0px 40px 0px;
+}
+
+.succesMelding a {
+    margin: 0px 10px 0px 0px;
+}
+
+#footer {
+    bottom: 0;
+    height: 50px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    border-top: 1px solid #999899;
+}
+
+#footer ul {
+    width: 960px;
+    margin: 0px auto;
+}
+
+#footer ul li {
+    text-align: right;
+}
+
+#footer ul li span {
+    line-height: 50px;
+}

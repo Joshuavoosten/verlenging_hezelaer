@@ -46,6 +46,7 @@ Route::group(['middleware' => 'web'], function () {
 
     // Deal
     Route::post('/deals/active/{id}', ['middleware' => 'auth', 'uses' => 'DealController@active']);
+    Route::match(['get', 'post'], '/verleng/{token}', ['uses' => 'DealController@extend']);
 
     // Prices
     Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PricesController@index']);

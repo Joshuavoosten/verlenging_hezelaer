@@ -4,6 +4,7 @@
 <script src="{{ URL::asset('assets/js/content/campaigns/details.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/dealActive.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/dealEndAgreement.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/rowstyle.js') }}"></script>
 @endsection
 
 @section('content')
@@ -59,7 +60,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">{{ __('Term Offer') }}</div>
-                    <div class="col-md-6">{{ $oCampaign->new_term_offer }}</div>
+                    <div class="col-md-6">{{ \App\Models\Campaign::newTermOfferFormatter($oCampaign->new_term_offer) }}</div>
                 </div>
                 @if($oCampaign->isElektricity())
                     <div class="row">
@@ -116,7 +117,7 @@
             <div class="col-md-12">
             <h4>{{ __('Customers without saving') }}</h4>
             <div style="height: 10px"></div>
-                <table id="table_customers_without_saving" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
+                <table id="table_customers_without_saving" class="table table-hover table-striped sortable" data-row-style="rowstyleFormatter" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
                             <th data-field="active" data-formatter="dealActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
@@ -131,7 +132,7 @@
                 </table>
                 <div style="height: 10px"></div>
                 <h4>{{ __('Customers with savings') }}</h4>
-                <table id="table_customers_with_savings" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
+                <table id="table_customers_with_savings" class="table table-hover table-striped sortable" data-row-style="rowstyleFormatter" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
                             <th data-field="active" data-formatter="dealActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>

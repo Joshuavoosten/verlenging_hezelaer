@@ -1,1 +1,0 @@
-var website_domain = '{{ $website_domain }}';

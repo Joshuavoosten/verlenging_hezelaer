@@ -397,17 +397,17 @@ class CampaignController extends Controller
                         foreach ($a as $o) {
                             $oDeal = new ModelDeal;
 
-                            $iCalculation = ModelPrice::getCalculation($aPrices);
+                            $iPriceCalculation = ModelPrice::getCalculation($aPrices);
 
-                            $estimate_price_1_year = ModelDeal::calculateCosts($iCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_saving_1_year = ModelDeal::calculateSaving($iCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_price_2_year = ModelDeal::calculateCosts($iCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_saving_2_year = ModelDeal::calculateSaving($iCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_price_3_year = ModelDeal::calculateCosts($iCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_saving_3_year = ModelDeal::calculateSaving($iCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_price_1_year = ModelDeal::calculateCosts($iPriceCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_saving_1_year = ModelDeal::calculateSaving($iPriceCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_price_2_year = ModelDeal::calculateCosts($iPriceCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_saving_2_year = ModelDeal::calculateSaving($iPriceCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_price_3_year = ModelDeal::calculateCosts($iPriceCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
+                            $estimate_saving_3_year = ModelDeal::calculateSaving($iPriceCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
 
-                            $has_saving = (max($estimate_saving_1_year, $estimate_saving_2_year, $estimate_saving_3_year) > ModelDeal::HAS_SAVING_PRICE ? 1 : 0);
-                            $active = $has_saving;
+                            $iHasSaving = (max($estimate_saving_1_year, $estimate_saving_2_year, $estimate_saving_3_year) > ModelDeal::HAS_SAVING_PRICE ? 1 : 0);
+                            $iActive = $iHasSaving;
 
                             $oDeal->campaign_id = $oCampaign->id;
                             $oDeal->client_name = $o->client_name;
@@ -452,8 +452,9 @@ class CampaignController extends Controller
                             $oDeal->new_price_low = null;
                             $oDeal->jaarlijkse_besparing = null;
                             $oDeal->token = sha1(openssl_random_pseudo_bytes(32));
-                            $oDeal->has_saving = $has_saving;
-                            $oDeal->active = $active;
+                            $oDeal->has_saving = $iHasSaving;
+                            $oDeal->active = $iActive;
+                            $oDeal->price_calculation = $iPriceCalculation;
 
                             $oDeal->save();
                         }

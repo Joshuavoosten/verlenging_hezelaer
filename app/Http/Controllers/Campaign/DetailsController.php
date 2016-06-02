@@ -230,6 +230,12 @@ class DetailsController extends Controller
 
         if (count($a) > 0) {
             foreach ($a as $o) {
+                $rowstyle = null;
+
+                if ($o->status == ModelDeal::STATUS_FORM_SAVED) {
+                    $rowstyle = 'success';
+                }
+
                 $aRows[] = [
                     'id' => $o->id,
                     'client_name' => $o->client_name,
@@ -238,9 +244,10 @@ class DetailsController extends Controller
                     'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
-                    'status_format' => ModelDeal::statusFormat($o->status),
+                    'status_format' => ModelDeal::statusFormatter($o->status),
                     'active' => $o->active,
-                    'campaign_status' => $o->campaign_status
+                    'campaign_status' => $o->campaign_status,
+                    'rowstyle' => $rowstyle
                 ];
             }
         }
@@ -322,6 +329,12 @@ class DetailsController extends Controller
 
         if (count($a) > 0) {
             foreach ($a as $o) {
+                $rowstyle = null;
+
+                if ($o->status == ModelDeal::STATUS_FORM_SAVED) {
+                    $rowstyle = 'success';
+                }
+
                 $aRows[] = [
                     'id' => $o->id,
                     'client_name' => $o->client_name,
@@ -330,9 +343,10 @@ class DetailsController extends Controller
                     'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
-                    'status_format' => ModelDeal::statusFormat($o->status),
+                    'status_format' => ModelDeal::statusFormatter($o->status),
                     'active' => $o->active,
-                    'campaign_status' => $o->campaign_status
+                    'campaign_status' => $o->campaign_status,
+                    'rowstyle' => $rowstyle
                 ];
             }
         }

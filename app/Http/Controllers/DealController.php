@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Campaign as ModelCampaign;
 use App\Models\Deal as ModelDeal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
@@ -30,4 +31,43 @@ class DealController extends Controller
 
         $oDeal->save();
     }
+
+    public function extend(Request $request, $token) {
+        // Deal
+
+        $oDeal = new ModelDeal();
+
+        $oDeal = ModelDeal::where('token', '=', $token)->firstOrFail();
+
+        // @todo check status
+
+        // The form has been requested.
+
+        if ($oDeal->status == ModelDeal::STATUS_INVITE_EMAIL_SENT) {
+            $oDeal->status = ModelDeal::STATUS_FORM_REQUESTED;
+        }
+
+        $oDeal->save();
+
+        // Campaign
+
+        $oCampaign = new ModelCampaign();
+
+        $oCampaign = $oCampaign->find($oDeal->campaign_id);
+
+        $aErrors = [];
+
+        // Post Request
+
+        if ($request->isMethod('post')) {
+            // @todo
+        }
+
+        return view('content.deals.extend', [
+            'oCampaign' => $oCampaign,
+            'oDeal' => $oDeal,
+            'token' => $token
+        ]);
+    }
+
 }
