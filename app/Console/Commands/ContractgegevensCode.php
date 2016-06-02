@@ -40,7 +40,7 @@ class ContractgegevensCode extends Command
     {
         DB::table('contractgegevens')
            ->where('code', '=', 'EContinu')
-           ->update(['status' => 'E3A'])
+           ->update(['code' => 'E3A'])
        ;
     }
 }
