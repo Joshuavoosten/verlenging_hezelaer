@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Campaign extends Model
 {
+    const TYPE_GAS = 1;
+    const TYPE_ELEKTRICITY = 2;
+
     const STATUS_PLANNED = 1;
     const STATUS_SENT = 2;
 
@@ -41,11 +44,17 @@ class Campaign extends Model
         return DB::table('deals')->where('campaign_id', '=', $this->id)->count();
     }
 
-    public function isElektricity() {
-        return ($this->price_normal > 0 && $this->price_low > 0);
+    /**
+     * @return bool true | false
+     */
+    public function isGas() {
+        return ($this->type == self::TYPE_GAS ? true : false);
     }
 
-    public function isGas() {
-        return ! ($this->price_normal > 0 && $this->price_low > 0);
+    /**
+     * @return bool true | false
+     */
+    public function isElektricity() {
+        return ($this->type == self::TYPE_ELEKTRICITY ? true : false);
     }
 }

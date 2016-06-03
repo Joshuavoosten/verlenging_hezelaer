@@ -8,6 +8,7 @@
 
 @section('scripts')
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+<script src="{{ URL::asset('assets/js/content/deals/extend.js') }}"></script>
 @endsection
 
 @section('content')
@@ -42,57 +43,114 @@
         <table style="font-size: 13px; width: 958px" class="currentAgreement table-content noBorder hezGrijs" cellpadding="0" cellspacing="0">
             <tr style="border: 1px solid #999899">
                 <td colspan="7" class="morePad">
-                    <b class="tableTitle">Uw huidige leveringsovereenkomst Elektriciteit & gas / Elek. / Gas</b>
-                    Kenmerk V72-00-4673-05
+                    <b class="tableTitle">
+                        @if($oCampaign->isGas())
+                            Uw huidige leveringsovereenkomst Gas
+                        @endif
+                        @if($oCampaign->isElektricity())
+                            Uw huidige leveringsovereenkomst Elektriciteit
+                        @endif
+                    </b>
+                    <!-- Kenmerk V72-00-4673-05 -->
                 </td>
             </tr>
             <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
                 <td colspan="7" class="morePad"><b>Leveringsadres:</b> {{ $oDeal->cadrFormatter() }}</td>
             </tr>
-            <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
-                <td width="90px"><b>Type</b></td>
-                <td width="140px"><b>EAN Code</b></td>
-                <td width="165px"><b>Totaal jaarverbruik</b></td>
-                <td width="165px"><b>Tarief (gas)</b></td>
-                <td width="165px"><b>Tarief (normaal)</b></td>
-                <td width="140px"><b>Tarief (laag)</b></td>
-                <td width="85px"><b>Einddatum</b></td>
-            </tr>
-            <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
-                <td>Elektriciteit</td>
-                <td>8716879400254125</td>
-                <td>41.627 kWh</td>
-                <td>-</td>
-                <td>3,42 &euro; ct/kWh</td>
-                <td>2,89 &euro; ct/kWh</td>
-                <td>1-1-2017</td>
-            </tr>
-            <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
-                <td>Gas</td>
-                <td>8716879400236523</td>
-                <td>41.627 m3</td>
-                <td>2,95 &euro; ct/m3</td>
-                <td>-</td>
-                <td>-</td>
-                <td>1-1-2017</td>
-            </tr>
+            @if($oCampaign->isElektricity())
+                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
+                    <td width="90px"><b>Type</b></td>
+                    <td width="140px"><b>EAN Code</b></td>
+                    <td width="165px"><b>Totaal jaarverbruik</b></td>
+                    <td width="165px"><b>&nbsp;</b></td>
+                    <td width="165px"><b>Tarief (normaal)</b></td>
+                    <td width="140px"><b>Tarief (laag)</b></td>
+                    <td width="85px"><b>Einddatum</b></td>
+                </tr>
+                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
+                    <td>Elektriciteit</td>
+                    <td>{{ $oDeal->ean }}</td>
+                    <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} kWh</td>
+                    <td>&nbsp;</td>
+                    <td>
+                        @if($oDeal->price_normal == 0)
+                            -
+                        @else
+                            {{ number_format($oDeal->price_normal,6,',','.') }} &euro; ct/kWh
+                        @endif
+                    </td>
+                    <td>
+                        @if($oDeal->price_low == 0)
+                            -
+                        @else
+                            {{ number_format($oDeal->price_low,6,',','.') }} &euro; ct/kWh
+                        @endif
+                    </td>
+                    <td>
+                        @if($oDeal->end_agreement == '3000-01-01')
+                            -
+                        @else
+                            {{ date('d-m-Y', strtotime($oDeal->end_agreement)) }}
+                        @endif
+                    </td>
+                </tr>
+            @endif
+            @if($oCampaign->isGas())
+                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
+                    <td width="90px"><b>Type</b></td>
+                    <td width="140px"><b>EAN Code</b></td>
+                    <td width="165px"><b>Totaal jaarverbruik</b></td>
+                    <td width="165px"><b>Tarief</b></td>
+                    <td width="85px"><b>Einddatum</b></td>
+                </tr>
+                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
+                    <td>Gas</td>
+                    <td>{{ $oDeal->ean }}</td>
+                    <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} m3</td>
+                    <td>
+                        ??? &euro; ct/m3
+                    </td>
+                    <td>
+                        @if($oDeal->end_agreement == '3000-01-01')
+                            -
+                        @else
+                            {{ date('d-m-Y', strtotime($oDeal->end_agreement)) }}
+                        @endif
+                    </td>
+                </tr>
+            @endif
             <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
                 <td colspan="7">&nbsp;
             </td>
-            <tr class="hezOranje" style="border: 1px solid #f29421;">
-                <td class="morePad" colspan="7">
-                    <span class="newPrices"><b>Nieuwe tarieven</b></span>
-                    <span class="newPrices"><b>Gas</b> 2,35 &euro; ct/m3</span>
-                    <span class="newPrices"><b>Normaal</b> 2,55 &euro; ct/kWh</span>
-                    <span class="newPrices"><b>Laag</b> 2,46 &euro; ct/kWh</span>
-                    <span class="newPrices"><b>Enkel</b> 2,82 &euro; ct/kWh</span>
-                    <span class="newPrices"><b>Jaarbesparing</b> &euro; 44,42</span>
-                </td>
-            </tr>
+            @if($oCampaign->isElektricity())
+                <tr class="hezOranje" style="border: 1px solid #f29421;">
+                    <td class="morePad" colspan="7">
+                        <span class="newPrices"><b>Nieuwe tarieven</b></span>
+                        <span class="newPrices"><b>Normaal</b> {{ number_format($oCampaign->price_normal,2,',','.') }} &euro; ct/kWh</span>
+                        <span class="newPrices"><b>Laag</b> {{ number_format($oCampaign->price_low,2,',','.') }} &euro; ct/kWh</span>
+                        @if($oCampaign->price_enkel > 0)
+                            <span class="newPrices"><b>Enkel</b> {{ number_format($oCampaign->price_enkel,2,',','.') }} &euro; ct/kWh</span>
+                        @endif
+                        @if($oDeal->has_saving)
+                            <span class="newPrices"><b>Jaarbesparing</b> &euro; <span class="estimate_saving">{{ number_format($oDeal->estimate_saving_3_year,2,',','.') }}</span></span>
+                        @endif
+                    </td>
+                </tr>
+            @endif
+            @if($oCampaign->isGas())
+                <tr class="hezOranje" style="border: 1px solid #f29421;">
+                    <td class="morePad" colspan="7">
+                        <span class="newPrices"><b>Nieuwe tarieven</b></span>
+                        <span class="newPrices"><b>Gas</b> {{ number_format($oCampaign->price_enkel,2,',','.') }} &euro; ct/m3</span>
+                        @if($oDeal->has_saving)
+                            <span class="newPrices"><b>Jaarbesparing</b> &euro; <span class="estimate_saving">{{ number_format($oDeal->estimate_saving_3_year,2,',','.') }}</span></span>
+                        @endif
+                    </td>
+                </tr>
+            @endif
             <tr class="hezBlauw" style="border: 1px solid #76999b; border-top: none">
                 <td class="infoCell1 morePad">&nbsp;</td>
                 <td class="morePad" colspan="6">
-                    - Nog een extra regel met informatie die je hier makkelijk kwijt kan.<br /><br />
                     - De huishoudelijke energie opwek wordt gesaldeerd tegen hetzelfde tarief.<br /><br />
                     - Alle leveringstarieven zijn excl. btw, de huidige energiebelasting en andere tot op heden bekende
                     overheidstoeslagen. Het leveringstarief voor gas is incl. regiotoeslag.<br /><br />
@@ -104,62 +162,81 @@
             <ul class="selectLooptijdBron clearfix">
                 <li class="clearfix left">
                     <h4>Selecteer de looptijd</h4>
+                    @if($errors->has('form_end_agreement'))
+                        <br />
+                        <span class="errorSpan">Dit is een verplichte keuze</span>
+                    @endif
                     <label class="clearfix">
-                        <input type="radio" name="" value="" />
-                        <span>Verleng u contract(en) tot 1-1-2018</span>
+                        {{ Form::radio('form_end_agreement', 1, ($aData['form_end_agreement'] == 1 ? true : false)) }}
+                        <span>Verleng u contract(en) tot {{ date('d-m-Y', strtotime('+1 year', strtotime($oDeal->end_agreement))) }}</span>
                     </label>
                     <label class="clearfix">
-                        <input type="radio" name="" value="" />
-                        <span>Verleng u contract(en) tot 1-1-2019</span>
+                        {{ Form::radio('form_end_agreement', 2, ($aData['form_end_agreement'] == 2 ? true : false)) }}
+                        <span>Verleng u contract(en) tot {{ date('d-m-Y', strtotime('+2 year', strtotime($oDeal->end_agreement))) }}</span>
                     </label>
                     <label class="clearfix">
-                        <input type="radio" name="" value="" />
-                        <span>Verleng u contract(en) tot 1-1-2020</span>
-                    </label>
-                </li>
-                <li class="clearfix right">
-                    <h4>Selecteer uw hernieuwbare bron</h4>
-                    <label class="clearfix">
-                        <input type="radio" name="" value="" />
-                        <span>100% opgewekt door Nederlandse windmolens <i class="hezGrijs">(+0.30 ct/kWh)</i></span>
-                    </label>
-                    <label class="clearfix">
-                        <input type="radio" name="" value="" />
-                        <span>100% opgewekt door windmolens</span>
-                    </label>
-                    <label class="clearfix">
-                        <input type="radio" name="" value="" />
-                        <span>niet hernieuwbaar <i class="hezGrijs">(-0.05 ct/kWh)</i></span>
+                        {{ Form::radio('form_end_agreement', 3, ($aData['form_end_agreement'] == 3 ? true : false)) }}
+                        <span>Verleng u contract(en) tot {{ date('d-m-Y', strtotime('+3 year', strtotime($oDeal->end_agreement))) }}</span>
                     </label>
                 </li>
+                @if($oCampaign->isElektricity())
+                    <li class="clearfix right">
+                        <h4>Selecteer uw hernieuwbare bron</h4>
+                        @if($errors->has('form_renewable_resource'))
+                            <br />
+                            <span class="errorSpan">Dit is een verplichte keuze</span>
+                        @endif
+                        <label class="clearfix">
+                            {{ Form::radio('form_renewable_resource', 1, ($aData['form_renewable_resource'] == 1 ? true : false)) }}
+                            <span>100% opgewekt door Nederlandse windmolens <i class="hezGrijs">(+0.30 ct/kWh)</i></span>
+                        </label>
+                        <label class="clearfix">
+                            {{ Form::radio('form_renewable_resource', 2, ($aData['form_renewable_resource'] == 2 ? true : false)) }}
+                            <span>100% opgewekt door windmolens</span>
+                        </label>
+                        <label class="clearfix">
+                            {{ Form::radio('form_renewable_resource', 3, ($aData['form_renewable_resource'] == 3 ? true : false)) }}
+                            <span>niet hernieuwbaar <i class="hezGrijs">(-0.05 ct/kWh)</i></span>
+                        </label>
+                    </li>
+                @endif
             </ul>
             <h4>Communicatie</h4>
             <span class="subHead">Geef hieronder aan op welke email adressen we u het beste kunnen bereiken</span>
             <label class="commLabel clearfix">
                 <span class="preText1">E-mail adres voor facturatie</span>
-                <input class="rounded" type="text" placeholder="naam@domein.nl" />
+                {{ Form::text('form_email_billing', $aData['form_email_billing'], ['placeholder' => 'naam@domein.nl', 'class' => 'rounded '.($errors->has('form_email_billing') ? 'redBorder' : null)]) }}
+                @if($errors->has('form_email_billing'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <label class="commLabel clearfix">
                 <span class="preText1">E-mail adres voor contractverlenging</span>
-                <input class="rounded" type="text" placeholder="naam@domein.nl" />
+                {{ Form::text('form_email_contract_extension', $aData['form_email_contract_extension'], ['placeholder' => 'naam@domein.nl', 'class' => 'rounded '.($errors->has('form_email_contract_extension') ? 'redBorder' : null)]) }}
+                @if($errors->has('form_email_contract_extension'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <label class="commLabel lastCom clearfix">
                 <span class="preText1">E-mail adres voor opgave meterstanden</span>
-                <input class="rounded redBorder" type="text" placeholder="naam@domein.nl" />
-                <span class="errorSpan">Dit is een verplicht veld</span>
+                {{ Form::text('form_email_meter_readings', $aData['form_email_meter_readings'], ['placeholder' => 'naam@domein.nl', 'class' => 'rounded '.($errors->has('form_email_meter_readings') ? 'redBorder' : null)]) }}
+                @if($errors->has('form_email_meter_readings'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <h4>Betalingsgegevens</h4>
             <ul class="betalingsGegevens clearfix">
                 <li class="clearfix">
                     <label class="clearfix">
-                        <input type="radio" name="" value="" />
+                        {{ Form::radio('form_payment', \App\Models\Deal::FORM_PAYMENT_AUTOMATIC_COLLECTION, ($aData['form_payment'] == \App\Models\Deal::FORM_PAYMENT_AUTOMATIC_COLLECTION ? true : false)) }}
                         <span>Ja, ik machtig Hezelaer voor automatische incasso</span>
-                        <a class="infoHolder" href="#">
+                        <a class="infoHolder tooltip-payment" href="#">
                             <div class="holderText rounded clearfix" style="display: none">
-                                Integer accumsan, purus at eleifend rhoncus, leo velit auctor neque, vitae bibendum leo lorem quis tortor. 
-                                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                                Nam feugiat leo lacus, viverra rutrum velit laoreet id. 
-                                In hac habitasse platea dictumst.<br /><br />
+                                <strong>Doorlopende machtiging SEPA automatische incasso</strong><br />
+                                Door ondertekening van dit formulier geeft u toestemming aan Hezelaer Energy B.V. (hierna Hezelaer), met incassant id NL38ZZZ171680950000 om doorlopend incasso-opdrachten te sturen naar uw bank om een bedrag van uw rekening af te schrijven wegens openstaande factu(u)r(e)n en uw bank om doorlopend een bedrag van uw rekening af te schrijven overeenkomstig de opdracht van Hezelaer. Als u het niet eens bent met deze afschrijving kunt u deze laten terugboeken. Neem hiervoor acht werken na afschrijving contact op met uw bank. Vraag uw bank naar de voorwaarden.<br />
+                                <br />
+                                <div style="font-style: italic"><strong>Let op:</strong> Er kan alleen ge&iuml;ncasseerd worden van uw rekening als u uw bank hiervoor toestemming geeft. Zie voor meer informatie de website van uw bank.</div>
+                                <br />
                                 <i class="infoRow">
                                     <b>Hezelaer Energy BV</b><br />
                                     Ulvenhoutselaan 12<br />
@@ -167,7 +244,7 @@
                                 </i>
                                 <i class="infoRow">
                                     <b>Incassant ID</b><br />
-                                    1234567890 ABC<br />
+                                    NL38ZZZ171680950000<br />
                                 </i>
                             </div>
                         </a>
@@ -175,14 +252,13 @@
                 </li>
                 <li class="clearfix">
                     <label class="clearfix">
-                        <input type="radio" name="" value="" />
+                        {{ Form::radio('form_payment', \App\Models\Deal::FORM_PAYMENT_INVOICE, ($aData['form_payment'] == \App\Models\Deal::FORM_PAYMENT_INVOICE ? true : false)) }}
                         <span>Nee, ik betaal per factuur</span>
-                        <a class="infoHolder" href="#">
-                            <div class="holderText rounded clearfix" style="display: block">
-                                Integer accumsan, purus at eleifend rhoncus, leo velit auctor neque, vitae bibendum leo lorem quis tortor. 
-                                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                                Nam feugiat leo lacus, viverra rutrum velit laoreet id. 
-                                In hac habitasse platea dictumst.<br /><br />
+                        <a class="infoHolder tooltip-payment" href="#">
+                            <div class="holderText rounded clearfix" style="display: none">
+                                <strong>Betaling per factuur</strong><br />
+                                Kiest u nier voor automatische incasso dan betaal u &euro; 2,- exclusief btw administratiekosten per maand en dient u de factuur te voldoen binnen 7 dagen na ontvangt. Indien Hezelaer uw automatische incasso be&euml;indigd i.v.m. een stornering, dan worden deze kosten ook in rekening gebracht. Wilt u facturen per post ontvangen, dan brengt Hezelaer Energy hiervoor &euro; 2,- exclusief btw per verzonden factuur per post in rekening. Het verzenden van uw facturen per e-mail is gratis. Indien Leveranciers de overeenkomst later dan bovenstaande datum (schriftelijk) ontvangt, dan heeft Leverancier het recht de tarieven te wijzigen, alleen indien Leverancier hierdoor een financieel nadeel heeft. De getekende overeenkomst komt hiermee niet te vervallen.<br/>
+                                <br />
                                 <i class="infoRow">
                                     <b>Hezelaer Energy BV</b><br />
                                     Ulvenhoutselaan 12<br />
@@ -190,89 +266,111 @@
                                 </i>
                                 <i class="infoRow">
                                     <b>Incassant ID</b><br />
-                                    1234567890 ABC<br />
+                                    NL38ZZZ171680950000<br />
                                 </i>
                             </div>
                         </a>
                     </label>
                 </li>
             </ul>
+            @if($errors->has('form_payment'))
+                <span class="errorSpan">Dit is een verplichte keuze</span>
+            @endif
             <div class="adresField clearfix">
                 <label class="straatnaamLabel clearfix">
                     <span class="preText2">Factuuradres</span>
-                    <input class="rounded" type="text" placeholder="Straatnaam" />
+                    {{ Form::text('form_fadr_street', $aData['form_fadr_street'], ['placeholder' => 'Straatnaam', 'class' => 'rounded '.($errors->has('form_fadr_street') ? 'redBorder' : null)]) }}
                 </label>
                 <label class="huisnrLabel clearfix">
-                    <input class="rounded" type="text" placeholder="00" />
+                    {{ Form::text('form_fadr_nr', $aData['form_fadr_nr'], ['placeholder' => '00', 'class' => 'rounded '.($errors->has('form_fadr_nr') ? 'redBorder' : null)]) }}
                 </label>
                 <label class="toevoegingLabel clearfix">
-                    <input class="rounded" type="text" placeholder="A" />
+                   {{ Form::text('form_fadr_nr_conn', $aData['form_fadr_nr_conn'], ['placeholder' => 'A', 'class' => 'rounded '.($errors->has('form_fadr_nr_conn') ? 'redBorder' : null)]) }}
                 </label>
+                @if($errors->has('form_fadr_street') || $errors->has('form_fadr_nr'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
                 <label class="postcodeLabel clearfix">
-                    <input class="rounded" type="text" placeholder="1234 AB" />
+                    {{ Form::text('form_fadr_zip', $aData['form_fadr_zip'], ['placeholder' => '1234 AB', 'class' => 'rounded '.($errors->has('form_fadr_zip') ? 'redBorder' : null)]) }}
                 </label>
                 <label class="stadLabel clearfix">
-                    <input class="rounded" type="text" placeholder="Stad" />
+                    {{ Form::text('form_fadr_city', $aData['form_fadr_city'], ['placeholder' => 'Stad', 'class' => 'rounded '.($errors->has('form_fadr_city') ? 'redBorder' : null)]) }}
                 </label>
+                @if($errors->has('form_fadr_zip') || $errors->has('form_fadr_city'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
                 <label class="ibanLabel clearfix">
                     <span class="preText2">IBAN</span>
-                    <input class="rounded redBorder" type="text" placeholder="NL00 INGB 0000 0000 00" />
-                    <span class="errorSpan">Dit is een verplicht veld</span>
+                    {{ Form::text('form_iban', $aData['form_iban'], ['placeholder' => 'NL00 INGB 0000 0000 00', 'class' => 'rounded '.($errors->has('form_iban') ? 'redBorder' : null)]) }}
+                    @if($errors->has('form_iban'))
+                        <span class="errorSpan">Dit is een verplicht veld</span>
+                    @endif
                     <i class="hezGrijs">Vergeet niet uw bankrekeningnummer door te geven voor eventuele terug betalingen</i>
                 </label>
             </div>
             <h4>Algemene voorwaarden</h4>
             <label class="algLabel clearfix">
-                <input type="checkbox" name="" value="" />
+                {{ Form::checkbox('form_terms_and_conditions_1', 1, ($aData['form_terms_and_conditions_1'] == 1 ? true : false)) }}
                 <a class="hezBlauw" href="#">Model aansluit- en transportovereenkomst (ATO)</a>
+                @if($errors->has('form_terms_and_conditions_1'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <label class="algLabel clearfix">
-                <input type="checkbox" name="" value="" />
+                {{ Form::checkbox('form_terms_and_conditions_2', 1, ($aData['form_terms_and_conditions_2'] == 1 ? true : false)) }}
                 <a class="hezBlauw" href="#">Algemene voorwaarden kleinverbruikaansluitingen</a>
+                @if($errors->has('form_terms_and_conditions_2'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <label class="algLabel lastAlg clearfix">
-                <input type="checkbox" name="" value="" />
+                {{ Form::checkbox('form_terms_and_conditions_3', 1, ($aData['form_terms_and_conditions_3'] == 1 ? true : false)) }}
                 <a class="hezBlauw" href="#">Leveringsvoorwaarden Zeker & Vast contract voor kleinverbruikaansluitingen</a>
-                <span class="errorSpan">Dit is een verplicht veld</span>
+                @if($errors->has('form_terms_and_conditions_3'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <h4>Ondertekenen</h4>
             <label class="signLabel clearfix">
                 <span class="preText3">Naam</span>
-                <input class="rounded redBorder" type="text" placeholder="Voorletters + Achternaam" />
-                <span class="errorSpan">Dit is een verplicht veld</span>
+                {{ Form::text('form_sign_name', $aData['form_sign_name'], ['placeholder' => 'Voorletters + Achternaam', 'class' => 'form_sign_name rounded '.($errors->has('form_sign_name') ? 'redBorder' : null)]) }}
+                @if($errors->has('form_sign_name'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <label class="signLabel clearfix">
                 <span class="preText3">Namens</span>
-                <input class="rounded" type="text" placeholder="Bedrijfsnaam" />
+                {{ Form::text('form_sign_on_behalf_of', $aData['form_sign_on_behalf_of'], ['placeholder' => 'Bedrijfsnaam', 'class' => 'rounded '.($errors->has('form_sign_on_behalf_of') ? 'redBorder' : null)]) }}
+                @if($errors->has('form_sign_on_behalf_of'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <label class="signLabel clearfix">
                 <span class="preText3">Functie</span>
-                <input class="rounded" type="text" placeholder="Functie" />
+                {{ Form::text('form_sign_function', $aData['form_sign_function'], ['placeholder' => 'Functie', 'class' => 'form_sign_function rounded '.($errors->has('form_sign_function') ? 'redBorder' : null)]) }}
+                @if($errors->has('form_sign_function'))
+                    <span class="errorSpan">Dit is een verplicht veld</span>
+                @endif
             </label>
             <span class="ingevuldeInfo hezBlauw">
-                voorletters + achternaam<br />
-                functie bij bedrijfsnaam<br />
-                <?= date('d-m-Y') ?>
+                <div class="sign_name">{{ $aData['form_sign_name'] }}</div>
+                <div class="sign_function">{{ $aData['form_sign_function'] }}</div>
+                {{ date('d-m-Y') }}<br />
             </span>
             <label class="submitLabel clearfix">
-                <input type="checkbox" value="" name="" />
+                {{ Form::checkbox('form_permission', 1, ($aData['form_permission'] == 1 ? true : false)) }}
                 <span class="hezBlauw">Hierbij verklaar ik mijn toestemming voor bovenstaande contractverlenging(en)</span>
             </label>
+            <div class="clearfix"></div>
+            @if($errors->has('form_permission'))
+                <span class="errorSpan">Dit is een verplicht veld</span>
+            @endif
             {{ Form::submit('Contractverlengen ondertekenen en bevestigen', ['class' => 'submitForm rounded']) }}
         {!! Form::close() !!}
-        <div class="succesMelding clearfix" style="display: none">
-            <h3>Gefeliciteerd met uw nieuwe contract</h3>
-            <h4>U heeft alles per e-mail ontvangen</h4>
-            <b>Contractverlenging</b>
-            <span>Wij hebben de bevestiging en de PDF van uw contractverlenging gemaild.</span>
-            <a class="hezBlauw" href="#">Zeker&Vast-SC-20160415-v8t.pdf</a>
-            <a class="hezBlauw" href="#">Download</a>
-            <a class="hezBlauw" href="#">Print</a>
-        </div>
     </div>
     <div id="footer">
         <ul class="clearfix">
-            <li><span>Copyrights &copy; <?= date('Y') ?> Hezelaer Energy B.V. - Contractverlenging Mevr. A. B. Achternaam</span></li>
+            <li><span>Copyrights &copy; {{ date('Y') }} Hezelaer Energy B.V. - Contractverlenging {{ $oDeal->client_name }}</span></li>
         </ul>
     </div>
 </div>

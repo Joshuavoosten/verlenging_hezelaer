@@ -19,7 +19,28 @@ class Deal extends Model
     // If the estimate saving is larger then this amount, the deal is saved with has_saving = 1.
     const HAS_SAVING_PRICE = 50;
 
+    const FORM_PAYMENT_INVOICE = 1;
+    const FORM_PAYMENT_AUTOMATIC_COLLECTION = 2;
+
     /**
+     * Remove Salutation
+     * 
+     * @param string $sValue
+     * @return string $sReturn
+     */
+    public static function removeSalutation($sValue) {
+        $sReturn =  $sValue;
+
+        $sReturn = str_replace('Geachte heer', '', $sReturn);
+        $sReturn = str_replace('Geachte mevrouw', '', $sReturn);
+        $sReturn = str_replace('Beste', '', $sReturn);
+
+        return $sReturn;
+    }
+
+    /**
+     * Status Formatter
+     *
      * @param string $sStatus
      * @return mixed null | string
      */
@@ -41,6 +62,8 @@ class Deal extends Model
     }
 
     /**
+     * Calculate Costs
+     *
      * @param int $iPriceCalculation
      * @param int $iYears
      * @param int $iMonths
@@ -90,6 +113,8 @@ class Deal extends Model
     }
 
     /**
+     * Calculate Saving
+     *
      * @param int $iPriceCalculation
      * @param int $iYears
      * @param int $iMonths
@@ -162,6 +187,29 @@ class Deal extends Model
         }
     }
 
+    /**
+     * Total Annual Consumption
+     *
+     * @return float
+     */
+    public function totalAnnualConsumption() {
+        return $this->syu_normal + $this->syu_low;
+    }
+
+    /**
+     * Invoice Address Formatter
+     *
+     * @return string
+     */
+    public function fadrFormatter() {
+        return implode(' ', [$this->fadr_street, $this->fadr_nr.' '.$this->fadr_nr_conn, $this->fadr_zip, $this->fadr_city]);
+    }
+
+    /**
+     * Connection Address Formatter
+     *
+     * @return string
+     */
     public function cadrFormatter() {
         return implode(' ', [$this->cadr_street, $this->cadr_nr.' '.$this->cadr_nr_conn, $this->cadr_zip, $this->cadr_city]);
     }

@@ -49,6 +49,8 @@ class DetailsController extends Controller
              App::abort(404, 'Campaign Not Found.');
          }
 
+         // Schedule
+
          if ($oCampaign->scheduled) {
              $iScheduleDay = date('d', strtotime($oCampaign->scheduled_at));
              $iScheduleMonth = date('m', strtotime($oCampaign->scheduled_at));

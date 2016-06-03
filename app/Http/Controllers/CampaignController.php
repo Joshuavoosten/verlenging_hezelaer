@@ -296,6 +296,14 @@ class CampaignController extends Controller
                     $oCampaign->price_low = (array_key_exists('low', $aPrices) ? $aPrices['low'] : 0);
                     $oCampaign->price_enkel = (array_key_exists('enkel', $aPrices) ? $aPrices['enkel'] : 0);
 
+                    // Type
+
+                    if ($oCampaign->price_normal > 0 && $oCampaign->price_low > 0) {
+                        $oCampaign->type = ModelCampaign::TYPE_ELEKTRICITY;
+                    } else {
+                        $oCampaign->type = ModelCampaign::TYPE_GAS;
+                    }
+
                     // Deals
 
                     $oDB = DB::table('contractgegevens')
