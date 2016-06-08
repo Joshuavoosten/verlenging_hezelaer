@@ -7,59 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Deal extends Model
 {
-    protected $table = 'deals';
+    const TYPE_GAS = 1;
+    const TYPE_ELEKTRICITY = 2;
 
-    const STATUS_PLANNED = 1;
-    const STATUS_INVITE_EMAIL_SCHEDULED = 2;
-    const STATUS_INVITE_EMAIL_QUEUED = 3;
-    const STATUS_INVITE_EMAIL_SENT = 4;
-    const STATUS_FORM_REQUESTED = 5;
-    const STATUS_FORM_SAVED = 6;
+    const CALCULATION_GAS_1_RATE = 1;
+    const CALCULATION_ENERGY_2_RATES = 2;
+    const CALCULATION_ENERGY_3_RATES = 3;
+
+    const NEW_VASTRECHT = 4.95;
 
     // If the estimate saving is larger then this amount, the deal is saved with has_saving = 1.
     const HAS_SAVING_PRICE = 50;
 
-    const FORM_PAYMENT_INVOICE = 1;
-    const FORM_PAYMENT_AUTOMATIC_COLLECTION = 2;
-
-    /**
-     * Remove Salutation
-     * 
-     * @param string $sValue
-     * @return string $sReturn
-     */
-    public static function removeSalutation($sValue) {
-        $sReturn =  $sValue;
-
-        $sReturn = str_replace('Geachte heer', '', $sReturn);
-        $sReturn = str_replace('Geachte mevrouw', '', $sReturn);
-        $sReturn = str_replace('Beste', '', $sReturn);
-
-        return $sReturn;
-    }
-
-    /**
-     * Status Formatter
-     *
-     * @param string $sStatus
-     * @return mixed null | string
-     */
-    public static function statusFormatter($sStatus) {
-        switch ($sStatus) {
-            case self::STATUS_PLANNED:
-                return null;
-            case self::STATUS_INVITE_EMAIL_SCHEDULED:
-                return __('Scheduled');
-            case self::STATUS_INVITE_EMAIL_QUEUED:
-                return __('Queued');
-            case self::STATUS_INVITE_EMAIL_SENT:
-                return __('Sent');
-            case self::STATUS_FORM_REQUESTED:
-                return __('Form Requested');
-            case self::STATUS_FORM_SAVED:
-                return __('Form Saved');
-        }
-    }
+    protected $table = 'deals';
 
     /**
      * Calculate Costs
@@ -67,46 +27,41 @@ class Deal extends Model
      * @param int $iPriceCalculation
      * @param int $iYears
      * @param int $iMonths
-     * @param float $syu_normal
-     * @param float $syu_low
-     * @param float $vastrecht
-     * @param float $price_normal
-     * @param float $price_low
      * @return float $fCosts
      */
-    public static function calculateCosts($iPriceCalculation,$aPrices,$iYears,$iMonths,$syu_normal,$syu_low,$vastrecht,$price_normal,$price_low) {
+    public function calculateCosts($aPrices,$iYears,$iMonths) {
         $fCosts = 0;
 
-        switch ($iPriceCalculation) {
+        switch ($this->calculation) {
 
             // Gas met een tarief normaal
 
-            case ModelPrice::CALCULATION_GAS_1_RATE:
+            case CampaignPrice::CALCULATION_GAS_1_RATE:
                 $new_price_gas = $aPrices['normal'];
 
                 // Kosten = ((syu_gas * new_price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
-                $fCosts = (($syu_normal * $new_price_gas) * $iYears) + ($vastrecht * $iMonths);
+                $fCosts = (($this->syu_normal * $new_price_gas) * $iYears) + ($this->vastrecht * $iMonths);
 
                 return $fCosts;
 
             // Energie met 2 tarieven (hoog en laag)
 
-            case ModelPrice::CALCULATION_ENERGY_2_RATES:
+            case CampaignPrice::CALCULATION_ENERGY_2_RATES:
                 $new_price_low = $aPrices['low'];
                 $new_price_high = $aPrices['normal'];
 
                 // Kosten = (((syu_low * new_price_low) + (syu_high * new_price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
-                $fCosts = ((($syu_low * $new_price_low) + ($syu_normal * $new_price_high)) * $iYears) + ($vastrecht * $iMonths);
+                $fCosts = ((($this->syu_low * $new_price_low) + ($this->syu_normal * $new_price_high)) * $iYears) + ($this->vastrecht * $iMonths);
 
                 return $fCosts;
 
             // Energie met 3 tarieven (hoog, laag en enkel)
 
-            case ModelPrice::CALCULATION_ENERGY_3_RATES:
+            case CampaignPrice::CALCULATION_ENERGY_3_RATES:
                 $new_price_enkel = $aPrices['enkel'];
 
                 // Kosten = ((syu_normal * new_price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd)
-                $fCosts = (($syu_normal * $new_price_enkel) * $iYears) + ($vastrecht * $iMonths);
+                $fCosts = (($this->syu_normal * $new_price_enkel) * $iYears) + ($this->vastrecht * $iMonths);
 
                 return $fCosts;
         }
@@ -118,28 +73,23 @@ class Deal extends Model
      * @param int $iPriceCalculation
      * @param int $iYears
      * @param int $iMonths
-     * @param float $syu_normal
-     * @param float $syu_low
-     * @param float $vastrecht
-     * @param float $price_normal
-     * @param float $price_low
      * @return float $fSaving
      */
-    public static function calculateSaving($iPriceCalculation,$aPrices,$iYears,$iMonths,$syu_normal,$syu_low,$vastrecht,$price_normal,$price_low) {
+    public function calculateSaving($aPrices,$iYears,$iMonths) {
         $fSaving = 0;
 
-        switch ($iPriceCalculation) {
+        switch ($this->calculation) {
 
             // Gas met een tarief normaal
 
-            case ModelPrice::CALCULATION_GAS_1_RATE:
+            case CampaignPrice::CALCULATION_GAS_1_RATE:
                 $new_price_gas = $aPrices['normal'];
 
                 // Besparing = (((syu_gas * new_price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
                 //           - (((syu_gas * price_gas) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
 
-                $fCostsOld = ((($syu_normal * $new_price_gas) * $iYears) + ($vastrecht * $iMonths));
-                $fCostsNew = ((($syu_normal * $price_normal) * $iYears) + ($vastrecht * $iMonths));
+                $fCostsOld = ((($this->syu_normal * $new_price_gas) * $iYears) + ($this->vastrecht * $iMonths));
+                $fCostsNew = ((($this->syu_normal * $this->price_normal) * $iYears) + ($this->vastrecht * $iMonths));
                 $fSaving = $fCostsOld - $fCostsNew;
 
                 if ($fSaving < 0) {
@@ -150,15 +100,15 @@ class Deal extends Model
 
             // Energie met 2 tarieven (hoog en laag)
 
-            case ModelPrice::CALCULATION_ENERGY_2_RATES:
+            case CampaignPrice::CALCULATION_ENERGY_2_RATES:
                 $new_price_low = $aPrices['low'];
                 $new_price_high = $aPrices['normal'];
 
                 // Besparing = ((((syu_low * price_low) + (syu_high * price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
                 // - ((((syu_low * new_price_low) + (syu_high * new_price_high)) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
 
-                $fCostsOld = (((($syu_low * $price_low) + ($syu_normal * $price_normal)) * $iYears) + ($vastrecht * $iMonths));
-                $fCostsNew = ((($syu_low * $new_price_low) + ($syu_normal * $new_price_high) * $iYears) + ($vastrecht * $iMonths));
+                $fCostsOld = (((($this->syu_low * $this->price_low) + ($this->syu_normal * $this->price_normal)) * $iYears) + ($this->vastrecht * $iMonths));
+                $fCostsNew = ((($this->syu_low * $new_price_low) + ($this->syu_normal * $new_price_high) * $iYears) + ($this->vastrecht * $iMonths));
                 $fSaving = $fCostsOld - $fCostsNew;
 
                 if ($fSaving < 0) {
@@ -169,14 +119,14 @@ class Deal extends Model
 
             // Energie met 3 tarieven (hoog, laag en enkel)
 
-            case ModelPrice::CALCULATION_ENERGY_3_RATES:
+            case CampaignPrice::CALCULATION_ENERGY_3_RATES:
                 $new_price_enkel = $aPrices['enkel'];
 
                 // Besparing = (((syu_normal * new_price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
                 //           - (((syu_normal * price_enkel) * aantal jaren in looptijd) + (vastrecht * aantal maanden in looptijd))
 
-                $fCostsOld = ((($syu_normal * $new_price_enkel) * $iYears) + ($vastrecht * $iMonths));
-                $fCostsNew = ((($syu_normal * $price_normal) * $iYears) + ($vastrecht * $iMonths));
+                $fCostsOld = ((($this->syu_normal * $new_price_enkel) * $iYears) + ($this->vastrecht * $iMonths));
+                $fCostsNew = ((($this->syu_normal * $this->price_normal) * $iYears) + ($this->vastrecht * $iMonths));
                 $fSaving = $fCostsOld - $fCostsNew;
 
                 if ($fSaving < 0) {
@@ -188,30 +138,26 @@ class Deal extends Model
     }
 
     /**
+     * @return bool true | false
+     */
+    public function isGas() {
+        return ($this->type == self::TYPE_GAS ? true : false);
+    }
+
+    /**
+     * @return bool true | false
+     */
+    public function isElektricity() {
+        return ($this->type == self::TYPE_ELEKTRICITY ? true : false);
+    }
+
+    /**
      * Total Annual Consumption
      *
      * @return float
      */
     public function totalAnnualConsumption() {
         return $this->syu_normal + $this->syu_low;
-    }
-
-    /**
-     * Invoice Address Formatter
-     *
-     * @return string
-     */
-    public function fadrFormatter() {
-        return implode(' ', [$this->fadr_street, $this->fadr_nr.' '.$this->fadr_nr_conn, $this->fadr_zip, $this->fadr_city]);
-    }
-
-    /**
-     * Connection Address Formatter
-     *
-     * @return string
-     */
-    public function cadrFormatter() {
-        return implode(' ', [$this->cadr_street, $this->cadr_nr.' '.$this->cadr_nr_conn, $this->cadr_zip, $this->cadr_city]);
     }
 
 }

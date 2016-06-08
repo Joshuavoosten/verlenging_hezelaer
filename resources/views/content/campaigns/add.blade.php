@@ -1,5 +1,9 @@
 @extends('layouts.master')
 
+@section('scripts')
+<script src="{{ URL::asset('assets/js/content/campaigns/add.js') }}"></script>
+@endsection
+
 @section('content')
 <ol class="breadcrumb">
     <li>
@@ -52,9 +56,9 @@
             </div>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="form-group {{ ($errors->first('current_profile_code') ? 'has-error' : '') }}">
-                        {{ Form::label('current_profile_code', __('Profile Code')) }}
-                        {{ Form::select('current_profile_code', $aCurrentProfileCodes, old('current_profile_codes'), ['id' => 'current_profile_codes', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    <div class="form-group {{ ($errors->first('current_profile_codes') ? 'has-error' : '') }}">
+                        {{ Form::label('current_profile_codes', __('Profile Code(s)')) }}
+                        {{ Form::select('current_profile_codes[]', $aCurrentProfileCodes, old('current_profile_codes'), ['id' => 'current_profile_codes', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'multiple']) }}
                     </div>
                 </div>
                 <div class="col-md-3">

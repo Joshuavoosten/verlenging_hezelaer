@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign as ModelCampaign;
+use App\Models\CampaignPrice as ModelCampaignPrice;
+use App\Models\CampaignCustomer as ModelCampaignCustomer;
 use App\Models\Deal as ModelDeal;
 use App\Models\Price as ModelPrice;
 use Auth;
@@ -37,13 +39,13 @@ class CampaignController extends Controller
                 'id',
                 'name',
                 'current_segment',
-                'current_profile_code',
+                'current_profile_codes',
                 'current_agreement',
                 'current_expiration_date',
                 'scheduled_at',
                 'created_at',
                 'updated_at',
-                DB::RAW('(SELECT COUNT(id) FROM deals AS d WHERE d.campaign_id = campaigns.id) AS count_customers') 
+                DB::RAW('(SELECT COUNT(id) FROM campaign_customers AS cc WHERE cc.campaign_id = campaigns.id) AS count_customers') 
             )
             ->where('status', '=', ModelCampaign::STATUS_PLANNED)
         ;
@@ -76,7 +78,7 @@ class CampaignController extends Controller
                     'id' => $o->id,
                     'name' => $o->name,
                     'current_segment' => $o->current_segment,
-                    'current_profile_code' => $o->current_profile_code,
+                    'current_profile_codes' => $o->current_profile_codes,
                     'current_agreement' => $o->current_agreement,
                     'current_expiration_date' => ($o->current_expiration_date ? date('d-m-Y', strtotime($o->current_expiration_date)) : ''),
                     'count_customers' => $o->count_customers,
@@ -102,12 +104,12 @@ class CampaignController extends Controller
                 'id',
                 'name',
                 'current_segment',
-                'current_profile_code',
+                'current_profile_codes',
                 'current_agreement',
                 'current_expiration_date',
                 'created_at',
                 'updated_at',
-                DB::RAW('(SELECT COUNT(id) FROM deals AS d WHERE d.campaign_id = campaigns.id) AS count_customers') 
+                DB::RAW('(SELECT COUNT(id) FROM campaign_customers AS cc WHERE cc.campaign_id = campaigns.id) AS count_customers') 
             )
             ->where('status', '=', ModelCampaign::STATUS_SENT)
         ;
@@ -140,7 +142,7 @@ class CampaignController extends Controller
                     'id' => $o->id,
                     'name' => $o->name,
                     'current_segment' => $o->current_segment,
-                    'current_profile_code' => $o->current_profile_code,
+                    'current_profile_codes' => $o->current_profile_codes,
                     'current_agreement' => $o->current_agreement,
                     'current_expiration_date' => ($o->current_expiration_date ? date('d-m-Y', strtotime($o->current_expiration_date)) : ''),
                     'count_customers' => $o->count_customers,
@@ -225,7 +227,7 @@ class CampaignController extends Controller
             $aMessages = [
                 'name.required' => sprintf(__('%s is required.'), __('Name')),
                 'current_segment.required' => sprintf(__('%s is required.'), __('Segment')),
-                'current_profile_code.required' => sprintf(__('%s is required.'), __('Profile Code')),
+                'current_profile_codes.required' => sprintf(__('%s is required.'), __('Profile Code')),
                 'current_agreement.required' => sprintf(__('%s is required.'), __('Agreement')),
                 'current_expiration_date.required' => sprintf(__('%s is required.'), __('Expiration Date')),
                 'new_agreement.required' => sprintf(__('%s is required.'), __('Agreement')),
@@ -236,7 +238,7 @@ class CampaignController extends Controller
             $oValidator = Validator::make(Input::all(), [
                 'name' => 'required',
                 'current_segment' => 'required',
-                'current_profile_code' => 'required',
+                'current_profile_codes' => 'required',
                 'current_agreement' => 'required',
                 'current_expiration_date' => 'required',
                 'new_agreement' => 'required',
@@ -275,34 +277,27 @@ class CampaignController extends Controller
                 $oCampaign->current_segment = Input::get('current_segment');
                 $oCampaign->current_in_a_group = $current_in_a_group;
                 $oCampaign->current_under_an_agent = $current_under_an_agent;
-                $oCampaign->current_profile_code = Input::get('current_profile_code');
+                $oCampaign->current_profile_codes = implode(',', Input::get('current_profile_codes'));
                 $oCampaign->current_agreement = Input::get('current_agreement');
                 $oCampaign->current_expiration_date = date('Y-m-d', strtotime(Input::get('current_expiration_date')));
                 $oCampaign->new_agreement = Input::get('new_agreement');
                 $oCampaign->new_term_offer = Input::get('new_term_offer');
                 $oCampaign->new_percentage = Input::get('new_percentage');
 
-                // Prices
+                // Campaign -> Prices
 
-                $aPrices = ModelPrice::getCampaignPrices(Input::get('current_profile_code'), Input::get('current_expiration_date'));
+                $aCampaignPrices = [];
 
-                if (count($aPrices) == 0) {
-                    $aErrors['prices'] = __('There are no prices available.');
-                } else {
-
-                    // Prices
-
-                    $oCampaign->price_normal = (array_key_exists('normal', $aPrices) ? $aPrices['normal'] : 0);
-                    $oCampaign->price_low = (array_key_exists('low', $aPrices) ? $aPrices['low'] : 0);
-                    $oCampaign->price_enkel = (array_key_exists('enkel', $aPrices) ? $aPrices['enkel'] : 0);
-
-                    // Type
-
-                    if ($oCampaign->price_normal > 0 && $oCampaign->price_low > 0) {
-                        $oCampaign->type = ModelCampaign::TYPE_ELEKTRICITY;
+                foreach (Input::get('current_profile_codes') as $current_profile_code) {
+                    $a = ModelPrice::getCampaignPrices($current_profile_code, Input::get('current_expiration_date'));
+                    if (count($a) == 0) {
+                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\'.'), $current_profile_code);
                     } else {
-                        $oCampaign->type = ModelCampaign::TYPE_GAS;
+                        $aCampaignPrices[$current_profile_code] = $a;
                     }
+                }
+
+                if (count($aErrors) == 0) {
 
                     // Deals
 
@@ -376,8 +371,8 @@ class CampaignController extends Controller
                     }
                     */
 
-                    // Profile Code
-                    $oDB->where('code', '=', Input::get('current_profile_code'));
+                    // Profile Code(s)
+                    $oDB->whereIn('code', Input::get('current_profile_codes'));
 
                     // Agreement
 
@@ -398,71 +393,102 @@ class CampaignController extends Controller
                         // Campaign
                         $oCampaign->save();
 
-                        // Deals
+                        // Campaign -> Prices
 
-                        $a = $oDB->get();
+                        foreach ($aCampaignPrices as $current_profile_code => $aCampaignPrice) {
+                            $oCampaignPrice = new ModelCampaignPrice();
 
-                        foreach ($a as $o) {
+                            $oCampaignPrice->campaign_id = $oCampaign->id;
+                            $oCampaignPrice->code = $aCampaignPrice['code'];
+                            $oCampaignPrice->price_normal = (array_key_exists('normal', $aCampaignPrice) ? $aCampaignPrice['normal'] : 0);
+                            $oCampaignPrice->price_low = (array_key_exists('low', $aCampaignPrice) ? $aCampaignPrice['low'] : 0);
+                            $oCampaignPrice->price_enkel = (array_key_exists('enkel', $aCampaignPrice) ? $aCampaignPrice['enkel'] : 0);
+                            $oCampaignPrice->type = $oCampaignPrice->determineType();
+                            $oCampaignPrice->calculation = $oCampaignPrice->determineCalculation();
+
+                            $oCampaignPrice->save();
+
+                            $aCampaignPrices[$current_profile_code]['type'] = $oCampaignPrice->type;
+                            $aCampaignPrices[$current_profile_code]['calculation'] = $oCampaignPrice->calculation;
+                        }
+
+                        // Campaign -> Customers
+                        $aCampaignCustomers = [];
+
+                        // Current Deals
+
+                        $aCurrentDeals = $oDB->get();
+
+                        foreach ($aCurrentDeals as $o) {
+
+                            // Campaign -> Customers
+
+                            $campaign_customer_id = null;
+
+                            if (!in_array($o->client_code, $aCampaignCustomers)) {
+                                $oCampaignCustomer = new ModelCampaignCustomer();
+
+                                $oCampaignCustomer->campaign_id = $oCampaign->id;
+                                $oCampaignCustomer->client_name = $o->client_name;
+                                $oCampaignCustomer->client_code = $o->client_code;
+                                $oCampaignCustomer->email_commercieel = $o->email_commercieel;
+                                $oCampaignCustomer->telnr_commercieel = $o->telnr_commercieel;
+                                $oCampaignCustomer->aanhef_commercieel = $o->aanhef_commercieel;
+                                $oCampaignCustomer->fadr_street = $o->fadr_street;
+                                $oCampaignCustomer->fadr_nr = $o->fadr_nr;
+                                $oCampaignCustomer->fadr_nr_conn = $o->fadr_nr_conn;
+                                $oCampaignCustomer->fadr_zip = $o->fadr_zip;
+                                $oCampaignCustomer->fadr_city = $o->fadr_city;
+                                $oCampaignCustomer->cadr_street = $o->cadr_street;
+                                $oCampaignCustomer->cadr_nr = $o->cadr_nr;
+                                $oCampaignCustomer->cadr_nr_conn = $o->cadr_nr_conn;
+                                $oCampaignCustomer->cadr_zip = $o->cadr_zip;
+                                $oCampaignCustomer->cadr_city = $o->cadr_city;
+                                $oCampaignCustomer->auto_renewal = $o->auto_renewal;
+                                $oCampaignCustomer->accountmanager = $o->accountmanager;
+                                $oCampaignCustomer->klantsegment = $o->klantsegment;
+                                $oCampaignCustomer->category1 = $o->category1;
+                                $oCampaignCustomer->category2 = $o->category2;
+                                $oCampaignCustomer->category3 = $o->category3;
+                                $oCampaignCustomer->consument = $o->consument;
+                                $oCampaignCustomer->token = sha1(openssl_random_pseudo_bytes(32));
+                                $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_PLANNED;
+
+                                $oCampaignCustomer->save();
+
+                                $campaign_customer_id = $oCampaignCustomer->id;
+
+                                $aCampaignCustomers[$campaign_customer_id] = $o->client_code;
+                            } else {
+                                $campaign_customer_id = array_search($o->client_code, $aCampaignCustomers);
+                            }
+
+                            // Deal
+
                             $oDeal = new ModelDeal;
 
-                            $iPriceCalculation = ModelPrice::getCalculation($aPrices);
-
-                            $estimate_price_1_year = ModelDeal::calculateCosts($iPriceCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_saving_1_year = ModelDeal::calculateSaving($iPriceCalculation,$aPrices,1,12,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_price_2_year = ModelDeal::calculateCosts($iPriceCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_saving_2_year = ModelDeal::calculateSaving($iPriceCalculation,$aPrices,2,24,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_price_3_year = ModelDeal::calculateCosts($iPriceCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-                            $estimate_saving_3_year = ModelDeal::calculateSaving($iPriceCalculation,$aPrices,3,36,$o->syu_normal,$o->syu_low,$o->vastrecht,$o->price_normal,$o->price_low);
-
-                            $iHasSaving = (max($estimate_saving_1_year, $estimate_saving_2_year, $estimate_saving_3_year) > ModelDeal::HAS_SAVING_PRICE ? 1 : 0);
-                            $iActive = $iHasSaving;
+                            $aPrices = $aCampaignPrices[$o->code];
 
                             $oDeal->campaign_id = $oCampaign->id;
-                            $oDeal->client_name = $o->client_name;
-                            $oDeal->client_code = $o->client_code;
+                            $oDeal->campaign_customer_id = $campaign_customer_id;
                             $oDeal->ean = $o->ean;
-                            $oDeal->code = $o->code;
                             $oDeal->super_contract_number = $o->super_contract_number;
+                            $oDeal->code = $o->code;
                             $oDeal->syu_normal = $o->syu_normal;
                             $oDeal->syu_low = $o->syu_low;
                             $oDeal->end_agreement = $o->end_agreement;
-                            $oDeal->email_commercieel = $o->email_commercieel;
-                            $oDeal->telnr_commercieel = $o->telnr_commercieel;
-                            $oDeal->aanhef_commercieel = $o->aanhef_commercieel;
-                            $oDeal->fadr_street = $o->fadr_street;
-                            $oDeal->fadr_nr = $o->fadr_nr;
-                            $oDeal->fadr_nr_conn = $o->fadr_nr_conn;
-                            $oDeal->fadr_zip = $o->fadr_zip;
-                            $oDeal->fadr_city = $o->fadr_city;
-                            $oDeal->cadr_street = $o->cadr_street;
-                            $oDeal->cadr_nr = $o->cadr_nr;
-                            $oDeal->cadr_nr_conn = $o->cadr_nr_conn;
-                            $oDeal->cadr_zip = $o->cadr_zip;
-                            $oDeal->cadr_city = $o->cadr_city;
                             $oDeal->vastrecht = $o->vastrecht;
-                            $oDeal->auto_renewal = $o->auto_renewal;
-                            $oDeal->accountmanager = $o->accountmanager;
-                            $oDeal->klantsegment = $o->klantsegment;
-                            $oDeal->category1 = $o->category1;
-                            $oDeal->category2 = $o->category2;
-                            $oDeal->category3 = $o->category3;
-                            $oDeal->consument = $o->consument;
                             $oDeal->price_normal = $o->price_normal;
                             $oDeal->price_low = $o->price_low;
-                            $oDeal->estimate_price_1_year = $estimate_price_1_year;
-                            $oDeal->estimate_saving_1_year = $estimate_saving_1_year;
-                            $oDeal->estimate_price_2_year = $estimate_price_2_year;
-                            $oDeal->estimate_saving_2_year = $estimate_saving_2_year;
-                            $oDeal->estimate_price_3_year = $estimate_price_3_year;
-                            $oDeal->estimate_saving_3_year = $estimate_saving_3_year;
-                            $oDeal->new_price_enkel = null;
-                            $oDeal->new_price_normal = null;
-                            $oDeal->new_price_low = null;
-                            $oDeal->jaarlijkse_besparing = null;
-                            $oDeal->token = sha1(openssl_random_pseudo_bytes(32));
-                            $oDeal->has_saving = $iHasSaving;
-                            $oDeal->active = $iActive;
-                            $oDeal->price_calculation = $iPriceCalculation;
+                            $oDeal->type = $aCampaignPrices[$o->code]['type'];
+                            $oDeal->calculation = $aCampaignPrices[$o->code]['calculation'];
+                            $oDeal->estimate_price_1_year = $oDeal->calculateCosts($aPrices,1,12);
+                            $oDeal->estimate_saving_1_year = $oDeal->calculateSaving($aPrices,1,12);
+                            $oDeal->estimate_price_2_year = $oDeal->calculateCosts($aPrices,2,24);
+                            $oDeal->estimate_saving_2_year = $oDeal->calculateSaving($aPrices,2,24);
+                            $oDeal->estimate_price_3_year = $oDeal->calculateCosts($aPrices,3,36);
+                            $oDeal->estimate_saving_3_year = $oDeal->calculateSaving($aPrices,3,36);
+                            $oDeal->has_saving = (max([$oDeal->estimate_saving_1_year, $oDeal->estimate_saving_2_year, $oDeal->estimate_saving_3_year]) > ModelDeal::HAS_SAVING_PRICE ? 1 : 0);
 
                             $oDeal->save();
                         }
@@ -560,6 +586,8 @@ class CampaignController extends Controller
 
         $oCampaign->delete();
 
+        DB::table('campaign_prices')->where('campaign_id', '=', $id)->delete();
+
         DB::table('deals')->where('campaign_id', '=', $id)->delete();
 
         return response()->json($aResponse);
@@ -567,49 +595,56 @@ class CampaignController extends Controller
 
     public function csv(Request $request, $id)
     {
-        $a = DB::table('deals')
+        $a = DB::table('campaign_customers AS cc')
             ->select(
-                'client_name',
-                'client_code',
-                'ean',
-                'code',
-                'super_contract_number',
-                'syu_normal',
-                'syu_low',
-                'end_agreement',
-                'email_commercieel',
-                'telnr_commercieel',
-                'aanhef_commercieel',
-                'fadr_street',
-                'fadr_nr',
-                'fadr_nr_conn',
-                'fadr_zip',
-                'fadr_city',
-                'cadr_street',
-                'cadr_nr',
-                'cadr_nr_conn',
-                'cadr_zip',
-                'cadr_city',
-                'vastrecht',
-                'auto_renewal',
-                'accountmanager',
-                'klantsegment',
-                'category1',
-                'category2',
-                'category3',
-                'consument',
-                'price_normal',
-                'price_low',
-                'new_price_enkel',
-                'new_price_normal',
-                'new_price_low',
-                'jaarlijkse_besparing'
+                'cc.campaign_id',
+                'cc.client_name',
+                'cc.client_code',
+                'cc.email_commercieel',
+                'cc.telnr_commercieel',
+                'cc.aanhef_commercieel',
+                'cc.fadr_street',
+                'cc.fadr_nr',
+                'cc.fadr_nr_conn',
+                'cc.fadr_zip',
+                'cc.fadr_city',
+                'cc.cadr_street',
+                'cc.cadr_nr',
+                'cc.cadr_nr_conn',
+                'cc.cadr_zip',
+                'cc.cadr_city',
+                'cc.auto_renewal',
+                'cc.accountmanager',
+                'cc.klantsegment',
+                'cc.category1',
+                'cc.category2',
+                'cc.category3',
+                'cc.consument',
+                'd.ean',
+                'd.code',
+                'd.super_contract_number',
+                'd.syu_normal',
+                'd.syu_low',
+                'd.end_agreement',
+                'd.vastrecht',
+                'd.price_normal',
+                'd.price_low',
+                'd.estimate_price_1_year',
+                'd.estimate_saving_1_year',
+                'd.estimate_price_2_year',
+                'd.estimate_saving_2_year',
+                'd.estimate_price_3_year',
+                'd.estimate_saving_3_year'
             )
-            ->where('campaign_id', '=', $id)
+            ->join('deals AS d', function($join) {
+                $join->on('d.campaign_id', '=', 'cc.campaign_id');
+                $join->on('d.campaign_customer_id', '=', 'cc.id');
+            })
+            ->where('cc.campaign_id', '=', $id)
             ->get()
         ;
 
-        $filename = 'campaign_deals_'.$id.'.csv';
+        $filename = 'campaign_customer_deals_'.$id.'.csv';
 
         $pathToFile = storage_path('app').'/'.$filename;
 
@@ -618,12 +653,6 @@ class CampaignController extends Controller
         $fields = [
             'client_name',
             'client_code',
-            'ean',
-            'code',
-            'super_contract_number',
-            'syu_normal',
-            'syu_low',
-            'end_agreement',
             'email_commercieel',
             'telnr_commercieel',
             'aanhef_commercieel',
@@ -637,7 +666,6 @@ class CampaignController extends Controller
             'cadr_nr_conn',
             'cadr_zip',
             'cadr_city',
-            'vastrecht',
             'auto_renewal',
             'accountmanager',
             'klantsegment',
@@ -645,12 +673,21 @@ class CampaignController extends Controller
             'category2',
             'category3',
             'consument',
+            'ean',
+            'code',
+            'super_contract_number',
+            'syu_normal',
+            'syu_low',
+            'end_agreement',
+            'vastrecht',
             'price_normal',
             'price_low',
-            'new_price_enkel',
-            'new_price_normal',
-            'new_price_low',
-            'jaarlijkse_besparing'
+            'estimate_price_1_year',
+            'estimate_saving_1_year',
+            'estimate_price_2_year',
+            'estimate_saving_2_year',
+            'estimate_price_3_year',
+            'estimate_saving_3_year'
         ];
 
         fputcsv($fp, $fields);
@@ -659,12 +696,6 @@ class CampaignController extends Controller
             $fields = [
                 'client_name' => $v->client_name,
                 'client_code' => $v->client_code,
-                'ean' => $v->ean,
-                'code' => $v->code,
-                'super_contract_number' => $v->super_contract_number,
-                'syu_normal' => $v->syu_normal,
-                'syu_low' => $v->syu_low,
-                'end_agreement' => $v->end_agreement,
                 'email_commercieel' => $v->email_commercieel,
                 'telnr_commercieel' => $v->telnr_commercieel,
                 'aanhef_commercieel' => $v->aanhef_commercieel,
@@ -678,7 +709,6 @@ class CampaignController extends Controller
                 'cadr_nr_conn' => $v->cadr_nr_conn,
                 'cadr_zip' => $v->cadr_zip,
                 'cadr_city' => $v->cadr_city,
-                'vastrecht' => $v->vastrecht,
                 'auto_renewal' => $v->auto_renewal,
                 'accountmanager' => $v->accountmanager,
                 'klantsegment' => $v->klantsegment,
@@ -686,12 +716,21 @@ class CampaignController extends Controller
                 'category2' => $v->category2,
                 'category3' => $v->category3,
                 'consument' => $v->consument,
+                'ean' => $v->ean,
+                'code' => $v->code,
+                'super_contract_number' => $v->super_contract_number,
+                'syu_normal' => $v->syu_normal,
+                'syu_low' => $v->syu_low,
+                'end_agreement' => $v->end_agreement,
+                'vastrecht' => $v->vastrecht,
                 'price_normal' => $v->price_normal,
                 'price_low' => $v->price_low,
-                'new_price_enkel' => $v->new_price_enkel,
-                'new_price_normal' => $v->new_price_normal,
-                'new_price_low' => $v->new_price_low,
-                'jaarlijkse_besparing' => $v->jaarlijkse_besparing,
+                'estimate_price_1_year' => $v->estimate_price_1_year,
+                'estimate_saving_1_year' => $v->estimate_saving_1_year,
+                'estimate_price_2_year' => $v->estimate_price_2_year,
+                'estimate_saving_2_year' => $v->estimate_saving_2_year,
+                'estimate_price_3_year' => $v->estimate_price_3_year,
+                'estimate_saving_3_year' => $v->estimate_saving_3_year
             ];
 
             fputcsv($fp, $fields);

@@ -66,4 +66,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::match(['get', 'post'], '/i18n/add', ['middleware' => 'auth', 'uses' => 'I18nController@add']);
     Route::match(['get', 'post'], '/i18n/edit/{id}', ['middleware' => 'auth', 'uses' => 'I18nController@edit', 'as' => 'i18n.edit']);
     Route::delete('/i18n/delete/{id}', ['middleware' => 'auth', 'uses' => 'I18nController@delete']);
+
+    // Test
+    Route::get('/test', ['middleware' => 'auth', 'uses' => 'TestController@index']);
 });

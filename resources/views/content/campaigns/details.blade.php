@@ -62,48 +62,62 @@
                     <div class="col-md-6">{{ __('Term Offer') }}</div>
                     <div class="col-md-6">{{ \App\Models\Campaign::newTermOfferFormatter($oCampaign->new_term_offer) }}</div>
                 </div>
-                @if($oCampaign->isElektricity())
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ __('Electricity prices') }}<br />
-                            <small style="color: #888">(&euro;ct/per kWh)</small>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    {{ __('Normal') }} &euro; {{ number_format($oCampaign->price_normal / 100,4,'.',',') }}
-                                </div>
+                @foreach ($aCampaignPrices as $oCampaignPrice)
+                    @if($oCampaignPrice->type == \App\Models\CampaignPrice::TYPE_ELEKTRICITY)
+                        <div style="height: 10px"></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ __('Electricity prices') }}<br />
+                                <small style="color: #888">(&euro;ct/per kWh)</small>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    {{ __('Low') }} &euro; {{ number_format($oCampaign->price_low / 100,4,'.',',') }}
-                                </div>
-                            </div>
-                            @if($oCampaign->price_enkel>0)
+                            <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        {{ __('Single') }} &euro; {{ number_format($oCampaign->price_enkel / 100,4,'.',',') }}
+                                        <span class="label label-custom">{{ $oCampaignPrice->code }}</span>
                                     </div>
                                 </div>
-                            @endif
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {{ __('Normal') }} &euro; {{ number_format($oCampaignPrice->price_normal / 100,4,'.',',') }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {{ __('Low') }} &euro; {{ number_format($oCampaignPrice->price_low / 100,4,'.',',') }}
+                                    </div>
+                                </div>
+                                @if($oCampaignPrice->price_enkel > 0)
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {{ __('Single') }} &euro; {{ number_format($oCampaignPrice->price_enkel / 100,4,'.',',') }}
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                    </div>
-                @endif
-                @if($oCampaign->isGas())
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ __('Gas price') }}<br />
-                            <small style="color: #888">(&euro;ct/per m3)</small>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    {{ __('Normal') }} &euro; {{ number_format($oCampaign->price_normal / 100,4,'.',',') }}
+                    @endif
+                    @if($oCampaignPrice->type == \App\Models\CampaignPrice::TYPE_GAS)
+                        <div style="height: 10px"></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ __('Gas price') }}<br />
+                                <small style="color: #888">(&euro;ct/per m3)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <span class="label label-custom">{{ $oCampaignPrice->code }}</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {{ __('Normal') }} &euro; {{ number_format($oCampaignPrice->price_normal / 100,4,'.',',') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                @endif
+                    @endif
+                @endforeach
             </div>
         </div>
     </div>

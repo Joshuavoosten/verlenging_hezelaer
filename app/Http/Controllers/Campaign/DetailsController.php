@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Campaign;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign as ModelCampaign;
+use App\Models\CampaignCustomer as CampaignCustomer;
 use App\Models\Deal as ModelDeal;
 use App\Models\Price as ModelPrice;
 use Auth;
@@ -39,15 +40,35 @@ class DetailsController extends Controller
 
     public function index(Request $request, $id)
     {
-         $aErrors = [];
+        $aErrors = [];
 
-         $oCampaign = new ModelCampaign();
+        // Campaign
 
-         $oCampaign = $oCampaign->find($id);
+        $oCampaign = new ModelCampaign();
 
-         if (!$oCampaign) {
-             App::abort(404, 'Campaign Not Found.');
-         }
+        $oCampaign = $oCampaign->find($id);
+
+        if (!$oCampaign) {
+            App::abort(404, 'Campaign Not Found.');
+        }
+
+        // Campaign -> Prices
+
+        $aCampaignPrices = [];
+
+         $oDB = DB::table('campaign_prices')
+             ->select(
+                 'code',
+                 'price_normal',
+                 'price_low',
+                 'price_enkel',
+                 'type',
+                 'calculation'
+            )
+            ->where('campaign_id', '=', $oCampaign->id)
+         ;
+
+         $aCampaignPrices = $oDB->get();
 
          // Schedule
 
@@ -152,6 +173,7 @@ class DetailsController extends Controller
 
          return View::make('content.campaigns.details', [
              'oCampaign' => $oCampaign,
+             'aCampaignPrices' => $aCampaignPrices,
              'iScheduleDay' => $iScheduleDay,
              'iScheduleMonth' => $iScheduleMonth,
              'iScheduleYear' => $iScheduleYear,
@@ -167,22 +189,23 @@ class DetailsController extends Controller
         $oDB = DB::table('deals AS d')
             ->select(
                 'd.id',
-                'd.client_name',
-                'd.client_code',
                 'd.code',
                 'd.end_agreement',
-                'd.aanhef_commercieel',
-                'd.status',
                 'd.active',
-                'c.status AS campaign_status'
+                'c.status AS campaign_status',
+                'cc.client_name',
+                'cc.client_code',
+                'cc.aanhef_commercieel',
+                'cc.status'
             )
             ->join('campaigns AS c', 'c.id', '=', 'd.campaign_id')
+            ->join('campaign_customers AS cc', 'cc.id', '=', 'd.campaign_customer_id')
             ->where('d.campaign_id', '=', $id)
             ->where('d.has_saving', '=', 0)
         ;
 
         if (Input::get('search')) {
-            $oDB->whereRaw('MATCH(d.client_name,d.client_code,d.code,d.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
+            $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
 
         if (Input::get('sort') && Input::get('order')) {
@@ -192,10 +215,10 @@ class DetailsController extends Controller
                     $sort = 'd.active';
                     break;
                 case 'client_name':
-                    $sort = 'd.client_name';
+                    $sort = 'cc.client_name';
                     break;
                 case 'client_code':
-                    $sort = 'd.client_code';
+                    $sort = 'cc.client_code';
                     break;
                 case 'code':
                     $sort = 'd.code';
@@ -204,18 +227,18 @@ class DetailsController extends Controller
                     $sort = 'd.end_agreement';
                     break;
                 case 'aanhef_commercieel':
-                    $sort = 'd.aanhef_commercieel';
+                    $sort = 'cc.aanhef_commercieel';
                     break;
                 case 'status':
-                    $sort = 'd.status';
+                    $sort = 'cc.status';
                     break;
                 default:
-                    $sort = 'd.client_name';
+                    $sort = 'cc.client_name';
                     break;
             }
             $oDB->orderBy($sort, Input::get('order'));
         } else {
-            $oDB->orderBy('d.client_name');
+            $oDB->orderBy('cc.client_name');
         }
 
         $total = $oDB->count();
@@ -234,7 +257,7 @@ class DetailsController extends Controller
             foreach ($a as $o) {
                 $rowstyle = null;
 
-                if ($o->status == ModelDeal::STATUS_FORM_SAVED) {
+                if ($o->status == CampaignCustomer::STATUS_FORM_SAVED) {
                     $rowstyle = 'success';
                 }
 
@@ -246,7 +269,7 @@ class DetailsController extends Controller
                     'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
-                    'status_format' => ModelDeal::statusFormatter($o->status),
+                    'status_format' => CampaignCustomer::statusFormatter($o->status),
                     'active' => $o->active,
                     'campaign_status' => $o->campaign_status,
                     'rowstyle' => $rowstyle
@@ -266,22 +289,23 @@ class DetailsController extends Controller
         $oDB = DB::table('deals AS d')
             ->select(
                 'd.id',
-                'd.client_name',
-                'd.client_code',
                 'd.code',
                 'd.end_agreement',
-                'd.aanhef_commercieel',
-                'd.status',
                 'd.active',
-                'c.status AS campaign_status'
+                'c.status AS campaign_status',
+                'cc.client_name',
+                'cc.client_code',
+                'cc.aanhef_commercieel',
+                'cc.status'
             )
             ->join('campaigns AS c', 'c.id', '=', 'd.campaign_id')
+            ->join('campaign_customers AS cc', 'cc.id', '=', 'd.campaign_customer_id')
             ->where('d.campaign_id', '=', $id)
             ->where('d.has_saving', '=', 1)
         ;
 
         if (Input::get('search')) {
-            $oDB->whereRaw('MATCH(d.client_name,d.client_code,d.code,d.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
+            $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
 
         if (Input::get('sort') && Input::get('order')) {
@@ -291,10 +315,10 @@ class DetailsController extends Controller
                     $sort = 'd.active';
                     break;
                 case 'client_name':
-                    $sort = 'd.client_name';
+                    $sort = 'cc.client_name';
                     break;
                 case 'client_code':
-                    $sort = 'd.client_code';
+                    $sort = 'cc.client_code';
                     break;
                 case 'code':
                     $sort = 'd.code';
@@ -303,18 +327,18 @@ class DetailsController extends Controller
                     $sort = 'd.end_agreement';
                     break;
                 case 'aanhef_commercieel':
-                    $sort = 'd.aanhef_commercieel';
+                    $sort = 'cc.aanhef_commercieel';
                     break;
                 case 'status':
-                    $sort = 'd.status';
+                    $sort = 'cc.status';
                     break;
                 default:
-                    $sort = 'd.client_name';
+                    $sort = 'cc.client_name';
                     break;
             }
             $oDB->orderBy($sort, Input::get('order'));
         } else {
-            $oDB->orderBy('d.client_name');
+            $oDB->orderBy('cc.client_name');
         }
 
         $total = $oDB->count();
@@ -333,7 +357,7 @@ class DetailsController extends Controller
             foreach ($a as $o) {
                 $rowstyle = null;
 
-                if ($o->status == ModelDeal::STATUS_FORM_SAVED) {
+                if ($o->status == CampaignCustomer::STATUS_FORM_SAVED) {
                     $rowstyle = 'success';
                 }
 
@@ -345,7 +369,7 @@ class DetailsController extends Controller
                     'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
-                    'status_format' => ModelDeal::statusFormatter($o->status),
+                    'status_format' => CampaignCustomer::statusFormatter($o->status),
                     'active' => $o->active,
                     'campaign_status' => $o->campaign_status,
                     'rowstyle' => $rowstyle
@@ -362,84 +386,8 @@ class DetailsController extends Controller
     }
 
     public function jsonCustomersWithCurrentOffer(Request $request, $id) {
-
         // @todo
         return [];
-
-        $oDB = DB::table('deals')
-            ->select(
-                'id',
-                'client_name',
-                'client_code',
-                'code',
-                'end_agreement',
-                'aanhef_commercieel'
-            )
-            ->where('campaign_id', '!=', $id)
-        ;
-
-        if (Input::get('search')) {
-            $oDB->whereRaw('MATCH(client_name,client_code,code,aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
-        }
-
-        if (Input::get('sort') && Input::get('order')) {
-            $sort = null;
-            switch (Input::get('sort')) {
-                case 'client_name':
-                    $sort = 'd.client_name';
-                    break;
-                case 'client_code':
-                    $sort = 'd.client_code';
-                    break;
-                case 'code':
-                    $sort = 'd.code';
-                    break;
-                case 'end_agreement':
-                    $sort = 'd.end_agreement';
-                    break;
-                case 'aanhef_commercieel':
-                    $sort = 'd.aanhef_commercieel';
-                    break;
-                default:
-                    $sort = 'd.client_name';
-                    break;
-            }
-            $oDB->orderBy($sort, Input::get('order'));
-        } else {
-            $oDB->orderBy('d.client_name');
-        }
-
-        $total = $oDB->count();
-
-        $offset = Input::get('offset', 0);
-
-        $limit = Input::get('limit', 25);
-
-        $oDB->skip($offset)->take($limit);
-
-        $a = $oDB->get();
-
-        $aRows = [];
-
-        if (count($a) > 0) {
-            foreach ($a as $o) {
-                $aRows[] = [
-                    'id' => $o->id,
-                    'client_name' => $o->client_name,
-                    'client_code' => $o->client_code,
-                    'code' => $o->code,
-                    'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
-                    'aanhef_commercieel' => $o->aanhef_commercieel
-                ];
-            }
-        }
-
-        $aResponse = [
-            'total' => $total,
-            'rows' => $aRows,
-        ];
-
-        return response()->json($aResponse);
     }
 
 }
