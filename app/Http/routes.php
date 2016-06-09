@@ -44,9 +44,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/campaigns/details/json/customers_with_savings/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithSavings']);
     Route::get('/campaigns/details/json/customers_with_current_offer/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithCurrentOffer']);
 
-    // Deal
-    Route::post('/deals/active/{id}', ['middleware' => 'auth', 'uses' => 'DealController@active']);
-    Route::match(['get', 'post'], '/verleng/{token}', ['uses' => 'DealController@extend']);
+    // Campaign -> Customer
+    Route::post('/campaign/customer/active/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\CustomerController@active']);
+    Route::match(['get', 'post'], '/verleng/{token}', ['uses' => 'CampaignCustomerController@extend']);
 
     // Prices
     Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PricesController@index']);

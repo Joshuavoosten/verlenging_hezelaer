@@ -1,4 +1,4 @@
-function dealActiveFormatter(value, row){
+function campaignCustomerActiveFormatter(value, row){
     if (row.campaign_status > 1 || row.status > 2) {
         switch (value) {
             case 0:
@@ -7,6 +7,6 @@ function dealActiveFormatter(value, row){
                 return '<i class="fa fa-lg fa-check" style="color: green"></i>';
         }
     } else {
-        return '<input type="checkbox" name="active['+row.id+']" class="deal_active" data-id="'+row.id+'" '+(value == 1 ? 'checked' : '')+' value="1" />';
+        return '<input type="checkbox" name="active['+row.id+']" class="campaign_customer_active" data-id="'+row.id+'" '+(value == 1 ? 'checked' : '')+' value="1" />';
     }
 }

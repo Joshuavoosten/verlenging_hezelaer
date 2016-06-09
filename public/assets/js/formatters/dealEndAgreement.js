@@ -1,5 +1,8 @@
 function dealEndAgreementFormatter(value, row){
-    if (value != '1-1-3000') {
-        return value;
-    }
+    var html = '';
+    var dates = value.split(",");
+    $.each(dates, function (index,value) {
+        html += value+'<br />';
+    });
+    return html;
 }

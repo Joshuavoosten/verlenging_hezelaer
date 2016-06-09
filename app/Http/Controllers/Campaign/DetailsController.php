@@ -186,45 +186,41 @@ class DetailsController extends Controller
     }
 
     public function jsonCustomersWithoutSaving(Request $request, $id) {
-        $oDB = DB::table('deals AS d')
+        $oDB = DB::table('campaign_customers AS cc')
             ->select(
-                'd.id',
-                'd.code',
-                'd.end_agreement',
-                'd.active',
-                'c.status AS campaign_status',
-                'cc.client_name',
+                'cc.id',
                 'cc.client_code',
+                'cc.client_name',
                 'cc.aanhef_commercieel',
-                'cc.status'
+                'cc.status',
+                'cc.active',
+                'c.status AS campaign_status',
+                DB::Raw('GROUP_CONCAT(DISTINCT d.code) AS codes'),
+                DB::Raw('GROUP_CONCAT(DISTINCT d.end_agreement) AS end_agreement')
             )
-            ->join('campaigns AS c', 'c.id', '=', 'd.campaign_id')
-            ->join('campaign_customers AS cc', 'cc.id', '=', 'd.campaign_customer_id')
-            ->where('d.campaign_id', '=', $id)
-            ->where('d.has_saving', '=', 0)
+            ->join('campaigns AS c', 'c.id', '=', 'cc.campaign_id')
+            ->join('deals AS d', 'd.campaign_customer_id', '=', 'cc.id')
+            ->where('cc.campaign_id', '=', $id)
+            ->where('cc.has_saving', '=', 0)
         ;
 
         if (Input::get('search')) {
             $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
 
+        $oDB->groupBy('cc.id');
+
         if (Input::get('sort') && Input::get('order')) {
             $sort = null;
             switch (Input::get('sort')) {
                 case 'active':
-                    $sort = 'd.active';
+                    $sort = 'cc.active';
                     break;
                 case 'client_name':
                     $sort = 'cc.client_name';
                     break;
                 case 'client_code':
                     $sort = 'cc.client_code';
-                    break;
-                case 'code':
-                    $sort = 'd.code';
-                    break;
-                case 'end_agreement':
-                    $sort = 'd.end_agreement';
                     break;
                 case 'aanhef_commercieel':
                     $sort = 'cc.aanhef_commercieel';
@@ -261,12 +257,22 @@ class DetailsController extends Controller
                     $rowstyle = 'success';
                 }
 
+                // Expiration Date
+
+                $sEndAgreement = $o->end_agreement;
+                $aEndAgreement = explode(',', $sEndAgreement);
+                asort($aEndAgreement);
+                foreach ($aEndAgreement as $k => $v) {
+                    $aEndAgreement[$k] = date(Auth::user()->date_format, strtotime($v));
+                }
+                $sEndAgreement = implode(',', $aEndAgreement);
+
                 $aRows[] = [
                     'id' => $o->id,
                     'client_name' => $o->client_name,
                     'client_code' => $o->client_code,
-                    'code' => $o->code,
-                    'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
+                    'codes' => $o->codes,
+                    'end_agreement' => $sEndAgreement,
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
                     'status_format' => CampaignCustomer::statusFormatter($o->status),
@@ -286,45 +292,41 @@ class DetailsController extends Controller
     }
 
     public function jsonCustomersWithSavings(Request $request, $id) {
-        $oDB = DB::table('deals AS d')
+        $oDB = DB::table('campaign_customers AS cc')
             ->select(
-                'd.id',
-                'd.code',
-                'd.end_agreement',
-                'd.active',
-                'c.status AS campaign_status',
-                'cc.client_name',
+                'cc.id',
                 'cc.client_code',
+                'cc.client_name',
                 'cc.aanhef_commercieel',
-                'cc.status'
+                'cc.status',
+                'cc.active',
+                'c.status AS campaign_status',
+                DB::Raw('GROUP_CONCAT(DISTINCT d.code) AS codes'),
+                DB::Raw('GROUP_CONCAT(DISTINCT d.end_agreement) AS end_agreement')
             )
-            ->join('campaigns AS c', 'c.id', '=', 'd.campaign_id')
-            ->join('campaign_customers AS cc', 'cc.id', '=', 'd.campaign_customer_id')
-            ->where('d.campaign_id', '=', $id)
-            ->where('d.has_saving', '=', 1)
+            ->join('campaigns AS c', 'c.id', '=', 'cc.campaign_id')
+            ->join('deals AS d', 'd.campaign_customer_id', '=', 'cc.id')
+            ->where('cc.campaign_id', '=', $id)
+            ->where('cc.has_saving', '=', 1)
         ;
 
         if (Input::get('search')) {
             $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
 
+        $oDB->groupBy('cc.id');
+
         if (Input::get('sort') && Input::get('order')) {
             $sort = null;
             switch (Input::get('sort')) {
                 case 'active':
-                    $sort = 'd.active';
+                    $sort = 'cc.active';
                     break;
                 case 'client_name':
                     $sort = 'cc.client_name';
                     break;
                 case 'client_code':
                     $sort = 'cc.client_code';
-                    break;
-                case 'code':
-                    $sort = 'd.code';
-                    break;
-                case 'end_agreement':
-                    $sort = 'd.end_agreement';
                     break;
                 case 'aanhef_commercieel':
                     $sort = 'cc.aanhef_commercieel';
@@ -361,12 +363,22 @@ class DetailsController extends Controller
                     $rowstyle = 'success';
                 }
 
+                // Expiration Date
+
+                $sEndAgreement = $o->end_agreement;
+                $aEndAgreement = explode(',', $sEndAgreement);
+                asort($aEndAgreement);
+                foreach ($aEndAgreement as $k => $v) {
+                    $aEndAgreement[$k] = date(Auth::user()->date_format, strtotime($v));
+                }
+                $sEndAgreement = implode(',', $aEndAgreement);
+
                 $aRows[] = [
                     'id' => $o->id,
                     'client_name' => $o->client_name,
                     'client_code' => $o->client_code,
-                    'code' => $o->code,
-                    'end_agreement' => ($o->end_agreement ? date('j-n-Y', strtotime($o->end_agreement)) : ''),
+                    'codes' => $o->codes,
+                    'end_agreement' => $sEndAgreement,
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
                     'status_format' => CampaignCustomer::statusFormatter($o->status),

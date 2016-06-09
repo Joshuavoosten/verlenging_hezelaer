@@ -16,9 +16,6 @@ class Deal extends Model
 
     const NEW_VASTRECHT = 4.95;
 
-    // If the estimate saving is larger then this amount, the deal is saved with has_saving = 1.
-    const HAS_SAVING_PRICE = 50;
-
     protected $table = 'deals';
 
     /**

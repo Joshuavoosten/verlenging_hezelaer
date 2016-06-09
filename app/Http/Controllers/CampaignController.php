@@ -80,11 +80,11 @@ class CampaignController extends Controller
                     'current_segment' => $o->current_segment,
                     'current_profile_codes' => $o->current_profile_codes,
                     'current_agreement' => $o->current_agreement,
-                    'current_expiration_date' => ($o->current_expiration_date ? date('d-m-Y', strtotime($o->current_expiration_date)) : ''),
+                    'current_expiration_date' => ($o->current_expiration_date ? date(Auth::user()->date_format, strtotime($o->current_expiration_date)) : ''),
                     'count_customers' => $o->count_customers,
-                    'scheduled_at' => ($o->scheduled_at ? date('d-m-Y H:i', strtotime($o->scheduled_at)) : ''),
-                    'created_at' => ($o->created_at ? date('d-m-Y H:i', strtotime($o->created_at)) : ''),
-                    'updated_at' => ($o->updated_at ? date('d-m-Y H:i', strtotime($o->updated_at)) : ''),
+                    'scheduled_at' => ($o->scheduled_at ? date(Auth::user()->date_format.' H:i', strtotime($o->scheduled_at)) : ''),
+                    'created_at' => ($o->created_at ? date(Auth::user()->date_format.' H:i', strtotime($o->created_at)) : ''),
+                    'updated_at' => ($o->updated_at ? date(Auth::user()->date_format.' H:i', strtotime($o->updated_at)) : ''),
                 ];
             }
         }
@@ -144,10 +144,10 @@ class CampaignController extends Controller
                     'current_segment' => $o->current_segment,
                     'current_profile_codes' => $o->current_profile_codes,
                     'current_agreement' => $o->current_agreement,
-                    'current_expiration_date' => ($o->current_expiration_date ? date('d-m-Y', strtotime($o->current_expiration_date)) : ''),
+                    'current_expiration_date' => ($o->current_expiration_date ? date(Auth::user()->date_format, strtotime($o->current_expiration_date)) : ''),
                     'count_customers' => $o->count_customers,
-                    'created_at' => ($o->created_at ? date('d-m-Y H:i', strtotime($o->created_at)) : ''),
-                    'updated_at' => ($o->updated_at ? date('d-m-Y H:i', strtotime($o->updated_at)) : ''),
+                    'created_at' => ($o->created_at ? date(Auth::user()->date_format.' H:i', strtotime($o->created_at)) : ''),
+                    'updated_at' => ($o->updated_at ? date(Auth::user()->date_format.' H:i', strtotime($o->updated_at)) : ''),
                 ];
             }
         }
@@ -416,8 +416,10 @@ class CampaignController extends Controller
                         $aCampaignCustomers = [];
 
                         // Current Deals
-
                         $aCurrentDeals = $oDB->get();
+
+                        // Campaign Customers : Prices
+                        $aCampaignCustomersPrices = [];
 
                         foreach ($aCurrentDeals as $o) {
 
@@ -488,9 +490,46 @@ class CampaignController extends Controller
                             $oDeal->estimate_saving_2_year = $oDeal->calculateSaving($aPrices,2,24);
                             $oDeal->estimate_price_3_year = $oDeal->calculateCosts($aPrices,3,36);
                             $oDeal->estimate_saving_3_year = $oDeal->calculateSaving($aPrices,3,36);
-                            $oDeal->has_saving = (max([$oDeal->estimate_saving_1_year, $oDeal->estimate_saving_2_year, $oDeal->estimate_saving_3_year]) > ModelDeal::HAS_SAVING_PRICE ? 1 : 0);
+                            $oDeal->has_saving = (max([$oDeal->estimate_saving_1_year, $oDeal->estimate_saving_2_year, $oDeal->estimate_saving_3_year]) > 0 ? 1 : 0);
 
                             $oDeal->save();
+
+                            // Campaign Customers : Prices
+
+                            if (!array_key_exists($campaign_customer_id, $aCampaignCustomersPrices)) {
+                                $aCampaignCustomersPrices[$campaign_customer_id] = [
+                                    'estimate_price_1_year' => 0,
+                                    'estimate_saving_1_year' => 0,
+                                    'estimate_price_2_year' => 0,
+                                    'estimate_saving_2_year' => 0,
+                                    'estimate_price_3_year' => 0,
+                                    'estimate_saving_3_year' => 0
+                                ];
+                            }
+
+                            $aCampaignCustomersPrices[$campaign_customer_id]['estimate_price_1_year'] += $oDeal->estimate_price_1_year;
+                            $aCampaignCustomersPrices[$campaign_customer_id]['estimate_saving_1_year'] += $oDeal->estimate_saving_1_year;
+                            $aCampaignCustomersPrices[$campaign_customer_id]['estimate_price_2_year'] += $oDeal->estimate_price_2_year;
+                            $aCampaignCustomersPrices[$campaign_customer_id]['estimate_saving_2_year'] += $oDeal->estimate_saving_2_year;
+                            $aCampaignCustomersPrices[$campaign_customer_id]['estimate_price_3_year'] += $oDeal->estimate_price_3_year;
+                            $aCampaignCustomersPrices[$campaign_customer_id]['estimate_saving_3_year'] += $oDeal->estimate_saving_3_year;
+                        }
+
+                        if (count($aCampaignCustomersPrices) > 0) {
+                            foreach ($aCampaignCustomersPrices as $campaign_customer_id => $v) {
+                                DB::table('campaign_customers')
+                                    ->where('id', $campaign_customer_id)
+                                    ->update([
+                                        'has_saving' => ($v['estimate_saving_3_year'] > ModelCampaignCustomer::HAS_SAVING_PRICE ? 1 : 0),
+                                        'estimate_price_1_year' => $v['estimate_price_1_year'],
+                                        'estimate_saving_1_year' => $v['estimate_saving_1_year'],
+                                        'estimate_price_2_year' => $v['estimate_price_2_year'],
+                                        'estimate_saving_2_year' => $v['estimate_saving_2_year'],
+                                        'estimate_price_3_year' => $v['estimate_price_3_year'],
+                                        'estimate_saving_3_year' => $v['estimate_saving_3_year'],
+                                    ])
+                                ;
+                            }
                         }
 
                         return Redirect::to('/campaigns/details/'.$oCampaign->id)

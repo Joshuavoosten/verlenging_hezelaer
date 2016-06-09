@@ -13,6 +13,9 @@ class CampaignCustomer extends Model
     const STATUS_FORM_REQUESTED = 5;
     const STATUS_FORM_SAVED = 6;
 
+    // If the estimate saving is larger then this amount, the deal is saved with has_saving = 1.
+    const HAS_SAVING_PRICE = 50;
+
     protected $table = 'campaign_customers';
 
     /**

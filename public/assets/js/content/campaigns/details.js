@@ -38,13 +38,12 @@ $(function(){
         }
     });
     // Checkbox
-    // $(document).off('click', '.deal_active');
-    $(document).on('click', '.deal_active', function(){
+    $(document).on('click', '.campaign_customer_active', function(){
         var _token = $('input[name=_token]').val();
         var id = $(this).data('id');
         var active = ($(this).is(':checked') ? 1 : 0);
         $.ajax({
-            url: '/deals/active/'+id,
+            url: '/campaign/customer/active/'+id,
             type: 'POST',
             data: {
                 '_token': _token,

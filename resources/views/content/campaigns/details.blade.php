@@ -2,8 +2,10 @@
 
 @section('scripts')
 <script src="{{ URL::asset('assets/js/content/campaigns/details.js') }}"></script>
-<script src="{{ URL::asset('assets/js/formatters/dealActive.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/campaignCustomerActive.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/datesFormatter.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/dealEndAgreement.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/profileCodes.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/rowstyle.js') }}"></script>
 @endsection
 
@@ -43,7 +45,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">{{ __('Expiration Date') }}</div>
-                    <div class="col-md-6">t/m {{ date('j-n-Y', strtotime($oCampaign->current_expiration_date)) }}</div>
+                    <div class="col-md-6">t/m {{ date(Auth::user()->date_format, strtotime($oCampaign->current_expiration_date)) }}</div>
                 </div>
                 @if($oCampaign->status == \App\Models\Campaign::STATUS_PLANNED)
                     <div style="height: 15px"></div>
@@ -134,11 +136,11 @@
                 <table id="table_customers_without_saving" class="table table-hover table-striped sortable" data-row-style="rowstyleFormatter" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
-                            <th data-field="active" data-formatter="dealActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
+                            <th data-field="active" data-formatter="campaignCustomerActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
                             <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
-                            <th data-field="code" data-sortable="true" class="col-md-1">{{ __('Profile Code') }}</th>
-                            <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="true" class="col-md-2">{{ __('Expiration Date') }}</th>
+                            <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-1">{{ __('Profile Code(s)') }}</th>
+                            <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="false" class="col-md-2">{{ __('Expiration Date') }}</th>
                             <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
                             <th data-field="status_format" data-align="center" data-sortable="true">{{ __('Status') }}</th>
                         </tr>
@@ -149,11 +151,11 @@
                 <table id="table_customers_with_savings" class="table table-hover table-striped sortable" data-row-style="rowstyleFormatter" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
-                            <th data-field="active" data-formatter="dealActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
+                            <th data-field="active" data-formatter="campaignCustomerActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
                             <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
-                            <th data-field="code" data-sortable="true" class="col-md-1">{{ __('Profile Code') }}</th>
-                            <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="true" class="col-md-2">{{ __('Expiration Date') }}</th>
+                            <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-1">{{ __('Profile Code(s)') }}</th>
+                            <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="false" class="col-md-2">{{ __('Expiration Date') }}</th>
                             <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
                             <th data-field="status_format" data-align="center" data-sortable="true">{{ __('Status') }}</th>
                         </tr>
@@ -166,8 +168,8 @@
                         <tr>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
                             <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
-                            <th data-field="code" data-sortable="true" class="col-md-1">{{ __('Profile Code') }}</th>
-                            <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="true" class="col-md-2">{{ __('Expiration Date') }}</th>
+                            <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-1">{{ __('Profile Code(s)') }}</th>
+                            <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="false" class="col-md-2">{{ __('Expiration Date') }}</th>
                             <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
                         </tr>
                     </thead>
@@ -246,7 +248,7 @@
                     {{ __('Date') }}
                 </div>
                 <div class="col-md-11">
-                    {{ date('d-m-Y H:i', strtotime($oCampaign->scheduled_at)) }}
+                    {{ date(Auth::user()->date_format.' H:i', strtotime($oCampaign->scheduled_at)) }}
                 </div>
             </div>
         </div>

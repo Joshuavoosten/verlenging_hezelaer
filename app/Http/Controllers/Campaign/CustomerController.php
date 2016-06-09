@@ -1,72 +1,48 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Campaign;
 
 use App;
+use App\Http\Controllers\Controller;
 use App\Models\Campaign as ModelCampaign;
-use App\Models\Deal as ModelDeal;
+use App\Models\CampaignCustomer as ModelCampaignCustomer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Validator;
 
-class DealController extends Controller
+class CustomerController extends Controller
 {
-    public function active(Request $request, $id)
-    {
-        $oDeal = new ModelDeal();
-
-        $oDeal = $oDeal->find($id);
-
-        if (!$oDeal) {
-            App::abort(404, 'Deal Not Found.');
-        }
-
-        // Check if the status is planned or scheduled.
-
-        if (!in_array($oDeal->status, [ModelDeal::STATUS_PLANNED, ModelDeal::STATUS_INVITE_EMAIL_SCHEDULED])) {
-            App::abort(500, 'The status is not equal to "planned" or "scheduled" therefore the active state cannot be modified.');
-        }
-
-        if (Input::get('active') == 0) {
-            $oDeal->status = ModelDeal::STATUS_PLANNED;
-        }
-
-        $oDeal->active = Input::get('active');
-
-        $oDeal->save();
-    }
-
     public function extend(Request $request, $token) {
-        // Deal
+        // Campaign -> Customer
 
-        $oDeal = new ModelDeal();
+        $oCampaignCustomer = new ModelCampaignCustomer();
 
-        $oDeal = ModelDeal::where('token', '=', $token)->first();
+        $oCampaignCustomer = ModelCampaignCustomer::where('token', '=', $token)->first();
 
-        if (!$oDeal) {
-            return view('content.deals.extend.token_error');
+        if (!$oCampaignCustomer) {
+            return view('content.campaign.customer.extend.token_error');
         }
 
         // Check if form already has been saved.
 
-        if ($oDeal->status == ModelDeal::STATUS_FORM_SAVED) {
-            return view('content.deals.extend.status_form_saved', [
-                'oDeal' => $oDeal
+        if ($oCampaignCustomer->status == ModelCampaignCustomer::STATUS_FORM_SAVED) {
+            return view('content.campaign.customer.extend.status_form_saved', [
+                'oCampaignCustomer' => $oCampaignCustomer
             ]);
         }
 
         // Check if the form has been requested for the first time.
 
-        if ($oDeal->status == ModelDeal::STATUS_INVITE_EMAIL_SENT) {
-            $oDeal->status = ModelDeal::STATUS_FORM_REQUESTED;
-            $oDeal->save();
+        if ($oCampaignCustomer->status == ModelCampaignCustomer::STATUS_INVITE_EMAIL_SENT) {
+            $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_FORM_REQUESTED;
+            $oCampaignCustomer->save();
         }
 
         // Campaign
 
         $oCampaign = new ModelCampaign();
 
-        $oCampaign = $oCampaign->find($oDeal->campaign_id);
+        $oCampaign = $oCampaign->find($oCampaignCustomer->campaign_id);
 
         // Check if the campaign has expired.
         $bExpired = (time() > strtotime($oCampaign->new_term_offer, strtotime($oCampaign->scheduled_at)) ? true : false);
@@ -75,15 +51,15 @@ class DealController extends Controller
         $aData = [
             'form_end_agreement' => null,
             'form_renewable_resource' => null,
-            'form_email_billing' => $oDeal->email_commercieel,
+            'form_email_billing' => $oCampaignCustomer->email_commercieel,
             'form_email_contract_extension' => null,
             'form_email_meter_readings' => null,
             'form_payment' => null,
-            'form_fadr_street' => $oDeal->fadr_street,
-            'form_fadr_nr' => $oDeal->fadr_nr,
-            'form_fadr_nr_conn' => $oDeal->fadr_nr_conn,
-            'form_fadr_zip' => $oDeal->fadr_zip,
-            'form_fadr_city' => $oDeal->fadr_city,
+            'form_fadr_street' => $oCampaignCustomer->fadr_street,
+            'form_fadr_nr' => $oCampaignCustomer->fadr_nr,
+            'form_fadr_nr_conn' => $oCampaignCustomer->fadr_nr_conn,
+            'form_fadr_zip' => $oCampaignCustomer->fadr_zip,
+            'form_fadr_city' => $oCampaignCustomer->fadr_city,
             'form_iban' => null,
             'form_terms_and_conditions_1' => null,
             'form_terms_and_conditions_2' => null,
@@ -196,12 +172,36 @@ class DealController extends Controller
             }
         }
 
-        return view('content.deals.extend', [
+        return view('content.campaign.customer.extend', [
             'aData' => $aData,
             'oCampaign' => $oCampaign,
-            'oDeal' => $oDeal,
+            'oCampaignCustomer' => $oCampaignCustomer,
             'token' => $token
         ])->withErrors($aErrors);
     }
 
+    public function active(Request $request, $id)
+    {
+        $oCampaignCustomer = new ModelCampaignCustomer();
+
+        $oCampaignCustomer = $oCampaignCustomer->find($id);
+
+        if (!$oCampaignCustomer) {
+            App::abort(404, 'Campaign Customer Not Found.');
+        }
+
+        // Check if the status is planned or scheduled.
+
+        if (!in_array($oCampaignCustomer->status, [ModelCampaignCustomer::STATUS_PLANNED, ModelCampaignCustomer::STATUS_INVITE_EMAIL_SCHEDULED])) {
+            App::abort(500, 'The status is not equal to "planned" or "scheduled" therefore the active state cannot be modified.');
+        }
+
+        if (Input::get('active') == 0) {
+            $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_PLANNED;
+        }
+
+        $oCampaignCustomer->active = Input::get('active');
+
+        $oCampaignCustomer->save();
+    }
 }

@@ -108,7 +108,7 @@ class PricesController extends Controller
                     'date_start' => ($o->date_start ? date(Auth::user()->date_format, strtotime($o->date_start)) : ''),
                     'date_end' => ($o->date_start ? date(Auth::user()->date_format, strtotime($o->date_start)) : ''),
                     'rate' => $o->rate,
-                    'codes' => $o->codes,
+                    'codes' => str_replace(' ', ',', $o->codes),
                     'price' => number_format($o->price,2,',','.'),
                     'created_at' => ($o->created_at ? date(Auth::user()->date_format.' H:i', strtotime($o->created_at)) : ''),
                     'updated_at' => ($o->updated_at ? date(Auth::user()->date_format.' H:i', strtotime($o->updated_at)) : ''),
