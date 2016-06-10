@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App;
 use App\Models\Language AS ModelLanguage;
 use View;
+use Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -36,6 +37,10 @@ class AuthController extends Controller
                 ])) {
                     $aErrors['email'] = __('These credentials do not match our records.');
                 } else {
+                    $oLanguage = new ModelLanguage();
+                    $oLanguage = $oLanguage->find(Auth::user()->language_id);
+                    Session::set('locale', $oLanguage->locale);
+
                     return redirect('/');
                 }
             }

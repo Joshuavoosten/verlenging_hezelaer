@@ -59,6 +59,7 @@ class DetailsController extends Controller
          $oDB = DB::table('campaign_prices')
              ->select(
                  'code',
+                 'years',
                  'price_normal',
                  'price_low',
                  'price_enkel',
@@ -152,13 +153,15 @@ class DetailsController extends Controller
 
                  $oCampaign->save();
 
-                 // Add deal to queue
+                 // Add customer to queue
 
+                 /*
                  DB::table('deals')
                     ->where('campaign_id', '=', $oCampaign->id)
                     ->where('active', '=', 1)
                     ->update(['status' => ModelDeal::STATUS_INVITE_EMAIL_SCHEDULED])
                 ;
+                 */
 
                  return Redirect::to('/campaigns/details/'.$oCampaign->id)
                     ->with('success', sprintf(
@@ -186,6 +189,8 @@ class DetailsController extends Controller
     }
 
     public function jsonCustomersWithoutSaving(Request $request, $id) {
+        $aClientCodes = ModelCampaign::getCustomersWithCurrentOffer($id);
+
         $oDB = DB::table('campaign_customers AS cc')
             ->select(
                 'cc.id',
@@ -202,11 +207,14 @@ class DetailsController extends Controller
             ->join('deals AS d', 'd.campaign_customer_id', '=', 'cc.id')
             ->where('cc.campaign_id', '=', $id)
             ->where('cc.has_saving', '=', 0)
+            ->whereNotIn('cc.client_code', $aClientCodes)
         ;
 
         if (Input::get('search')) {
             $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
+
+        $total = $oDB->count(DB::raw('cc.id'));
 
         $oDB->groupBy('cc.id');
 
@@ -236,8 +244,6 @@ class DetailsController extends Controller
         } else {
             $oDB->orderBy('cc.client_name');
         }
-
-        $total = $oDB->count();
 
         $offset = Input::get('offset', 0);
 
@@ -292,6 +298,8 @@ class DetailsController extends Controller
     }
 
     public function jsonCustomersWithSavings(Request $request, $id) {
+        $aClientCodes = ModelCampaign::getCustomersWithCurrentOffer($id);
+
         $oDB = DB::table('campaign_customers AS cc')
             ->select(
                 'cc.id',
@@ -308,11 +316,14 @@ class DetailsController extends Controller
             ->join('deals AS d', 'd.campaign_customer_id', '=', 'cc.id')
             ->where('cc.campaign_id', '=', $id)
             ->where('cc.has_saving', '=', 1)
+            ->whereNotIn('cc.client_code', $aClientCodes)
         ;
 
         if (Input::get('search')) {
             $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
+
+        $total = $oDB->count(DB::raw('cc.id'));
 
         $oDB->groupBy('cc.id');
 
@@ -342,8 +353,6 @@ class DetailsController extends Controller
         } else {
             $oDB->orderBy('cc.client_name');
         }
-
-        $total = $oDB->count();
 
         $offset = Input::get('offset', 0);
 
@@ -398,8 +407,92 @@ class DetailsController extends Controller
     }
 
     public function jsonCustomersWithCurrentOffer(Request $request, $id) {
-        // @todo
-        return [];
+        $aClientCodes = ModelCampaign::getCustomersWithCurrentOffer($id);
+
+        $oDB = DB::table('campaign_customers AS cc')
+            ->select(
+                'cc.id',
+                'cc.client_code',
+                'cc.client_name',
+                'cc.aanhef_commercieel',
+                'cc.status',
+                DB::Raw('GROUP_CONCAT(DISTINCT d.code) AS codes'),
+                DB::Raw('GROUP_CONCAT(DISTINCT d.end_agreement) AS end_agreement')
+            )
+            ->join('campaigns AS c', 'c.id', '=', 'cc.campaign_id')
+            ->join('deals AS d', 'd.campaign_customer_id', '=', 'cc.id')
+            ->where('cc.campaign_id', '=', $id)
+            ->whereIn('cc.client_code', $aClientCodes)
+        ;
+
+        if (Input::get('search')) {
+            $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
+        }
+
+        $total = $oDB->count(DB::raw('DISTINCT cc.id'));
+
+        $oDB->groupBy('cc.id');
+
+        if (Input::get('sort') && Input::get('order')) {
+            $sort = null;
+            switch (Input::get('sort')) {
+                case 'client_name':
+                    $sort = 'cc.client_name';
+                    break;
+                case 'client_code':
+                    $sort = 'cc.client_code';
+                    break;
+                case 'aanhef_commercieel':
+                    $sort = 'cc.aanhef_commercieel';
+                    break;
+                default:
+                    $sort = 'cc.client_name';
+                    break;
+            }
+            $oDB->orderBy($sort, Input::get('order'));
+        } else {
+            $oDB->orderBy('cc.client_name');
+        }
+
+        $offset = Input::get('offset', 0);
+
+        $limit = Input::get('limit', 25);
+
+        $oDB->skip($offset)->take($limit);
+
+        $a = $oDB->get();
+
+        $aRows = [];
+
+        if (count($a) > 0) {
+            foreach ($a as $o) {
+                // Expiration Date
+
+                $sEndAgreement = $o->end_agreement;
+                $aEndAgreement = explode(',', $sEndAgreement);
+                asort($aEndAgreement);
+                foreach ($aEndAgreement as $k => $v) {
+                    $aEndAgreement[$k] = date(Auth::user()->date_format, strtotime($v));
+                }
+                $sEndAgreement = implode(',', $aEndAgreement);
+
+                $aRows[] = [
+                    'id' => $o->id,
+                    'client_name' => $o->client_name,
+                    'client_code' => $o->client_code,
+                    'codes' => $o->codes,
+                    'end_agreement' => $sEndAgreement,
+                    'aanhef_commercieel' => $o->aanhef_commercieel
+                ];
+            }
+        }
+
+        $aResponse = [
+            'total' => $total,
+            'rows' => $aRows,
+        ];
+
+        return response()->json($aResponse);
     }
 
 }

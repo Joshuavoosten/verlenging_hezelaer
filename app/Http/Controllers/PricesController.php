@@ -106,7 +106,7 @@ class PricesController extends Controller
                 $aRows[] = [
                     'id' => $o->id,
                     'date_start' => ($o->date_start ? date(Auth::user()->date_format, strtotime($o->date_start)) : ''),
-                    'date_end' => ($o->date_start ? date(Auth::user()->date_format, strtotime($o->date_start)) : ''),
+                    'date_end' => ($o->date_end ? date(Auth::user()->date_format, strtotime($o->date_end)) : ''),
                     'rate' => $o->rate,
                     'codes' => str_replace(' ', ',', $o->codes),
                     'price' => number_format($o->price,2,',','.'),

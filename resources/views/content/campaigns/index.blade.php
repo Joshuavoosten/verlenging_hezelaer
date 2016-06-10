@@ -7,6 +7,7 @@
 <script src="{{ URL::asset('assets/js/formatters/edit.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/campaignDetails.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/campaignCsv.js') }}"></script>
+<script src="{{ URL::asset('assets/js/formatters/profileCodes.js') }}"></script>
 @endsection
 
 @section('content')
@@ -39,7 +40,7 @@
                 <tr>
                     <th data-field="name" data-formatter="campaignDetailsFormatter" data-sortable="true">{{ __('Name') }}</th>
                     <th data-field="current_segment" data-sortable="true" class="col-md-1">{{ __('Segment') }}</th>
-                    <th data-field="current_profile_code" data-sortable="true" class="col-md-1">{{ __('Profile Code') }}</th>
+                    <th data-field="current_profile_codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-2">{{ __('Profile Code(s)') }}</th>
                     <th data-field="current_agreement" data-sortable="true" class="col-md-2">{{ __('Agreement') }}</th>
                     <th data-field="current_expiration_date" data-align="center" data-sortable="true" class="col-md-1">{{ __('Expiration Date') }}</th>
                     <th data-field="count_customers" data-align="center" data-sortable="false" class="col-md-1">{{ __('Customers') }}</th>
@@ -57,7 +58,7 @@
                 <tr>
                     <th data-field="name" data-formatter="campaignDetailsFormatter" data-sortable="true">{{ __('Name') }}</th>
                     <th data-field="current_segment" data-sortable="false" class="col-md-1">{{ __('Segment') }}</th>
-                    <th data-field="current_profile_code" data-sortable="false" class="col-md-1">{{ __('Profile Code') }}</th>
+                    <th data-field="current_profile_codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-2">{{ __('Profile Code(s)') }}</th>
                     <th data-field="current_agreement" data-sortable="false" class="col-md-2">{{ __('Agreement') }}</th>
                     <th data-field="current_expiration_date" data-align="center" data-sortable="false" class="col-md-1">{{ __('Expiration Date') }}</th>
                     <th data-field="count_customers" data-align="center" data-sortable="false" class="col-md-1">{{ __('Customers') }}</th>

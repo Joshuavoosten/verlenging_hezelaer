@@ -211,9 +211,9 @@ class CampaignController extends Controller
 
         // Term Offers (new)
         $aNewTermOffers = [
-            '+1 weeks' => '1 week',
-            '+2 weeks' => '2 weken',
-            '+3 weeks' => '3 weken'
+            '+1 week' => '1 week',
+            '+2 week' => '2 weken',
+            '+3 week' => '3 weken'
         ];
 
         // Percentages (new)
@@ -284,16 +284,26 @@ class CampaignController extends Controller
                 $oCampaign->new_term_offer = Input::get('new_term_offer');
                 $oCampaign->new_percentage = Input::get('new_percentage');
 
-                // Campaign -> Prices
+                // Prices
 
-                $aCampaignPrices = [];
+                $year = date('Y', strtotime(Input::get('current_expiration_date')));
+
+                $aPrices = [];
 
                 foreach (Input::get('current_profile_codes') as $current_profile_code) {
                     $a = ModelPrice::getCampaignPrices($current_profile_code, Input::get('current_expiration_date'));
+
                     if (count($a) == 0) {
                         $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\'.'), $current_profile_code);
-                    } else {
-                        $aCampaignPrices[$current_profile_code] = $a;
+                    } elseif(!array_key_exists(1, $a)) {
+                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), ($year+1), $current_profile_code);
+                    } elseif(!array_key_exists(2, $a)) {
+                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), ($year+2), $current_profile_code);
+                    } elseif(!array_key_exists(3, $a)) {
+                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), ($year+3), $current_profile_code);
+                    }
+                    else {
+                        $aPrices[$current_profile_code] = $a;
                     }
                 }
 
@@ -395,21 +405,38 @@ class CampaignController extends Controller
 
                         // Campaign -> Prices
 
-                        foreach ($aCampaignPrices as $current_profile_code => $aCampaignPrice) {
-                            $oCampaignPrice = new ModelCampaignPrice();
+                        foreach ($aPrices as $code => $v) {
+                            foreach($v as $years => $aPrice) {
+                                $oCampaignPrice = new ModelCampaignPrice();
 
-                            $oCampaignPrice->campaign_id = $oCampaign->id;
-                            $oCampaignPrice->code = $aCampaignPrice['code'];
-                            $oCampaignPrice->price_normal = (array_key_exists('normal', $aCampaignPrice) ? $aCampaignPrice['normal'] : 0);
-                            $oCampaignPrice->price_low = (array_key_exists('low', $aCampaignPrice) ? $aCampaignPrice['low'] : 0);
-                            $oCampaignPrice->price_enkel = (array_key_exists('enkel', $aCampaignPrice) ? $aCampaignPrice['enkel'] : 0);
-                            $oCampaignPrice->type = $oCampaignPrice->determineType();
-                            $oCampaignPrice->calculation = $oCampaignPrice->determineCalculation();
+                                $oCampaignPrice->campaign_id = $oCampaign->id;
+                                $oCampaignPrice->date_start = $aPrice['date_start'];
+                                $oCampaignPrice->date_end = $aPrice['date_end'];
+                                $oCampaignPrice->years = $years;
+                                $oCampaignPrice->rate = $aPrice['rate'];
+                                $oCampaignPrice->code = $code;
+                                $oCampaignPrice->price_normal = (array_key_exists('normal', $aPrice) ? $aPrice['normal'] : 0);
+                                $oCampaignPrice->price_low = (array_key_exists('low', $aPrice) ? $aPrice['low'] : 0);
+                                $oCampaignPrice->price_enkel = (array_key_exists('enkel', $aPrice) ? $aPrice['enkel'] : 0);
+                                $oCampaignPrice->type = $oCampaignPrice->determineType();
+                                $oCampaignPrice->calculation = $oCampaignPrice->determineCalculation();
 
-                            $oCampaignPrice->save();
+                                $oCampaignPrice->save();
 
-                            $aCampaignPrices[$current_profile_code]['type'] = $oCampaignPrice->type;
-                            $aCampaignPrices[$current_profile_code]['calculation'] = $oCampaignPrice->calculation;
+                                $aCampaignPrices[$code][$years] = [
+                                    'date_start' => $aPrice['date_start'],
+                                    'date_end' => $aPrice['date_end'],
+                                    'years' => $years,
+                                    'rate' => $aPrice['rate'],
+                                    'code' => $aPrice['code'],
+                                    'normal' => $aPrice['normal'],
+                                    'enkel' => $aPrice['enkel'],
+                                    'low' => $aPrice['low'],
+                                    'type' => $oCampaignPrice->type,
+                                    'calculation' => $oCampaignPrice->calculation,
+                                    'percentage' => $oCampaign->new_percentage
+                                ];
+                            }
                         }
 
                         // Campaign -> Customers
@@ -454,6 +481,7 @@ class CampaignController extends Controller
                                 $oCampaignCustomer->category3 = $o->category3;
                                 $oCampaignCustomer->consument = $o->consument;
                                 $oCampaignCustomer->token = sha1(openssl_random_pseudo_bytes(32));
+                                $oCampaignCustomer->active = 1;
                                 $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_PLANNED;
 
                                 $oCampaignCustomer->save();
@@ -469,8 +497,6 @@ class CampaignController extends Controller
 
                             $oDeal = new ModelDeal;
 
-                            $aPrices = $aCampaignPrices[$o->code];
-
                             $oDeal->campaign_id = $oCampaign->id;
                             $oDeal->campaign_customer_id = $campaign_customer_id;
                             $oDeal->ean = $o->ean;
@@ -480,16 +506,15 @@ class CampaignController extends Controller
                             $oDeal->syu_low = $o->syu_low;
                             $oDeal->end_agreement = $o->end_agreement;
                             $oDeal->vastrecht = $o->vastrecht;
+                            $oDeal->new_vastrecht = ModelDeal::NEW_VASTRECHT;
                             $oDeal->price_normal = $o->price_normal;
                             $oDeal->price_low = $o->price_low;
-                            $oDeal->type = $aCampaignPrices[$o->code]['type'];
-                            $oDeal->calculation = $aCampaignPrices[$o->code]['calculation'];
-                            $oDeal->estimate_price_1_year = $oDeal->calculateCosts($aPrices,1,12);
-                            $oDeal->estimate_saving_1_year = $oDeal->calculateSaving($aPrices,1,12);
-                            $oDeal->estimate_price_2_year = $oDeal->calculateCosts($aPrices,2,24);
-                            $oDeal->estimate_saving_2_year = $oDeal->calculateSaving($aPrices,2,24);
-                            $oDeal->estimate_price_3_year = $oDeal->calculateCosts($aPrices,3,36);
-                            $oDeal->estimate_saving_3_year = $oDeal->calculateSaving($aPrices,3,36);
+                            $oDeal->estimate_price_1_year = $oDeal->calculateCosts($aCampaignPrices[$o->code][1]);
+                            $oDeal->estimate_saving_1_year = $oDeal->calculateSaving($aCampaignPrices[$o->code][1]);
+                            $oDeal->estimate_price_2_year = $oDeal->calculateCosts($aCampaignPrices[$o->code][2]);
+                            $oDeal->estimate_saving_2_year = $oDeal->calculateSaving($aCampaignPrices[$o->code][1]);
+                            $oDeal->estimate_price_3_year = $oDeal->calculateCosts($aCampaignPrices[$o->code][3]);
+                            $oDeal->estimate_saving_3_year = $oDeal->calculateSaving($aCampaignPrices[$o->code][3]);
                             $oDeal->has_saving = (max([$oDeal->estimate_saving_1_year, $oDeal->estimate_saving_2_year, $oDeal->estimate_saving_3_year]) > 0 ? 1 : 0);
 
                             $oDeal->save();

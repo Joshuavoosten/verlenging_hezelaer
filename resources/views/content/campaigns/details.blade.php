@@ -3,7 +3,6 @@
 @section('scripts')
 <script src="{{ URL::asset('assets/js/content/campaigns/details.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/campaignCustomerActive.js') }}"></script>
-<script src="{{ URL::asset('assets/js/formatters/datesFormatter.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/dealEndAgreement.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/profileCodes.js') }}"></script>
 <script src="{{ URL::asset('assets/js/formatters/rowstyle.js') }}"></script>
@@ -36,8 +35,12 @@
                     <div class="col-md-6">{{ $oCampaign->current_segment }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">{{ __('Profile Code') }}</div>
-                    <div class="col-md-6">{{ $oCampaign->current_profile_code }}</div>
+                    <div class="col-md-6">{{ __('Profile Code(s)') }}</div>
+                    <div class="col-md-6">
+                        @foreach(explode(',', $oCampaign->current_profile_codes) as $code)
+                            <span class="label label-custom">{{ $code }}</span>
+                        @endforeach
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">{{ __('Agreement') }}</div>
@@ -64,12 +67,16 @@
                     <div class="col-md-6">{{ __('Term Offer') }}</div>
                     <div class="col-md-6">{{ \App\Models\Campaign::newTermOfferFormatter($oCampaign->new_term_offer) }}</div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">{{ __('Prijs opslag percentage') }}</div>
+                    <div class="col-md-6">{{ $oCampaign->new_percentage }} %</div>
+                </div>
                 @foreach ($aCampaignPrices as $oCampaignPrice)
                     @if($oCampaignPrice->type == \App\Models\CampaignPrice::TYPE_ELEKTRICITY)
                         <div style="height: 10px"></div>
                         <div class="row">
                             <div class="col-md-6">
-                                {{ __('Electricity prices') }}<br />
+                                {{ __('Electricity prices') }} <small style="color: #888">({{ $oCampaignPrice->years }} {{ __('year') }})</small><br />
                                 <small style="color: #888">(&euro;ct/per kWh)</small>
                             </div>
                             <div class="col-md-6">
@@ -102,7 +109,7 @@
                         <div style="height: 10px"></div>
                         <div class="row">
                             <div class="col-md-6">
-                                {{ __('Gas price') }}<br />
+                                {{ __('Gas price') }} <small style="color: #888">({{ $oCampaignPrice->years }} {{ __('year') }})</small><br />
                                 <small style="color: #888">(&euro;ct/per m3)</small>
                             </div>
                             <div class="col-md-6">
@@ -138,11 +145,11 @@
                         <tr>
                             <th data-field="active" data-formatter="campaignCustomerActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
-                            <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
+                            <th data-field="client_code" data-sortable="true" class="col-md-2">{{ __('Number') }}</th>
                             <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-1">{{ __('Profile Code(s)') }}</th>
                             <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="false" class="col-md-2">{{ __('Expiration Date') }}</th>
-                            <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
-                            <th data-field="status_format" data-align="center" data-sortable="true">{{ __('Status') }}</th>
+                            <th data-field="aanhef_commercieel" data-sortable="true" class="col-md-2">{{ __('Salutation') }}</th>
+                            <th data-field="status_format" data-align="center" data-sortable="true" class="col-md-1">{{ __('Status') }}</th>
                         </tr>
                     </thead>
                 </table>
@@ -153,11 +160,11 @@
                         <tr>
                             <th data-field="active" data-formatter="campaignCustomerActiveFormatter" data-align="center" data-sortable="true" class="col-md-1"></th>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
-                            <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
+                            <th data-field="client_code" data-sortable="true" class="col-md-2">{{ __('Number') }}</th>
                             <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-1">{{ __('Profile Code(s)') }}</th>
                             <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="false" class="col-md-2">{{ __('Expiration Date') }}</th>
-                            <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
-                            <th data-field="status_format" data-align="center" data-sortable="true">{{ __('Status') }}</th>
+                            <th data-field="aanhef_commercieel" data-sortable="true" class="col-md-2">{{ __('Salutation') }}</th>
+                            <th data-field="status_format" data-align="center" data-sortable="true" class="col-md-1">{{ __('Status') }}</th>
                         </tr>
                     </thead>
                 </table>
@@ -166,11 +173,13 @@
                 <table id="table_customers_with_current_offer" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
+                            <th class="col-md-1"></th>
                             <th data-field="client_name" data-sortable="true">{{ __('Name') }}</th>
-                            <th data-field="client_code" data-sortable="true">{{ __('Number') }}</th>
+                            <th data-field="client_code" data-sortable="true" class="col-md-2">{{ __('Number') }}</th>
                             <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-1">{{ __('Profile Code(s)') }}</th>
                             <th data-field="end_agreement" data-formatter="dealEndAgreementFormatter" data-align="center" data-sortable="false" class="col-md-2">{{ __('Expiration Date') }}</th>
-                            <th data-field="aanhef_commercieel" data-sortable="true">{{ __('Salutation') }}</th>
+                            <th data-field="aanhef_commercieel" data-sortable="true" class="col-md-2">{{ __('Salutation') }}</th>
+                            <th class="col-md-1"></th>
                         </tr>
                     </thead>
                 </table>
