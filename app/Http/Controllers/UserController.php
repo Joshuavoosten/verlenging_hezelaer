@@ -149,7 +149,7 @@ class UserController extends Controller
                 'gender' => 'required',
                 'email' => 'required|email|unique:users',
                 'date_format' => 'required',
-                'language' => 'required',
+                'language_id' => 'required',
             ], $aMessages);
 
             if ($oValidator->fails()) {
