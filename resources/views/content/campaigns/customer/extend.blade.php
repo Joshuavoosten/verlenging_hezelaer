@@ -1,14 +1,14 @@
 @extends('layouts.external')
 
 @section('stylesheets')
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/normalize.css') }}">
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/main.css') }}">
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/shifft_template.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/normalize.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/main.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/shifft_template.css') }}">
 @endsection
 
 @section('scripts')
 <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-<script src="{{ URL::asset('assets/js/content/deals/extend.js') }}"></script>
+<script src="{{ URL::asset('assets/js/content/campaigns/customer/extend.js') }}"></script>
 @endsection
 
 @section('content')
@@ -18,12 +18,12 @@
             <li class="left"></li>
             <li class="right">
                 <span><b>Klantgegevens</b></span>
-                <span>{{ $oDeal->client_name }}</span>
-                <span>Klantcode #{{ $oDeal->client_code }}</span>
+                <span>{{ $oCampaignCustomer->client_name }}</span>
+                <span>Klantcode #{{ $oCampaignCustomer->client_code }}</span>
             </li>
             <li class="right">
                 <span><b>Persoonlijk contact opnemen</b></span>
-                <span>{{ $oDeal->accountmanager }}</span>
+                <span>{{ $oCampaignCustomer->accountmanager }}</span>
                 <span>T. +31 76 30 30 720</span>
             </li>
         </ul>
@@ -35,120 +35,108 @@
                 <h4>Snel en makkelijk online verlengen</h4>
             </div>
             <div class="right">
-                @if($oDeal->has_saving)
-                    <a href="#">Uw jaarbesparing <b>&euro; <span class="estimate_saving">{{ number_format($oDeal->estimate_saving_3_year,2,',','.') }}</span></b></a>
+                @if($oCampaignCustomer->has_saving)
+                    <a href="#">Uw jaarbesparing <b>&euro; <span class="estimate_saving">{{ number_format($oCampaignCustomer->estimate_saving_3_year,2,',','.') }}</span></b></a>
                 @endif
             </div>
         </div>
-        <table style="font-size: 13px; width: 958px" class="currentAgreement table-content noBorder hezGrijs" cellpadding="0" cellspacing="0">
-            <tr style="border: 1px solid #999899">
+        <table style="font-size: 13px; width: 958px;" class="currentAgreement table-content noBorder hezGrijs" cellpadding="0" cellspacing="0">
+            <tr style="border: 1px solid #999899;">
                 <td colspan="7" class="morePad">
-                    <b class="tableTitle">
-                        @if($oCampaign->isGas())
-                            Uw huidige leveringsovereenkomst Gas
-                        @endif
-                        @if($oCampaign->isElektricity())
-                            Uw huidige leveringsovereenkomst Elektriciteit
-                        @endif
-                    </b>
-                    <!-- Kenmerk V72-00-4673-05 -->
+                    <b class="tableTitle">Uw huidige leveringsovereenkomst(en)</b>
+                    Kenmerk {{ $oCampaignCustomer->kenmerkFormatter() }}
                 </td>
             </tr>
-            <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
-                <td colspan="7" class="morePad"><b>Leveringsadres:</b> {{ $oDeal->cadrFormatter() }}</td>
-            </tr>
-            @if($oCampaign->isElektricity())
-                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
-                    <td width="90px"><b>Type</b></td>
-                    <td width="140px"><b>EAN Code</b></td>
-                    <td width="165px"><b>Totaal jaarverbruik</b></td>
-                    <td width="165px"><b>&nbsp;</b></td>
-                    <td width="165px"><b>Tarief (normaal)</b></td>
-                    <td width="140px"><b>Tarief (laag)</b></td>
-                    <td width="85px"><b>Einddatum</b></td>
-                </tr>
-                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
-                    <td>Elektriciteit</td>
-                    <td>{{ $oDeal->ean }}</td>
-                    <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} kWh</td>
-                    <td>&nbsp;</td>
-                    <td>
-                        @if($oDeal->price_normal == 0)
-                            -
-                        @else
-                            {{ number_format($oDeal->price_normal,6,',','.') }} &euro; ct/kWh
-                        @endif
-                    </td>
-                    <td>
-                        @if($oDeal->price_low == 0)
-                            -
-                        @else
-                            {{ number_format($oDeal->price_low,6,',','.') }} &euro; ct/kWh
-                        @endif
-                    </td>
-                    <td>
-                        @if($oDeal->end_agreement == '3000-01-01')
-                            -
-                        @else
-                            {{ date('d-m-Y', strtotime($oDeal->end_agreement)) }}
-                        @endif
-                    </td>
-                </tr>
-            @endif
-            @if($oCampaign->isGas())
-                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
-                    <td width="90px"><b>Type</b></td>
-                    <td width="140px"><b>EAN Code</b></td>
-                    <td width="165px"><b>Totaal jaarverbruik</b></td>
-                    <td width="165px"><b>Tarief</b></td>
-                    <td width="85px"><b>Einddatum</b></td>
-                </tr>
-                <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
-                    <td>Gas</td>
-                    <td>{{ $oDeal->ean }}</td>
-                    <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} m3</td>
-                    <td>
-                        ??? &euro; ct/m3
-                    </td>
-                    <td>
-                        @if($oDeal->end_agreement == '3000-01-01')
-                            -
-                        @else
-                            {{ date('d-m-Y', strtotime($oDeal->end_agreement)) }}
-                        @endif
-                    </td>
-                </tr>
-            @endif
+            {{--*/ $cadrChecksum = null /*--}}
+            @foreach ($aDeals as $oDeal)
+                @if($cadrChecksum != $oDeal->cadrChecksum())
+                    <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
+                        <td colspan="7" class="morePad"><b>Leveringsadres:</b> {{ $oDeal->cadrFormatter() }}</td>
+                    </tr>
+                    <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899"> 
+                        <td width="90px"><b>Type</b></td>
+                        <td width="140px"><b>EAN Code</b></td>
+                        <td width="165px"><b>Totaal jaarverbruik</b></td>
+                        <td width="165px"><b>Tarief (gas)</b></td>
+                        <td width="165px"><b>Tarief (normaal)</b></td>
+                        <td width="140px"><b>Tarief (laag)</b></td>
+                        <td width="85px"><b>Einddatum</b></td>
+                    </tr>
+                @endif
+                @if($oDeal->isElektricity())
+                    <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
+                        <td>Elektriciteit</td>
+                        <td>{{ $oDeal->ean }}</td>
+                        <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} kWh</td>
+                        <td>-</td>
+                        <td>
+                            @if($oDeal->price_normal == 0)
+                                -
+                            @else
+                                {{ number_format($oDeal->price_normal,6,',','.') }} &euro; ct/kWh
+                            @endif
+                        </td>
+                        <td>
+                            @if($oDeal->price_low == 0)
+                                -
+                            @else
+                                {{ number_format($oDeal->price_low,6,',','.') }} &euro; ct/kWh
+                            @endif
+                        </td>
+                        <td>
+                            @if($oDeal->end_agreement == '3000-01-01')
+                                -
+                            @else
+                                {{ date('d-m-Y', strtotime($oDeal->end_agreement)) }}
+                            @endif
+                        </td>
+                    </tr>
+                @endif
+                @if($oDeal->isGas())
+                    <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
+                        <td>Gas</td>
+                        <td>{{ $oDeal->ean }}</td>
+                        <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} m3</td>
+                        <td>
+                            {{ number_format($oDeal->price_normal,6,',','.') }} &euro; ct/m3
+                        </td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>
+                            @if($oDeal->end_agreement == '3000-01-01')
+                                -
+                            @else
+                                {{ date('d-m-Y', strtotime($oDeal->end_agreement)) }}
+                            @endif
+                        </td>
+                    </tr>
+                @endif
+                {{--*/ $cadrChecksum = $oDeal->cadrChecksum() /*--}}
+            @endforeach
             <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
                 <td colspan="7">&nbsp;
             </td>
-            @if($oCampaign->isElektricity())
-                <tr class="hezOranje" style="border: 1px solid #f29421;">
-                    <td class="morePad" colspan="7">
-                        <span class="newPrices"><b>Nieuwe tarieven</b></span>
-                        <span class="newPrices"><b>Normaal</b> {{ number_format($oCampaign->price_normal,2,',','.') }} &euro; ct/kWh</span>
-                        <span class="newPrices"><b>Laag</b> {{ number_format($oCampaign->price_low,2,',','.') }} &euro; ct/kWh</span>
-                        @if($oCampaign->price_enkel > 0)
-                            <span class="newPrices"><b>Enkel</b> {{ number_format($oCampaign->price_enkel,2,',','.') }} &euro; ct/kWh</span>
-                        @endif
-                        @if($oDeal->has_saving)
-                            <span class="newPrices"><b>Jaarbesparing</b> &euro; <span class="estimate_saving">{{ number_format($oDeal->estimate_saving_3_year,2,',','.') }}</span></span>
-                        @endif
-                    </td>
+            @foreach ($aCampaignPrices as $sCode => $o)
+                <tr class="hezOranje nieuwe_tarieven" style="border: 1px solid #f29421">
+                    @if($o[3]->type == \App\Models\CampaignPrice::TYPE_GAS)
+                        <td class="morePad" colspan="7">
+                            <span class="newPrices"><b>Nieuwe tarieven ({{ $sCode }})</b></span>
+                            <span class="newPrices"><b>Gas</b> {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/m3</span>
+                        </td>
+                    @endif
+                    @if($o[3]->type == \App\Models\CampaignPrice::TYPE_ELEKTRICITY)
+                        <td class="morePad" colspan="7">
+                            <span class="newPrices"><b>Nieuwe tarieven ({{ $sCode }})</b></span>
+                            <span class="newPrices"><b>Normaal</b> {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/kWh</span>
+                            <span class="newPrices"><b>Laag</b> {{ number_format($o[3]->price_low/100,6,',','.') }} &euro; ct/kWh</span>
+                            @if($o[3]->price_enkel > 0)
+                                <span class="newPrices"><b>Enkel</b> {{ number_format($o[3]->price_enkel/100,6,',','.') }} &euro; ct/kWh</span>
+                            @endif
+                        </td>
+                    @endif
                 </tr>
-            @endif
-            @if($oCampaign->isGas())
-                <tr class="hezOranje" style="border: 1px solid #f29421;">
-                    <td class="morePad" colspan="7">
-                        <span class="newPrices"><b>Nieuwe tarieven</b></span>
-                        <span class="newPrices"><b>Gas</b> {{ number_format($oCampaign->price_enkel,2,',','.') }} &euro; ct/m3</span>
-                        @if($oDeal->has_saving)
-                            <span class="newPrices"><b>Jaarbesparing</b> &euro; <span class="estimate_saving">{{ number_format($oDeal->estimate_saving_3_year,2,',','.') }}</span></span>
-                        @endif
-                    </td>
-                </tr>
-            @endif
-            <tr class="hezBlauw" style="border: 1px solid #76999b; border-top: none">
+            @endforeach
+            <tr class="hezBlauw" style="border: 1px solid #76999b; border-top: none;">
                 <td class="infoCell1 morePad">&nbsp;</td>
                 <td class="morePad" colspan="6">
                     - De huishoudelijke energie opwek wordt gesaldeerd tegen hetzelfde tarief.<br /><br />
@@ -179,7 +167,7 @@
                         <span>Verleng u contract(en) tot {{ date('d-m-Y', strtotime('+3 year', strtotime($oDeal->end_agreement))) }}</span>
                     </label>
                 </li>
-                @if($oCampaign->isElektricity())
+                @if($hasElektricity)
                     <li class="clearfix right">
                         <h4>Selecteer uw hernieuwbare bron</h4>
                         @if($errors->has('form_renewable_resource'))
@@ -228,7 +216,7 @@
             <ul class="betalingsGegevens clearfix">
                 <li class="clearfix">
                     <label class="clearfix">
-                        {{ Form::radio('form_payment', \App\Models\Deal::FORM_PAYMENT_AUTOMATIC_COLLECTION, ($aData['form_payment'] == \App\Models\Deal::FORM_PAYMENT_AUTOMATIC_COLLECTION ? true : false)) }}
+                        {{ Form::radio('form_payment', \App\Models\Form::PAYMENT_AUTOMATIC_COLLECTION, ($aData['form_payment'] == \App\Models\Form::PAYMENT_AUTOMATIC_COLLECTION ? true : false)) }}
                         <span>Ja, ik machtig Hezelaer voor automatische incasso</span>
                         <a class="infoHolder tooltip-payment" href="#">
                             <div class="holderText rounded clearfix" style="display: none">
@@ -252,7 +240,7 @@
                 </li>
                 <li class="clearfix">
                     <label class="clearfix">
-                        {{ Form::radio('form_payment', \App\Models\Deal::FORM_PAYMENT_INVOICE, ($aData['form_payment'] == \App\Models\Deal::FORM_PAYMENT_INVOICE ? true : false)) }}
+                        {{ Form::radio('form_payment', \App\Models\Form::PAYMENT_INVOICE, ($aData['form_payment'] == \App\Models\Form::PAYMENT_INVOICE ? true : false)) }}
                         <span>Nee, ik betaal per factuur</span>
                         <a class="infoHolder tooltip-payment" href="#">
                             <div class="holderText rounded clearfix" style="display: none">
@@ -311,21 +299,21 @@
             <h4>Algemene voorwaarden</h4>
             <label class="algLabel clearfix">
                 {{ Form::checkbox('form_terms_and_conditions_1', 1, ($aData['form_terms_and_conditions_1'] == 1 ? true : false)) }}
-                <a class="hezBlauw" href="#">Model aansluit- en transportovereenkomst (ATO)</a>
+                <a class="hezBlauw" href="http://www.hezelaer.nl/voorwaarden/" target="index">Model aansluit- en transportovereenkomst (ATO)</a>
                 @if($errors->has('form_terms_and_conditions_1'))
                     <span class="errorSpan">Dit is een verplicht veld</span>
                 @endif
             </label>
             <label class="algLabel clearfix">
                 {{ Form::checkbox('form_terms_and_conditions_2', 1, ($aData['form_terms_and_conditions_2'] == 1 ? true : false)) }}
-                <a class="hezBlauw" href="#">Algemene voorwaarden kleinverbruikaansluitingen</a>
+                <a class="hezBlauw" href="http://www.hezelaer.nl/voorwaarden/" target="index">Algemene voorwaarden kleinverbruikaansluitingen</a>
                 @if($errors->has('form_terms_and_conditions_2'))
                     <span class="errorSpan">Dit is een verplicht veld</span>
                 @endif
             </label>
             <label class="algLabel lastAlg clearfix">
                 {{ Form::checkbox('form_terms_and_conditions_3', 1, ($aData['form_terms_and_conditions_3'] == 1 ? true : false)) }}
-                <a class="hezBlauw" href="#">Leveringsvoorwaarden Zeker & Vast contract voor kleinverbruikaansluitingen</a>
+                <a class="hezBlauw" href="http://www.hezelaer.nl/voorwaarden/" target="index">Leveringsvoorwaarden Zeker & Vast contract voor kleinverbruikaansluitingen</a>
                 @if($errors->has('form_terms_and_conditions_3'))
                     <span class="errorSpan">Dit is een verplicht veld</span>
                 @endif
@@ -370,7 +358,7 @@
     </div>
     <div id="footer">
         <ul class="clearfix">
-            <li><span>Copyrights &copy; {{ date('Y') }} Hezelaer Energy B.V. - Contractverlenging {{ $oDeal->client_name }}</span></li>
+            <li><span>Copyrights &copy; {{ date('Y') }} Hezelaer Energy B.V. - Contractverlenging {{ $oCampaignCustomer->client_name }}</span></li>
         </ul>
     </div>
 </div>

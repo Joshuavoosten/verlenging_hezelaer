@@ -1,9 +1,9 @@
 @extends('layouts.external')
 
 @section('stylesheets')
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/normalize.css') }}">
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/main.css') }}">
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/shifft_template.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/normalize.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/main.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/shifft_template.css') }}">
 @endsection
 
 @section('scripts')
@@ -17,12 +17,12 @@
             <li class="left"></li>
             <li class="right">
                 <span><b>Klantgegevens</b></span>
-                <span>{{ $oDeal->client_name }}</span>
-                <span>Klantcode #{{ $oDeal->client_code }}</span>
+                <span>{{ $oCampaignCustomer->client_name }}</span>
+                <span>Klantcode #{{ $oCampaignCustomer->client_code }}</span>
             </li>
             <li class="right">
                 <span><b>Persoonlijk contact opnemen</b></span>
-                <span>{{ $oDeal->accountmanager }}</span>
+                <span>{{ $oCampaignCustomer->accountmanager }}</span>
                 <span>T. +31 76 30 30 720</span>
             </li>
         </ul>

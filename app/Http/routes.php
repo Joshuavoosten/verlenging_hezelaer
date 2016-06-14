@@ -46,7 +46,7 @@ Route::group(['middleware' => 'web'], function () {
 
     // Campaign -> Customer
     Route::post('/campaign/customer/active/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\CustomerController@active']);
-    Route::match(['get', 'post'], '/verleng/{token}', ['uses' => 'CampaignCustomerController@extend']);
+    Route::match(['get', 'post'], '/verleng/{token}', ['uses' => 'Campaign\CustomerController@extend']);
 
     // Prices
     Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PricesController@index']);

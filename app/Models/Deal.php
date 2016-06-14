@@ -19,6 +19,24 @@ class Deal extends Model
     protected $table = 'deals';
 
     /**
+     * Connection Address Formatter
+     *
+     * @return string
+     */
+    public function cadrFormatter() {
+        return implode(' ', [$this->cadr_street, $this->cadr_nr.' '.$this->cadr_nr_conn, $this->cadr_zip, $this->cadr_city]);
+    }
+
+    /**
+     * Connection Address Checksum
+     *
+     * @return string
+     */
+    public function cadrChecksum() {
+        return sha1(implode(' ', [$this->cadr_street, $this->cadr_nr.' '.$this->cadr_nr_conn, $this->cadr_zip, $this->cadr_city]));
+    }
+
+    /**
      * Calculate Costs
      *
      * @param array $aCampaignPrices

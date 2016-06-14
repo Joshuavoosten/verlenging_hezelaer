@@ -19,21 +19,28 @@ class CampaignCustomer extends Model
     protected $table = 'campaign_customers';
 
     /**
-     * Connection Address Formatter
-     *
-     * @return string
-     */
-    public function cadrFormatter() {
-        return implode(' ', [$this->cadr_street, $this->cadr_nr.' '.$this->cadr_nr_conn, $this->cadr_zip, $this->cadr_city]);
-    }
-
-    /**
      * Invoice Address Formatter
      *
      * @return string
      */
     public function fadrFormatter() {
         return implode(' ', [$this->fadr_street, $this->fadr_nr.' '.$this->fadr_nr_conn, $this->fadr_zip, $this->fadr_city]);
+    }
+
+    /**
+     * Generate an unique reference.
+     *
+     * @return string $sKenmerk
+     */
+    public function kenmerkFormatter() {
+        $sKenmerk = null;
+
+        $sKenmerk .= 'V';
+        $sKenmerk .= date('Ym', strtotime($this->created_at));
+        $sKenmerk .= '_';
+        $sKenmerk .= str_pad($this->id, 4, 0, STR_PAD_LEFT);
+
+        return $sKenmerk;
     }
 
     /**

@@ -468,11 +468,6 @@ class CampaignController extends Controller
                                 $oCampaignCustomer->fadr_nr_conn = $o->fadr_nr_conn;
                                 $oCampaignCustomer->fadr_zip = $o->fadr_zip;
                                 $oCampaignCustomer->fadr_city = $o->fadr_city;
-                                $oCampaignCustomer->cadr_street = $o->cadr_street;
-                                $oCampaignCustomer->cadr_nr = $o->cadr_nr;
-                                $oCampaignCustomer->cadr_nr_conn = $o->cadr_nr_conn;
-                                $oCampaignCustomer->cadr_zip = $o->cadr_zip;
-                                $oCampaignCustomer->cadr_city = $o->cadr_city;
                                 $oCampaignCustomer->auto_renewal = $o->auto_renewal;
                                 $oCampaignCustomer->accountmanager = $o->accountmanager;
                                 $oCampaignCustomer->klantsegment = $o->klantsegment;
@@ -502,6 +497,11 @@ class CampaignController extends Controller
                             $oDeal->ean = $o->ean;
                             $oDeal->super_contract_number = $o->super_contract_number;
                             $oDeal->code = $o->code;
+                            $oDeal->cadr_street = $o->cadr_street;
+                            $oDeal->cadr_nr = $o->cadr_nr;
+                            $oDeal->cadr_nr_conn = $o->cadr_nr_conn;
+                            $oDeal->cadr_zip = $o->cadr_zip;
+                            $oDeal->cadr_city = $o->cadr_city;
                             $oDeal->syu_normal = $o->syu_normal;
                             $oDeal->syu_low = $o->syu_low;
                             $oDeal->end_agreement = $o->end_agreement;
@@ -515,6 +515,8 @@ class CampaignController extends Controller
                             $oDeal->estimate_saving_2_year = $oDeal->calculateSaving($aCampaignPrices[$o->code][1]);
                             $oDeal->estimate_price_3_year = $oDeal->calculateCosts($aCampaignPrices[$o->code][3]);
                             $oDeal->estimate_saving_3_year = $oDeal->calculateSaving($aCampaignPrices[$o->code][3]);
+                            $oDeal->type = $aCampaignPrices[$o->code][1]['type'];
+                            $oDeal->calculation = $aCampaignPrices[$o->code][1]['calculation'];
                             $oDeal->has_saving = (max([$oDeal->estimate_saving_1_year, $oDeal->estimate_saving_2_year, $oDeal->estimate_saving_3_year]) > 0 ? 1 : 0);
 
                             $oDeal->save();

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Campaign;
 
 use App;
 use App\Http\Controllers\Controller;
+use App\Models\Deal as ModelDeal;
 use App\Models\Campaign as ModelCampaign;
 use App\Models\CampaignCustomer as ModelCampaignCustomer;
+use App\Models\Form as ModelForm;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Validator;
@@ -13,6 +16,9 @@ use Validator;
 class CustomerController extends Controller
 {
     public function extend(Request $request, $token) {
+        // Default Contract Period
+        $iYears = 3;
+
         // Campaign -> Customer
 
         $oCampaignCustomer = new ModelCampaignCustomer();
@@ -20,13 +26,13 @@ class CustomerController extends Controller
         $oCampaignCustomer = ModelCampaignCustomer::where('token', '=', $token)->first();
 
         if (!$oCampaignCustomer) {
-            return view('content.campaign.customer.extend.token_error');
+            return view('content.campaigns.customer.extend.token_error');
         }
 
         // Check if form already has been saved.
 
         if ($oCampaignCustomer->status == ModelCampaignCustomer::STATUS_FORM_SAVED) {
-            return view('content.campaign.customer.extend.status_form_saved', [
+            return view('content.campaigns.customer.extend.status_form_saved', [
                 'oCampaignCustomer' => $oCampaignCustomer
             ]);
         }
@@ -47,10 +53,69 @@ class CustomerController extends Controller
         // Check if the campaign has expired.
         $bExpired = (time() > strtotime($oCampaign->new_term_offer, strtotime($oCampaign->scheduled_at)) ? true : false);
 
+        // Has Elektricity or Gas
+
+        $hasElektricity = false;
+        $hasGas = false;
+
+        // Deals
+
+        $aDeals = [];
+
+        $oDB = DB::table('deals')
+            ->select(
+                'id'
+            )
+            ->where('campaign_customer_id', '=', $oCampaignCustomer->id)
+        ;
+
+        $a = $oDB->get();
+
+        foreach ($a as $o) {
+            $oDeal = new ModelDeal();
+            $oDeal = $oDeal->find($o->id);
+            $aDeals[] = $oDeal;
+
+            if ($oDeal->type == ModelDeal::TYPE_ELEKTRICITY) {
+                $hasElektricity = true;
+            }
+
+            if ($oDeal->type == ModelDeal::TYPE_GAS) {
+                $hasGas = true;
+            }
+        }
+
+        // Campaign Prices
+
+        $aCampaignPrices = [];
+
+        $oDB = DB::table('campaign_prices')
+            ->select(
+                'id',
+                'date_start',
+                'date_end',
+                'years',
+                'rate',
+                'code',
+                'price_normal',
+                'price_low',
+                'price_enkel',
+                'type',
+                'calculation'
+            )
+            ->where('campaign_id', '=', $oCampaign->id)
+        ;
+
+        $a = $oDB->get();
+
+        foreach ($a as $o) {
+            $aCampaignPrices[$o->code][$o->years] = $o;
+        }
+
         // Data
         $aData = [
             'form_end_agreement' => null,
-            'form_renewable_resource' => null,
+            'form_renewable_resource' => 2, // 100% opgewekt door windmolens
             'form_email_billing' => $oCampaignCustomer->email_commercieel,
             'form_email_contract_extension' => null,
             'form_email_meter_readings' => null,
@@ -124,7 +189,7 @@ class CustomerController extends Controller
                'form_permission' => 'required'
             ];
 
-            if ($oCampaign->isElektricity()) {
+            if ($hasElektricity) {
                 $aRules = array_merge($aRules, [
                     'form_renewable_resource' => 'required'
                 ]);
@@ -145,35 +210,47 @@ class CustomerController extends Controller
             // Process
 
             if (count($aErrors) == 0) {
-                $oDeal->form_end_agreement = Input::get('form_end_agreement');
-                $oDeal->form_renewable_resource = Input::get('form_renewable_resource');
-                $oDeal->form_email_billing = Input::get('form_email_billing');
-                $oDeal->form_email_contract_extension = Input::get('form_email_contract_extension');
-                $oDeal->form_email_meter_readings = Input::get('form_email_meter_readings');
-                $oDeal->form_payment = Input::get('form_payment');
-                $oDeal->form_fadr_street = Input::get('form_fadr_street');
-                $oDeal->form_fadr_nr = Input::get('form_fadr_nr');
-                $oDeal->form_fadr_nr_conn = Input::get('form_fadr_nr_conn');
-                $oDeal->form_fadr_zip = Input::get('form_fadr_zip');
-                $oDeal->form_fadr_city = Input::get('form_fadr_city');
-                $oDeal->form_iban = Input::get('form_iban');
-                $oDeal->form_sign_name = Input::get('form_sign_name');
-                $oDeal->form_sign_on_behalf_of = Input::get('form_sign_on_behalf_of');
-                $oDeal->form_sign_function = Input::get('form_sign_function');
-                $oDeal->form_created_at = date('Y-m-d H:i:s');
+                $oForm = new ModelForm();
 
-                $oDeal->status = ModelDeal::STATUS_FORM_SAVED;
+                $oForm->campaign_customer_id = $oCampaignCustomer->id;
+                $oForm->end_agreement = Input::get('form_end_agreement');
+                $oForm->renewable_resource = Input::get('form_renewable_resource');
+                $oForm->email_billing = Input::get('form_email_billing');
+                $oForm->email_contract_extension = Input::get('form_email_contract_extension');
+                $oForm->email_meter_readings = Input::get('form_email_meter_readings');
+                $oForm->payment = Input::get('form_payment');
+                $oForm->fadr_street = Input::get('form_fadr_street');
+                $oForm->fadr_nr = Input::get('form_fadr_nr');
+                $oForm->fadr_nr_conn = Input::get('form_fadr_nr_conn');
+                $oForm->fadr_zip = Input::get('form_fadr_zip');
+                $oForm->fadr_city = Input::get('form_fadr_city');
+                $oForm->iban = Input::get('form_iban');
+                $oForm->sign_name = Input::get('form_sign_name');
+                $oForm->sign_on_behalf_of = Input::get('form_sign_on_behalf_of');
+                $oForm->sign_function = Input::get('form_sign_function');
+                $oForm->created_at = date('Y-m-d H:i:s');
 
-                $oDeal->save();
+                $oForm->save();
 
-                return view('content.deals.extend.status_form_saved', [
-                    'oDeal' => $oDeal
+                // Campaign -> Customer
+
+                $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_FORM_SAVED;
+
+                $oCampaignCustomer->save();
+
+                return view('content.campaigns.customer.extend.status_form_saved', [
+                    'oCampaignCustomer' => $oCampaignCustomer
                 ]);
             }
         }
 
-        return view('content.campaign.customer.extend', [
+        return view('content.campaigns.customer.extend', [
             'aData' => $aData,
+            'aDeals' => $aDeals,
+            'aCampaignPrices' => $aCampaignPrices,
+            'hasElektricity' => $hasElektricity,
+            'hasGas' => $hasGas,
+            'iYears' => $iYears,
             'oCampaign' => $oCampaign,
             'oCampaignCustomer' => $oCampaignCustomer,
             'token' => $token

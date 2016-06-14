@@ -1,9 +1,9 @@
 @extends('layouts.external')
 
 @section('stylesheets')
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/normalize.css') }}">
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/main.css') }}">
-<link rel="stylesheet" href="{{ URL::asset('assets/css/content/deals/extend/shifft_template.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/normalize.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/main.css') }}">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/content/campaigns/customer/extend/shifft_template.css') }}">
 @endsection
 
 @section('scripts')
