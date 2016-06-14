@@ -4,13 +4,13 @@ namespace App\Console\Commands;
 
 use App;
 use App\Models\Campaign as ModelCampaign;
-use App\Models\Deal as ModelDeal;
-use App\Jobs\DealsInviteEmail;
+use App\Models\CampaignCustomer as ModelCampaignCustomer;
+use App\Jobs\CampaignCustomersInviteEmail;
 use DB;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
-class DealsInviteEmailScheduler extends Command
+class CampaignCustomersInviteEmailScheduler extends Command
 {
     use DispatchesJobs;
     
@@ -19,14 +19,14 @@ class DealsInviteEmailScheduler extends Command
      *
      * @var string
      */
-    protected $signature = 'deals:invite_email_scheduler';
+    protected $signature = 'campaign_customers:invite_email_scheduler';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Deals Invite Email Scheduler';
+    protected $description = 'Campaign Customers Invite Email Scheduler';
 
     /**
      * Create a new command instance.
@@ -48,18 +48,18 @@ class DealsInviteEmailScheduler extends Command
         $oDB = DB::table('campaigns AS c')
             ->select(
                 'c.id AS campaign_id',
-                'd.id AS deal_id'
+                'cc.id AS campaign_customer_id'
             )
-            ->join('deals AS d', 'd.campaign_id', '=', 'c.id')
+            ->join('campaign_customers AS cc', 'cc.campaign_id', '=', 'c.id')
             ->where('c.status', '=', ModelCampaign::STATUS_PLANNED)
             ->where('c.scheduled', '=', 1)
             ->whereRaw('c.scheduled_at <= NOW()')
-            ->where('d.status', '=', ModelDeal::STATUS_INVITE_EMAIL_SCHEDULED)
-            ->where('d.active', '=', 1)
+            ->where('cc.status', '=', ModelCampaignCustomer::STATUS_INVITE_EMAIL_SCHEDULED)
+            ->where('cc.active', '=', 1)
         ;
 
         if ($oDB->count() == 0) {
-            echo 'There are no campaigns planned or deals scheduled.';
+            echo 'There are no campaigns planned or customers scheduled.';
             return false;
         }
 
@@ -77,22 +77,23 @@ class DealsInviteEmailScheduler extends Command
 
             $campaign_id = $o->campaign_id;
 
-            // Deal
+            // Campaign -> Customer
 
-            $oDeal = new ModelDeal();
-            $oDeal = $oDeal->find($o->deal_id);
+            $oCampaignCustomer = new ModelCampaignCustomer();
+            $oCampaignCustomer = $oCampaignCustomer->find($o->campaign_customer_id);
 
-            $oDeal->status = ModelDeal::STATUS_INVITE_EMAIL_QUEUED;
-            $oDeal->save();
+            $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_INVITE_EMAIL_QUEUED;
+            $oCampaignCustomer->save();
+
+            // Debug CLI
+
+            if (App::runningInConsole()) {
+                echo sprintf('Scheduler: Campaign (%s) %s - Customer (%s) %s : %s', $o->campaign_id, $oCampaign->name, $o->campaign_customer_id, $oCampaignCustomer->client_name, $oCampaignCustomer->client_code) . "\n"; 
+            }
 
             // Job
 
-            // Debug CLI
-            if (App::runningInConsole()) {
-                echo sprintf('Scheduler: Campaign (%s) %s - Deal (%s) %s <%s>', $o->campaign_id, $oCampaign->name, $o->deal_id, $oDeal->client_name, $oDeal->email_commercieel) . "\n"; 
-            }
-
-            $oJob = (new DealsInviteEmail($oCampaign, $oDeal))->onQueue('deals_invite_email');
+            $oJob = (new CampaignCustomersInviteEmail($oCampaign, $oCampaignCustomer))->onQueue('campaign_customers_invite_email');
 
             $this->dispatch($oJob);
         }

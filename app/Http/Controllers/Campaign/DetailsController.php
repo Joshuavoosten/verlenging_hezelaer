@@ -153,15 +153,11 @@ class DetailsController extends Controller
 
                  $oCampaign->save();
 
-                 // Add customer to queue
-
-                 /*
-                 DB::table('deals')
+                 DB::table('campaign_customers')
                     ->where('campaign_id', '=', $oCampaign->id)
                     ->where('active', '=', 1)
-                    ->update(['status' => ModelDeal::STATUS_INVITE_EMAIL_SCHEDULED])
+                    ->update(['status' => CampaignCustomer::STATUS_INVITE_EMAIL_SCHEDULED])
                 ;
-                 */
 
                  return Redirect::to('/campaigns/details/'.$oCampaign->id)
                     ->with('success', sprintf(

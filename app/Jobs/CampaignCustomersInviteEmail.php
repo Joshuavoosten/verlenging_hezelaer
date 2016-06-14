@@ -5,31 +5,31 @@ namespace App\Jobs;
 use App;
 use App\Jobs\Job;
 use App\Models\Campaign as ModelCampaign;
-use App\Models\Deal as ModelDeal;
+use App\Models\CampaignCustomer as ModelCampaignCustomer;
 use Config;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Mail;
 
-class DealsInviteEmail extends Job implements ShouldQueue
+class CampaignCustomersInviteEmail extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
 
     protected $oCampaign;
-    protected $oDeal;
+    protected $oCampaignCustomer;
 
     /**
      * Create a new job instance.
      *
      * @param object $oCampaign
-     * @param object $oDeal
+     * @param object $oCampaignCustomer
      * @return void
      */
-    public function __construct(ModelCampaign $oCampaign, ModelDeal $oDeal)
+    public function __construct(ModelCampaign $oCampaign, ModelCampaignCustomer $oCampaignCustomer)
     {
         $this->oCampaign = $oCampaign;
-        $this->oDeal = $oDeal;
+        $this->oCampaignCustomer = $oCampaignCustomer;
     }
 
     /**
@@ -43,12 +43,13 @@ class DealsInviteEmail extends Job implements ShouldQueue
 
         $oCampaign = $this->oCampaign;
 
-        // Deal
-        $oDeal = $this->oDeal;
+        // Campaign -> Customer
+        $oCampaignCustomer = $this->oCampaignCustomer;
 
         // Debug CLI
+
         if (App::runningInConsole()) {
-            echo sprintf('Job: Campaign (%s) %s - Deal (%s) %s <%s>', $oCampaign->id, $oCampaign->name, $oDeal->id, $oDeal->client_name, $oDeal->email_commercieel) . "\n";
+            echo sprintf('Job: Campaign (%s) %s - Customer (%s) %s : %s', $o->campaign_id, $oCampaign->name, $o->campaign_customer_id, $oCampaignCustomer->client_name, $oCampaignCustomer->client_code) . "\n"; 
         }
 
         // Mail
@@ -58,23 +59,24 @@ class DealsInviteEmail extends Job implements ShouldQueue
 
         // $to_address = $oDeal->email_commercieel;
         $to_address = 'david@floro.nl'; // @todo
-        $to_name = $oDeal->client_name;
+        $to_name = $oCampaignCustomer->client_name;
 
         $subject = 'Verleng nu uw leveringsovereenkomst(en)';
 
-        $besparing = 0.00; // @todo
-
         $aMergeVars = [
-            'client_name' => $oDeal->client_name,
-            'client_code' => $oDeal->client_code,
-            'aanhef_commercieel' => $oDeal->aanhef_commercieel,
-            'besparing' => $besparing,
-            'accountmanager' => $oDeal->accountmanager,
-            'token' => $oDeal->token
+            'client_name' => $oCampaignCustomer->client_name,
+            'client_code' => $oCampaignCustomer->client_code,
+            'aanhef_commercieel' => $oCampaignCustomer->aanhef_commercieel,
+            'besparing' => $oCampaignCustomer->estimate_saving_3_year,
+            'accountmanager' => $oCampaignCustomer->accountmanager,
+            'token' => $oCampaignCustomer->token
         ];
 
-        // $sTemplate = 'Contractverlenging met besparing';
-        $sTemplate = 'Contractverlenging zonder besparing';
+        if ($oCampaignCustomer->estimate_saving_3_year < ModelCampaignCustomer::HAS_SAVING_PRICE) {
+            $sTemplate = 'Contractverlenging zonder besparing';
+        } else {
+            $sTemplate = 'Contractverlenging met besparing';
+        }
 
         Mail::send('emails.test', [], function($m) use ($from_address, $from_name, $to_address, $to_name, $aMergeVars, $sTemplate, $subject) {
             $headers = $m->getHeaders();
@@ -83,12 +85,14 @@ class DealsInviteEmail extends Job implements ShouldQueue
             $m->to($to_address, $to_name)->subject($subject);
         });
 
-        // Save
-
-        $oDeal->status = ModelDeal::STATUS_INVITE_EMAIL_SENT;
-        $oDeal->save();
+        // Campaign
 
         $oCampaign->status = ModelCampaign::STATUS_SENT;
         $oCampaign->save();
+
+        // Campaign -> Customer
+
+        $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_INVITE_EMAIL_SENT;
+        $oCampaignCustomer->save();
     }
 }
