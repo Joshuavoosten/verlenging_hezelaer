@@ -214,7 +214,7 @@ class DetailsController extends Controller
             $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
 
-        $total = $oDB->count(DB::raw('cc.id'));
+        $total = $oDB->count(DB::raw('DISTINCT cc.id'));
 
         $oDB->groupBy('cc.id');
 
@@ -323,7 +323,7 @@ class DetailsController extends Controller
             $oDB->whereRaw('MATCH(cc.client_name,cc.client_code,cc.aanhef_commercieel) AGAINST(? IN BOOLEAN MODE)', [Input::get('search')]);
         }
 
-        $total = $oDB->count(DB::raw('cc.id'));
+        $total = $oDB->count(DB::raw('DISTINCT cc.id'));
 
         $oDB->groupBy('cc.id');
 
