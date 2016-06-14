@@ -49,7 +49,7 @@ class CampaignCustomersInviteEmail extends Job implements ShouldQueue
         // Debug CLI
 
         if (App::runningInConsole()) {
-            echo sprintf('Job: Campaign (%s) %s - Customer (%s) %s : %s', $o->campaign_id, $oCampaign->name, $o->campaign_customer_id, $oCampaignCustomer->client_name, $oCampaignCustomer->client_code) . "\n"; 
+            echo sprintf('Job: Campaign (%s) %s - Customer (%s) %s : %s', $oCampaign->campaign_id, $oCampaign->name, $oCampaignCustomer->id, $oCampaignCustomer->client_name, $oCampaignCustomer->client_code) . "\n"; 
         }
 
         // Mail
@@ -95,4 +95,5 @@ class CampaignCustomersInviteEmail extends Job implements ShouldQueue
         $oCampaignCustomer->status = ModelCampaignCustomer::STATUS_INVITE_EMAIL_SENT;
         $oCampaignCustomer->save();
     }
+
 }
