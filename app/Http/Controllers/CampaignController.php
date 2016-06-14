@@ -191,8 +191,8 @@ class CampaignController extends Controller
 
         // Agreements (current)
         $aCurrentAgreements = [
-            'Zeker & Vast' => 'Zeker & Vast',
-            'Onbepaald' => 'Onbepaald'
+            'Onbepaald' => 'Onbepaald',
+            'Zeker & Vast' => 'Zeker & Vast'
         ];
 
         // Expiration Date
@@ -205,8 +205,8 @@ class CampaignController extends Controller
 
         // Agreements (new)
         $aNewAgreements = [
+            'Onbepaald' => 'Onbepaald',
             'Zeker & Vast' => 'Zeker & Vast',
-            'Onbepaald' => 'Onbepaald'
         ];
 
         // Term Offers (new)
@@ -296,11 +296,11 @@ class CampaignController extends Controller
                     if (count($a) == 0) {
                         $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\'.'), $current_profile_code);
                     } elseif(!array_key_exists(1, $a)) {
-                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), ($year+1), $current_profile_code);
+                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), $current_profile_code, ($year+1));
                     } elseif(!array_key_exists(2, $a)) {
-                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), ($year+2), $current_profile_code);
+                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), $current_profile_code, ($year+2));
                     } elseif(!array_key_exists(3, $a)) {
-                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), ($year+3), $current_profile_code);
+                        $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\' with year \'%s\'.'), $current_profile_code, ($year+3));
                     }
                     else {
                         $aPrices[$current_profile_code] = $a;
@@ -429,9 +429,9 @@ class CampaignController extends Controller
                                     'years' => $years,
                                     'rate' => $aPrice['rate'],
                                     'code' => $aPrice['code'],
-                                    'normal' => $aPrice['normal'],
-                                    'enkel' => $aPrice['enkel'],
-                                    'low' => $aPrice['low'],
+                                    'normal' => $oCampaignPrice->price_normal,
+                                    'enkel' => $oCampaignPrice->price_enkel,
+                                    'low' => $oCampaignPrice->price_low,
                                     'type' => $oCampaignPrice->type,
                                     'calculation' => $oCampaignPrice->calculation,
                                     'percentage' => $oCampaign->new_percentage

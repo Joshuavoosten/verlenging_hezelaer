@@ -43,7 +43,6 @@ class Price extends Model
             
             if (strpos($o->rate, 'gas') !== false) {
                 $r[$o->years]['normal'] = $o->price;
-                break;
             }
             if (strpos($o->rate, 'laag') !== false) {
                 $r[$o->years]['low'] = $o->price;
