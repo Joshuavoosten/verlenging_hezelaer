@@ -37,6 +37,29 @@ $(function(){
             };
         }
     });
+    // Enable, Disable
+    $(document).on('click', '.button-toggle', function(){
+        var _token = $('input[name=_token]').val();
+        var campaign_id = $(this).data('campaign-id');
+        var has_saving = $(this).data('has-saving');
+        var active = $(this).data('active');
+        $.ajax({
+            url: '/campaign/customer/toggle/'+campaign_id,
+            type: 'POST',
+            data: {
+                '_token': _token,
+                'has_saving': has_saving,
+                'active': active
+            },
+            success: function(response) {
+                if (has_saving){
+                    $('#table_customers_with_savings').bootstrapTable('refresh');
+                } else {
+                    $('#table_customers_without_saving').bootstrapTable('refresh');
+                } 
+            },
+        });
+    });
     // Checkbox
     $(document).on('click', '.campaign_customer_active', function(){
         var _token = $('input[name=_token]').val();

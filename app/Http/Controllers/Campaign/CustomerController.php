@@ -281,4 +281,16 @@ class CustomerController extends Controller
 
         $oCampaignCustomer->save();
     }
+
+    public function toggle(Request $request, $campaign_id)
+    {
+        DB::table('campaign_customers')
+            ->where('campaign_id', $campaign_id)
+            ->where('has_saving', Input::get('has_saving'))
+            ->where('status', '=', ModelCampaignCustomer::STATUS_PLANNED)
+            ->update([
+                'active' => Input::get('active')
+            ])
+        ;
+    }
 }

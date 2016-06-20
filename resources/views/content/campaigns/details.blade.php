@@ -138,8 +138,18 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-12">
-            <h4>{{ __('Customers without saving') }}</h4>
-            <div style="height: 10px"></div>
+                <h4>{{ __('Customers without saving') }}</h4>
+                <div style="height: 10px"></div>
+                @if($oCampaign->status == \App\Models\Campaign::STATUS_PLANNED)
+                    <button type="button" class="button-toggle btn btn-default" data-campaign-id="{{ $oCampaign->id }}" data-has-saving="0" data-active="1">
+                        <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        {{ __('Enable') }}
+                    </button>
+                    <button type="button" class="button-toggle btn btn-default" data-campaign-id="{{ $oCampaign->id }}" data-has-saving="0" data-active="0" style="margin-left: 10px">
+                        <span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        {{ __('Disable') }}
+                    </button>
+                @endif
                 <table id="table_customers_without_saving" class="table table-hover table-striped sortable" data-row-style="rowstyleFormatter" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
@@ -155,6 +165,16 @@
                 </table>
                 <div style="height: 10px"></div>
                 <h4>{{ __('Customers with savings') }}</h4>
+                @if($oCampaign->status == \App\Models\Campaign::STATUS_PLANNED)
+                    <button type="button" class="button-toggle btn btn-default" data-campaign-id="{{ $oCampaign->id }}" data-has-saving="1" data-active="1">
+                        <span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        {{ __('Enable') }}
+                    </button>
+                    <button type="button" class="button-toggle btn btn-default" data-campaign-id="{{ $oCampaign->id }}" data-has-saving="1" data-active="0" style="margin-left: 10px">
+                        <span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        {{ __('Disable') }}
+                    </button>
+                @endif
                 <table id="table_customers_with_savings" class="table table-hover table-striped sortable" data-row-style="rowstyleFormatter" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
                     <thead>
                         <tr>
