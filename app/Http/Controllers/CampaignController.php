@@ -74,13 +74,28 @@ class CampaignController extends Controller
 
         if (count($a) > 0) {
             foreach ($a as $o) {
+                // Current Expiration Date
+
+                if ($o->current_agreement == 'Flexibel contract') {
+                    switch (Auth::user()->date_format) {
+                        case 'Y-m-d':
+                            $current_expiration_date = '3000-01-01';
+                            break;
+                        case 'd-m-Y':
+                            $current_expiration_date = '01-01-3000';
+                            break;
+                    }
+                } else {
+                    $current_expiration_date = date(Auth::user()->date_format, strtotime($o->current_expiration_date));
+                }
+
                 $aRows[] = [
                     'id' => $o->id,
                     'name' => $o->name,
                     'current_segment' => $o->current_segment,
                     'current_profile_codes' => $o->current_profile_codes,
                     'current_agreement' => $o->current_agreement,
-                    'current_expiration_date' => ($o->current_expiration_date ? date(Auth::user()->date_format, strtotime($o->current_expiration_date)) : ''),
+                    'current_expiration_date' => $current_expiration_date,
                     'count_customers' => $o->count_customers,
                     'scheduled_at' => ($o->scheduled_at ? date(Auth::user()->date_format.' H:i', strtotime($o->scheduled_at)) : ''),
                     'created_at' => ($o->created_at ? date(Auth::user()->date_format.' H:i', strtotime($o->created_at)) : ''),
@@ -138,13 +153,28 @@ class CampaignController extends Controller
 
         if (count($a) > 0) {
             foreach ($a as $o) {
+                // Current Expiration Date
+
+                if ($o->current_agreement == 'Flexibel contract') {
+                    switch (Auth::user()->date_format) {
+                        case 'Y-m-d':
+                            $current_expiration_date = '3000-01-01';
+                            break;
+                        case 'd-m-Y':
+                            $current_expiration_date = '01-01-3000';
+                            break;
+                    }
+                } else {
+                    $current_expiration_date = date(Auth::user()->date_format, strtotime($o->current_expiration_date));
+                }
+
                 $aRows[] = [
                     'id' => $o->id,
                     'name' => $o->name,
                     'current_segment' => $o->current_segment,
                     'current_profile_codes' => $o->current_profile_codes,
                     'current_agreement' => $o->current_agreement,
-                    'current_expiration_date' => ($o->current_expiration_date ? date(Auth::user()->date_format, strtotime($o->current_expiration_date)) : ''),
+                    'current_expiration_date' => $current_expiration_date,
                     'count_customers' => $o->count_customers,
                     'created_at' => ($o->created_at ? date(Auth::user()->date_format.' H:i', strtotime($o->created_at)) : ''),
                     'updated_at' => ($o->updated_at ? date(Auth::user()->date_format.' H:i', strtotime($o->updated_at)) : ''),
@@ -191,13 +221,15 @@ class CampaignController extends Controller
 
         // Agreements (current)
         $aCurrentAgreements = [
-            'Onbepaald' => 'Onbepaald',
-            'Zeker & Vast' => 'Zeker & Vast'
+            'Vast contract' => 'Vast contract',
+            'Flexibel contract' => 'Flexibel contract',
         ];
 
         // Expiration Date
 
-        $aCurrentExpirationDate = [];
+        $aCurrentExpirationDate = [
+            null => ''
+        ];
 
         for ($i = date('Y') + 1; $i < date('Y') + 5; $i++) {
             $aCurrentExpirationDate['01-01-'.$i] = __('t/m').' '.'1-1-'.$i;
@@ -205,8 +237,8 @@ class CampaignController extends Controller
 
         // Agreements (new)
         $aNewAgreements = [
-            'Onbepaald' => 'Onbepaald',
-            'Zeker & Vast' => 'Zeker & Vast',
+            'Vast contract' => 'Vast contract',
+            'Flexibel contract' => 'Flexibel contract',
         ];
 
         // Term Offers (new)
@@ -229,7 +261,6 @@ class CampaignController extends Controller
                 'current_segment.required' => sprintf(__('%s is required.'), __('Segment')),
                 'current_profile_codes.required' => sprintf(__('%s is required.'), __('Profile Code')),
                 'current_agreement.required' => sprintf(__('%s is required.'), __('Agreement')),
-                'current_expiration_date.required' => sprintf(__('%s is required.'), __('Expiration Date')),
                 'new_agreement.required' => sprintf(__('%s is required.'), __('Agreement')),
                 'new_term_offer.required' => sprintf(__('%s is required.'), __('Term Offer')),
                 'new_percentage.required' => sprintf(__('%s is required.'), __('Percentage')),
@@ -240,7 +271,6 @@ class CampaignController extends Controller
                 'current_segment' => 'required',
                 'current_profile_codes' => 'required',
                 'current_agreement' => 'required',
-                'current_expiration_date' => 'required',
                 'new_agreement' => 'required',
                 'new_term_offer' => 'required',
                 'new_percentage' => 'required',
@@ -248,6 +278,15 @@ class CampaignController extends Controller
 
             if ($oValidator->fails()) {
                 $aErrors = $oValidator->errors();
+            }
+
+            if (count($aErrors) == 0) {
+                if (Input::get('current_agreement') == 'Vast contract'){
+                    if (!Input::get('current_expiration_date')){
+                        $oValidator->getMessageBag()->add('current_expiration_date', sprintf(__('%s is required.'), __('Expiration Date')));
+                        $aErrors = $oValidator->errors();
+                    }
+                }
             }
 
             if (count($aErrors) == 0) {
@@ -273,25 +312,35 @@ class CampaignController extends Controller
                     $current_under_an_agent = (Input::get('current_under_an_agent') == 'Y' ? 1 : 0);
                 }
 
+                // Current Expiration Date
+
+                if (Input::get('current_agreement') == 'Vast contract'){
+                    $current_expiration_date = Input::get('current_expiration_date');
+                }
+
+                if (Input::get('current_agreement') == 'Flexibel contract'){
+                    $current_expiration_date = date('Y-01-01', strtotime('+1 YEAR'));
+                }
+
                 $oCampaign->name = Input::get('name');
                 $oCampaign->current_segment = Input::get('current_segment');
                 $oCampaign->current_in_a_group = $current_in_a_group;
                 $oCampaign->current_under_an_agent = $current_under_an_agent;
                 $oCampaign->current_profile_codes = implode(',', Input::get('current_profile_codes'));
                 $oCampaign->current_agreement = Input::get('current_agreement');
-                $oCampaign->current_expiration_date = date('Y-m-d', strtotime(Input::get('current_expiration_date')));
+                $oCampaign->current_expiration_date = date('Y-m-d', strtotime($current_expiration_date));
                 $oCampaign->new_agreement = Input::get('new_agreement');
                 $oCampaign->new_term_offer = Input::get('new_term_offer');
                 $oCampaign->new_percentage = Input::get('new_percentage');
 
                 // Prices
 
-                $year = date('Y', strtotime(Input::get('current_expiration_date')));
+                $year = date('Y', strtotime($current_expiration_date));
 
                 $aPrices = [];
 
                 foreach (Input::get('current_profile_codes') as $current_profile_code) {
-                    $a = ModelPrice::getCampaignPrices($current_profile_code, Input::get('current_expiration_date'));
+                    $a = ModelPrice::getCampaignPrices($current_profile_code, $current_expiration_date);
 
                     if (count($a) == 0) {
                         $aErrors['prices'] = sprintf(__('There are no prices available for profile code \'%s\'.'), $current_profile_code);
@@ -386,15 +435,15 @@ class CampaignController extends Controller
 
                     // Agreement
 
-                    if (Input::get('current_agreement') == 'Zeker & Vast') {
-                        $oDB->where('end_agreement', '=', '3000-01-01');
-                    }
-
-                    if (Input::get('current_agreement') == 'Onbepaald') {
+                    if (Input::get('current_agreement') == 'Vast contract') {
                         $oDB->where('end_agreement', '!=', '3000-01-01');
 
                         // Expiration Date
                         $oDB->where('end_agreement', '<=', date('Y-m-d', strtotime(Input::get('current_expiration_date'))));
+                    }
+
+                    if (Input::get('current_agreement') == 'Flexibel contract') {
+                        $oDB->where('end_agreement', '=', '3000-01-01');
                     }
 
                     if ($oDB->count() == 0) {

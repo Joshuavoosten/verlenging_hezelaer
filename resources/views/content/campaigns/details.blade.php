@@ -46,10 +46,12 @@
                     <div class="col-md-6">{{ __('Agreement') }}</div>
                     <div class="col-md-6">{{ $oCampaign->current_agreement }}</div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">{{ __('Expiration Date') }}</div>
-                    <div class="col-md-6">t/m {{ date(Auth::user()->date_format, strtotime($oCampaign->current_expiration_date)) }}</div>
-                </div>
+                @if($oCampaign->current_agreement == 'Vast contract')
+                    <div class="row">
+                        <div class="col-md-6">{{ __('Expiration Date') }}</div>
+                        <div class="col-md-6">t/m {{ date(Auth::user()->date_format, strtotime($oCampaign->current_expiration_date)) }}</div>
+                    </div>
+                @endif
                 @if($oCampaign->status == \App\Models\Campaign::STATUS_PLANNED)
                     <div style="height: 15px"></div>
                     <a href="/campaigns/edit/{{ $oCampaign->id }}" class="btn btn-default">
