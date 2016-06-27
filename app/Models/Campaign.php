@@ -12,10 +12,16 @@ class Campaign extends Model
 
     protected $table = 'campaigns';
 
+    /**
+     * Count number of planned campaigns.
+     */
     public static function countPlanned() {
         return DB::table('campaigns')->where('status', '=', self::STATUS_PLANNED)->count();
     }
 
+    /**
+     * Count number of sent campaigns.
+     */
     public static function countSent() {
         return DB::table('campaigns')->where('status', '=', self::STATUS_SENT)->count();
     }
@@ -36,6 +42,71 @@ class Campaign extends Model
                 return sprintf(__('%s weeks'), 3);
             default:
                 return $sNewTermOffer;
+        }
+    }
+
+    /**
+     * Segment Formatter
+     *
+     * @return string
+     */
+    public function currentSegementFormatter() {
+        if ($this->current_segment == 'FALSE'){
+            return __('Business');
+        } else {
+            return __('Consumer');
+        }
+    }
+
+    /**
+     * Auto Renewal Formatter
+     *
+     * @return string
+     */
+    public function currentAutoRenewalFormatter() {
+        if ($this->current_auto_renewal){
+            return __('Yes');
+        } else {
+            return __('No');
+        }
+    }
+
+    /**
+     * Holding Formatter
+     *
+     * @return string
+     */
+    public function currentHoldingFormatter() {
+        if ($this->current_holding){
+            return __('Yes');
+        } else {
+            return __('No');
+        }
+    }
+
+    /**
+     * Under An Agent Formatter
+     *
+     * @return string
+     */
+    public function currentUnderAnAgentFormatter() {
+        if ($this->current_under_an_agent){
+            return __('Yes');
+        } else {
+            return __('No');
+        }
+    }
+
+    /**
+     * In A Group Formatter
+     *
+     * @return string
+     */
+    public function currentCurrentInAGroupFormatter() {
+        if ($this->current_in_a_group){
+            return __('Yes');
+        } else {
+            return __('No');
         }
     }
 
@@ -71,6 +142,9 @@ class Campaign extends Model
         return $aClientCodes;
     }
 
+    /**
+     * Count number of customers in campaign.
+     */
     public function countCustomers() {
         return DB::table('campaign_customers')->where('campaign_id', '=', $this->id)->count();
     }

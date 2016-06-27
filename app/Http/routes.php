@@ -40,6 +40,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::delete('/campaigns/delete/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@delete']);
     Route::get('/campaigns/csv/{id}', ['middleware' => 'auth', 'uses' => 'CampaignController@csv']);
     Route::match(['get', 'post'], '/campaigns/details/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@index']);
+    Route::get('/campaigns/details/json/campaign_prices/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@jsonCampaignPrices']);
     Route::get('/campaigns/details/json/customers_without_saving/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithoutSaving']);
     Route::get('/campaigns/details/json/customers_with_savings/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithSavings']);
     Route::get('/campaigns/details/json/customers_with_current_offer/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\DetailsController@JsonCustomersWithCurrentOffer']);
@@ -48,6 +49,10 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/campaign/customer/active/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\CustomerController@active']);
     Route::post('/campaign/customer/toggle/{campaign_id}', ['middleware' => 'auth', 'uses' => 'Campaign\CustomerController@toggle']);
     Route::match(['get', 'post'], '/verleng/{token}', ['uses' => 'Campaign\CustomerController@extend']);
+
+    // Deals
+    Route::get('/deals', ['middleware' => 'auth', 'uses' => 'DealController@index']);
+    Route::get('/deals/json', ['middleware' => 'auth', 'uses' => 'DealController@json']);
 
     // Prices
     Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PricesController@index']);

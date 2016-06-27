@@ -52,25 +52,6 @@ class DetailsController extends Controller
             App::abort(404, 'Campaign Not Found.');
         }
 
-        // Campaign -> Prices
-
-        $aCampaignPrices = [];
-
-         $oDB = DB::table('campaign_prices')
-             ->select(
-                 'code',
-                 'years',
-                 'price_normal',
-                 'price_low',
-                 'price_enkel',
-                 'type',
-                 'calculation'
-            )
-            ->where('campaign_id', '=', $oCampaign->id)
-         ;
-
-         $aCampaignPrices = $oDB->get();
-
          // Schedule
 
          if ($oCampaign->scheduled) {
@@ -172,7 +153,6 @@ class DetailsController extends Controller
 
          return View::make('content.campaigns.details', [
              'oCampaign' => $oCampaign,
-             'aCampaignPrices' => $aCampaignPrices,
              'iScheduleDay' => $iScheduleDay,
              'iScheduleMonth' => $iScheduleMonth,
              'iScheduleYear' => $iScheduleYear,
@@ -182,6 +162,80 @@ class DetailsController extends Controller
              'aHours' => $aHours,
              'aMinutes' => $aMinutes
          ]);
+    }
+
+    public function jsonCampaignPrices(Request $request, $id) {
+        // Campaign
+
+        $oCampaign = new ModelCampaign();
+
+        $oCampaign = $oCampaign->find($id);
+
+        if (!$oCampaign) {
+            App::abort(404, 'Campaign Not Found.');
+        }
+
+        // Campaign -> Prices
+
+        $oDB = DB::table('campaign_prices')
+            ->select(
+                'id',
+                'date_start',
+                'date_end',
+                'rate',
+                'code',
+                'years',
+                'price_normal',
+                'price_low',
+                'price_enkel',
+                'type',
+                'calculation'
+            )
+            ->where('campaign_id', '=', $oCampaign->id)
+         ;
+
+        $total = $oDB->count(DB::raw('DISTINCT id'));
+
+        if (Input::get('sort') && Input::get('order')) {
+            $oDB->orderBy(Input::get('sort'), Input::get('order'));
+        } else {
+            $oDB->orderBy('code');
+        }
+
+        $offset = Input::get('offset', 0);
+
+        $limit = Input::get('limit', 25);
+
+        $oDB->skip($offset)->take($limit);
+
+        $a = $oDB->get();
+
+        $aRows = [];
+
+        if (count($a) > 0) {
+            foreach ($a as $o) {
+                $aRows[] = [
+                    'id' => $o->id,
+                    'date_start' => ($o->date_start ? date(Auth::user()->date_format, strtotime($o->date_start)) : ''),
+                    'date_end' => ($o->date_end ? date(Auth::user()->date_format, strtotime($o->date_end)) : ''),
+                    'rate' => $o->rate,
+                    'code' => $o->code,
+                    'years' => $o->years,
+                    'price_normal' => number_format($o->price_normal,4,',','.'),
+                    'price_low' => number_format($o->price_low,4,',','.'),
+                    'price_enkel' => number_format($o->price_enkel,4,',','.'),
+                    'type' => $o->type,
+                    'calculation' => $o->calculation
+                ];
+            }
+        }
+
+        $aResponse = [
+            'total' => $total,
+            'rows' => $aRows,
+        ];
+
+        return response()->json($aResponse);
     }
 
     public function jsonCustomersWithoutSaving(Request $request, $id) {

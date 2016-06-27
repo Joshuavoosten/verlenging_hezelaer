@@ -8,8 +8,8 @@ function current_agreement() {
     }
 }
 $(function(){
-    // Profile Codes
-    $('#current_profile_codes').chosen();
+    // Under An Agent
+    $('#current_under_an_agent').chosen();
     // Current Agreement
     $(document).on('change', '#current_agreement', function(){
         current_agreement();

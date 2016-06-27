@@ -36,31 +36,45 @@
             <h4>{{ __('Current Contracts') }}</h4>
             <div class="row">
                 <div class="col-md-3">
+                    <div class="form-group {{ ($errors->first('label') ? 'has-error' : '') }}">
+                        {{ Form::label('label', __('Label')) }}
+                        {{ Form::select('label', $aLabels, old('label'), ['id' => 'label', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group {{ ($errors->first('auto_renewal') ? 'has-error' : '') }}">
+                        {{ Form::label('auto_renewal', __('Auto renewal')) }}
+                        {{ Form::select('auto_renewal', $aAutoRenewal, old('auto_renewal'), ['id' => 'auto_renewal', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group {{ ($errors->first('holding') ? 'has-error' : '') }}">
+                        {{ Form::label('holding', __('Holding')) }}
+                        {{ Form::select('holding', $aHolding, old('holding'), ['id' => 'holding', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_segment') ? 'has-error' : '') }}">
                         {{ Form::label('current_segment', __('Segment')) }}
                         {{ Form::select('current_segment', $aCurrentSegments, old('current_segment'), ['id' => 'current_segment', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="form-group {{ ($errors->first('current_in_a_group') ? 'has-error' : '') }}">
-                        {{ Form::label('current_in_a_group', __('In a group')) }}
-                        {{ Form::select('current_in_a_group', $aCurrentInAGroup, old('current_in_a_group'), ['id' => 'current_in_a_group', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'disabled']) }}
+                    <div class="form-group {{ ($errors->first('current_under_an_agent') ? 'has-error' : '') }}">
+                        {{ Form::label('current_under_an_agent', __('Under an agent')) }}
+                        {{ Form::select('current_under_an_agent[]', $aCurrentUnderAnAgent, $aData['current_under_an_agent'], ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'multiple']) }}
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="form-group {{ ($errors->first('current_under_an_agent') ? 'has-error' : '') }}">
-                        {{ Form::label('current_under_an_agent', __('Under an agent')) }}
-                        {{ Form::select('current_under_an_agent', $aCurrentUnderAnAgent, old('current_under_an_agent'), ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'disabled']) }}
+                    <div class="form-group {{ ($errors->first('current_in_a_group') ? 'has-error' : '') }}">
+                        {{ Form::label('current_in_a_group', __('In a group')) }}
+                        {{ Form::select('current_in_a_group', $aCurrentInAGroup, old('current_in_a_group'), ['id' => 'current_in_a_group', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group {{ ($errors->first('current_profile_codes') ? 'has-error' : '') }}">
-                        {{ Form::label('current_profile_codes', __('Profile Code(s)')) }}
-                        {{ Form::select('current_profile_codes[]', $aCurrentProfileCodes, old('current_profile_codes'), ['id' => 'current_profile_codes', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'multiple']) }}
-                    </div>
-                </div>
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_agreement') ? 'has-error' : '') }}">
                         {{ Form::label('current_agreement', __('Agreement')) }}

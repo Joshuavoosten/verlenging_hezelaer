@@ -14,6 +14,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="/deals">
+                        <i class="fa fa-paper-plane"></i>
+                        {{ __('Deals') }}
+                    </a>
+                </li>
+                <li>
                     <a href="/users">
                         <i class="fa fa-users"></i>
                         {{ __('Users') }}

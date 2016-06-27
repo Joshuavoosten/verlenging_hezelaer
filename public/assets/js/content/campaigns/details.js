@@ -1,6 +1,18 @@
 $(function(){
     var campaign_id = $('input[name=campaign_id]').val();
     // Table
+    $('#table_campaign_prices').bootstrapTable({
+        url: '/campaigns/details/json/campaign_prices/'+campaign_id,
+        queryParams: function(params){
+            return {
+                limit: params.limit,
+                offset: params.offset,
+                order: params.order,
+                search: params.search,
+                sort: params.sort
+            };
+        }
+    });
     $('#table_customers_without_saving').bootstrapTable({
         url: '/campaigns/details/json/customers_without_saving/'+campaign_id,
         queryParams: function(params){

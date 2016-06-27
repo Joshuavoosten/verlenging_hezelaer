@@ -41,7 +41,6 @@
                 <tr>
                     <th data-field="name" data-formatter="campaignDetailsFormatter" data-sortable="true">{{ __('Name') }}</th>
                     <th data-field="current_segment" data-formatter="campaignSegmentFormatter" data-sortable="true" class="col-md-1">{{ __('Segment') }}</th>
-                    <th data-field="current_profile_codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-2">{{ __('Profile Code(s)') }}</th>
                     <th data-field="current_agreement" data-sortable="true" class="col-md-2">{{ __('Agreement') }}</th>
                     <th data-field="current_expiration_date" data-align="center" data-sortable="true" class="col-md-1">{{ __('Expiration Date') }}</th>
                     <th data-field="count_customers" data-align="center" data-sortable="false" class="col-md-1">{{ __('Customers') }}</th>
@@ -59,7 +58,6 @@
                 <tr>
                     <th data-field="name" data-formatter="campaignDetailsFormatter" data-sortable="true">{{ __('Name') }}</th>
                     <th data-field="current_segment" data-formatter="campaignSegmentFormatter" data-sortable="false" class="col-md-1">{{ __('Segment') }}</th>
-                    <th data-field="current_profile_codes" data-formatter="profileCodesFormatter" data-sortable="false" class="col-md-2">{{ __('Profile Code(s)') }}</th>
                     <th data-field="current_agreement" data-sortable="false" class="col-md-2">{{ __('Agreement') }}</th>
                     <th data-field="current_expiration_date" data-align="center" data-sortable="false" class="col-md-1">{{ __('Expiration Date') }}</th>
                     <th data-field="count_customers" data-align="center" data-sortable="false" class="col-md-1">{{ __('Customers') }}</th>
