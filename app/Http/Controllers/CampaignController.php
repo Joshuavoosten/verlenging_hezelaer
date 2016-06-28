@@ -65,7 +65,7 @@ class CampaignController extends Controller
         return view('content.campaigns.index', [
             'iCountPlanned' => $iCountPlanned,
             'iCountSent' => $iCountSent,
-            'success' => Session::get('success'),
+            'success' => Session::get('success')
         ]);
     }
 
@@ -268,10 +268,10 @@ class CampaignController extends Controller
         // Under an agent (current)
 
         $aCurrentUnderAnAgent = DB::table('contractgegevens')->distinct()
-            ->whereNotNull('accountmanager')
-            ->where('accountmanager', '!=', '')
-            ->orderby('accountmanager')
-            ->pluck('accountmanager', 'accountmanager')
+            ->whereNotNull('category2')
+            ->where('category2', '!=', '')
+            ->orderby('category2')
+            ->pluck('category2', 'category2')
         ;
 
         // Agreements (current)
@@ -308,12 +308,6 @@ class CampaignController extends Controller
             15 => '15 %',
             20 => '20 %',
             25 => '25 %',
-        ];
-
-        // Data
-
-        $aData = [
-            'current_under_an_agent' => $aCurrentUnderAnAgent
         ];
 
         if ($request->isMethod('post')) {
@@ -461,7 +455,7 @@ class CampaignController extends Controller
                 // Under an agent
     
                 if (Input::get('current_under_an_agent')) {
-                    $oDB->whereIn('accountmanager', Input::get('current_under_an_agent'));
+                    $oDB->whereIn('category2', Input::get('current_under_an_agent'));
                 }
 
                 // In a group
@@ -730,7 +724,6 @@ class CampaignController extends Controller
         }
 
         return View::make('content.campaigns.add', [
-            'aData' => $aData,
             'aLabels' => $aLabels,
             'aAutoRenewal' => $aAutoRenewal,
             'aHolding' => $aHolding,
@@ -870,7 +863,7 @@ class CampaignController extends Controller
             ->get()
         ;
 
-        $filename = 'campaign_customer_deals_'.$id.'.csv';
+        $filename = 'campaign_customer_deals_'.$id.'_'.date('Y_m_d_H_i').'.csv';
 
         $pathToFile = storage_path('app').'/'.$filename;
 

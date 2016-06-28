@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Campaign;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign as ModelCampaign;
-use App\Models\CampaignCustomer as CampaignCustomer;
+use App\Models\CampaignCustomer as ModelCampaignCustomer;
 use App\Models\Deal as ModelDeal;
 use App\Models\Price as ModelPrice;
 use Auth;
@@ -137,7 +137,7 @@ class DetailsController extends Controller
                  DB::table('campaign_customers')
                     ->where('campaign_id', '=', $oCampaign->id)
                     ->where('active', '=', 1)
-                    ->update(['status' => CampaignCustomer::STATUS_INVITE_EMAIL_SCHEDULED])
+                    ->update(['status' => ModelCampaignCustomer::STATUS_INVITE_EMAIL_SCHEDULED])
                 ;
 
                  return Redirect::to('/campaigns/details/'.$oCampaign->id)
@@ -309,7 +309,7 @@ class DetailsController extends Controller
             foreach ($a as $o) {
                 $rowstyle = null;
 
-                if ($o->status == CampaignCustomer::STATUS_FORM_SAVED) {
+                if ($o->status == ModelCampaignCustomer::STATUS_FORM_SAVED) {
                     $rowstyle = 'success';
                 }
 
@@ -331,7 +331,7 @@ class DetailsController extends Controller
                     'end_agreement' => $sEndAgreement,
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
-                    'status_format' => CampaignCustomer::statusFormatter($o->status),
+                    'status_format' => ModelCampaignCustomer::statusFormatter($o->status),
                     'active' => $o->active,
                     'campaign_status' => $o->campaign_status,
                     'rowstyle' => $rowstyle
@@ -418,7 +418,7 @@ class DetailsController extends Controller
             foreach ($a as $o) {
                 $rowstyle = null;
 
-                if ($o->status == CampaignCustomer::STATUS_FORM_SAVED) {
+                if ($o->status == ModelCampaignCustomer::STATUS_FORM_SAVED) {
                     $rowstyle = 'success';
                 }
 
@@ -440,7 +440,7 @@ class DetailsController extends Controller
                     'end_agreement' => $sEndAgreement,
                     'aanhef_commercieel' => $o->aanhef_commercieel,
                     'status' => $o->status,
-                    'status_format' => CampaignCustomer::statusFormatter($o->status),
+                    'status_format' => ModelCampaignCustomer::statusFormatter($o->status),
                     'active' => $o->active,
                     'campaign_status' => $o->campaign_status,
                     'rowstyle' => $rowstyle

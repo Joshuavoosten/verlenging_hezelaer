@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         Commands\ContractgegevensCode::class,
         Commands\MailTest::class,
         Commands\PricesCodes::class,
+        Commands\PricesImport::class,
     ];
 
     /**
@@ -28,6 +29,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')
+                 ->hourly();
+
+        // Import prices from the latest CSV.
+        $schedule->command('prices:import')
                  ->hourly();
     }
 }

@@ -20,6 +20,18 @@
                     </a>
                 </li>
                 <li>
+                    <a href="/prices">
+                        <i class="fa fa-euro"></i>
+                        {{ __('Prices') }}
+                    </a>
+                </li>
+                <li>
+                    <a href="/i18n">
+                        <i class="fa fa-flag"></i>
+                        {{ __('Translations') }}
+                    </a>
+                </li>
+                <li>
                     <a href="/users">
                         <i class="fa fa-users"></i>
                         {{ __('Users') }}

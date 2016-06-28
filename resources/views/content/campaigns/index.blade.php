@@ -21,10 +21,6 @@
         </h3>
     </div>
     <div class="panel-body">
-        <div class="pull-left">
-            <h3>{{ __('Overview') }}</h3>
-            <p>Contract verlengingen aangeboden via deze wizard</p>
-        </div>
         <div class="pull-right">
             <a href="/campaigns/add" class="btn btn-default">
                 <i class="fa fa-plus" style="margin-right: 5px"></i>

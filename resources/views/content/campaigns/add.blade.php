@@ -64,7 +64,7 @@
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_under_an_agent') ? 'has-error' : '') }}">
                         {{ Form::label('current_under_an_agent', __('Under an agent')) }}
-                        {{ Form::select('current_under_an_agent[]', $aCurrentUnderAnAgent, $aData['current_under_an_agent'], ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'multiple']) }}
+                        {{ Form::select('current_under_an_agent[]', $aCurrentUnderAnAgent, old('current_under_an_agent'), ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'multiple']) }}
                     </div>
                 </div>
                 <div class="col-md-3">

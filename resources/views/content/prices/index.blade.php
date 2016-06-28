@@ -12,6 +12,11 @@
         <h3 class="panel-title">
             <i class="fa fa-eur"></i>
             {{ __('Prices') }}
+            <div class="pull-right">
+                 <i class="fa fa-calendar"></i>
+                 {{ __('Date Modified') }}:
+                 <strong>{{ $sDateModified }}</strong>
+            </div>
         </h3>
     </div>
     <div class="panel-body">
@@ -24,8 +29,17 @@
                 {{ Form::label('code', __('Profile Code')) }}
                 {{ Form::select('code', $aProfileCodes, old('code'), ['id' => 'code', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
             </div>
+            <div class="pull-right">
+                <a href="/prices/import" class="btn btn-default" style="margin-right: 15px">
+                    <i class="fa fa-file-text-o" style="margin-right: 5px"></i>
+                    {{ __('Import CSV') }}
+                </a>
+            </div>
         </div>
-        <table id="table_prices" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true">
+        <div class="clearfix"></div>
+        <div style="height: 15px"></div>
+        @include('alerts.success')
+        <table id="table_prices" class="table table-hover table-striped sortable" data-side-pagination="server" data-pagination="true" data-page-size="25" data-page-list="[25, 50, 100]" data-search="true" data-show-refresh="true">
             <thead>
                 <tr>
                     <th data-field="date_start" data-align="center" data-sortable="true" class="col-md-1">{{ __('Date Start') }}</th>
@@ -34,7 +48,6 @@
                     <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false">{{ __('Profile Codes') }}</th>
                     <th data-field="price" data-align="right" data-sortable="true" class="col-md-2">{{ __('Price') }}</th>
                     <th data-field="created_at" data-align="center" data-sortable="true" class="col-md-2">{{ __('Created') }}</th>
-                    <th data-field="updated_at" data-align="center" data-sortable="true" class="col-md-2">{{ __('Updated') }}</th>
                 </tr>
             </thead>
         </table>

@@ -53,10 +53,12 @@ Route::group(['middleware' => 'web'], function () {
     // Deals
     Route::get('/deals', ['middleware' => 'auth', 'uses' => 'DealController@index']);
     Route::get('/deals/json', ['middleware' => 'auth', 'uses' => 'DealController@json']);
+    Route::get('/deals/csv', ['middleware' => 'auth', 'uses' => 'DealController@csv']);
 
     // Prices
-    Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PricesController@index']);
-    Route::get('/prices/json', ['middleware' => 'auth', 'uses' => 'PricesController@json']);
+    Route::get('/prices', ['middleware' => 'auth', 'uses' => 'PriceController@index']);
+    Route::get('/prices/json', ['middleware' => 'auth', 'uses' => 'PriceController@json']);
+    Route::match(['get', 'post'], '/prices/import', ['middleware' => 'auth', 'uses' => 'PriceController@import']);
 
     // Users
     Route::get('/users', ['middleware' => 'auth', 'uses' => 'UserController@index']);
