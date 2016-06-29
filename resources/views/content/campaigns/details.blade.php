@@ -51,9 +51,9 @@
                     <div class="col-md-6">{{ __('Under an agent') }}</div>
                     <div class="col-md-6">
                         {{ $oCampaign->currentUnderAnAgentFormatter() }}
-                        @if($oCampaign->current_under_an_agent)
+                        @if($oCampaign->current_under_an_agent == 'S')
                             <div style="height: 5px"></div>
-                            @foreach(explode(',', $oCampaign->current_under_an_agent) as $sAgent)
+                            @foreach(explode(',', $oCampaign->current_agents) as $sAgent)
                                 <span class="label label-custom">{{ $sAgent }}</span>
                             @endforeach
                         @endif

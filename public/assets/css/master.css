@@ -39,7 +39,7 @@ ol.breadcrumb i {
 table {
     background-color: #EFEFEF;
 }
-table tr:hover td {
+table tr:hover > td {
     background-color: #DDE6E7;
 }
 div#delete-alert {

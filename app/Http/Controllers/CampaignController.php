@@ -267,12 +267,22 @@ class CampaignController extends Controller
 
         // Under an agent (current)
 
-        $aCurrentUnderAnAgent = DB::table('contractgegevens')->distinct()
+        $aCurrentUnderAnAgent = [
+            null => '',
+            'Y' => __('Yes'),
+            'S' => __('Yes, selection'),
+            'N' => __('No')
+        ];
+
+        $aCurrentAgents = DB::table('contractgegevens')->distinct()
             ->whereNotNull('category2')
             ->where('category2', '!=', '')
+            ->where('category2', '!=', 'NA')
             ->orderby('category2')
             ->pluck('category2', 'category2')
         ;
+
+        $aData['current_agents'] = $aCurrentAgents;
 
         // Agreements (current)
         $aCurrentAgreements = [
@@ -313,10 +323,10 @@ class CampaignController extends Controller
         if ($request->isMethod('post')) {
             // Under An Agent
 
-            $aData['current_under_an_agent'] = [];
+            $aData['current_agents'] = [];
 
-            if (Input::get('current_under_an_agent')) {
-                $aData['current_under_an_agent'] = Input::get('current_under_an_agent');
+            if (Input::get('current_under_an_agent') == 'S') {
+                $aData['current_agents'] = Input::get('current_agents');
             }
 
             $aMessages = [
@@ -453,21 +463,31 @@ class CampaignController extends Controller
                 }
 
                 // Under an agent
-    
-                if (Input::get('current_under_an_agent')) {
-                    $oDB->whereIn('category2', Input::get('current_under_an_agent'));
+
+                if (Input::get('current_under_an_agent') == 'Y') {
+                    $oDB->whereNotNull('category2');
+                    $oDB->where('category2', '!=', 'NA');
+                }
+
+                if (Input::get('current_under_an_agent') == 'S') {
+                    $oDB->whereIn('category2', Input::get('current_agents'));
+                }
+
+                if (Input::get('current_under_an_agent') == 'N') {
+                    $oDB->whereNull('category2');
+                    $oDB->orWhere('category2', '=', 'NA');
                 }
 
                 // In a group
 
                 if (Input::get('current_in_a_group') == 'Y') {
-                    $oDB->whereNotNull('category2');
-                    $oDB->where('category2', '!=', '');
+                    $oDB->whereNotNull('category3');
+                    $oDB->where('category3', '!=', 'NA');
                 }
 
                 if (Input::get('current_in_a_group') == 'N') {
-                    $oDB->whereNull('category2');
-                    $oDB->orWhere('category2', '=', '');
+                    $oDB->whereNull('category3');
+                    $oDB->orWhere('category3', '=', 'NA');
                 }
 
                 // Agreement
@@ -540,6 +560,14 @@ class CampaignController extends Controller
             }
 
             if (count($aErrors) == 0) {
+                // Agents
+
+                $sAgents = null;
+
+                if (Input::get('current_under_an_agent') == 'S') {
+                    $sAgents = implode(',', Input::get('current_agents'));
+                }
+
                 // Campaign
 
                 $oCampaign = new ModelCampaign();
@@ -550,7 +578,8 @@ class CampaignController extends Controller
                 $oCampaign->current_holding = $iHolding;
                 $oCampaign->current_segment = Input::get('current_segment');
                 $oCampaign->current_in_a_group = $iCurrentInAGroup;
-                $oCampaign->current_under_an_agent = implode(',', Input::get('current_under_an_agent'));
+                $oCampaign->current_under_an_agent = Input::get('current_under_an_agent');
+                $oCampaign->current_agents = $sAgents;
                 $oCampaign->current_profile_codes = implode(',', $aProfileCodes);
                 $oCampaign->current_agreement = Input::get('current_agreement');
                 $oCampaign->current_expiration_date = date('Y-m-d', strtotime($sCurrentExpirationDate));
@@ -724,9 +753,11 @@ class CampaignController extends Controller
         }
 
         return View::make('content.campaigns.add', [
+            'aData' => $aData,
             'aLabels' => $aLabels,
             'aAutoRenewal' => $aAutoRenewal,
             'aHolding' => $aHolding,
+            'aCurrentAgents' => $aCurrentAgents,
             'aCurrentSegments' => $aCurrentSegments,
             'aCurrentInAGroup' => $aCurrentInAGroup,
             'aCurrentUnderAnAgent' => $aCurrentUnderAnAgent,

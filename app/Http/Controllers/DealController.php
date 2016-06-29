@@ -44,6 +44,7 @@ class DealController extends Controller
                 'cc.estimate_saving_3_year AS estimate_total_saving_3_year',
                 'cc.status',
                 'c.name AS campaign',
+                'd.id AS deal_id',
                 'd.ean',
                 'd.code',
                 'd.super_contract_number',
@@ -73,6 +74,10 @@ class DealController extends Controller
                 ModelCampaignCustomer::STATUS_FORM_REQUESTED,
                 ModelCampaignCustomer::STATUS_FORM_SAVED,
             ])
+            ->orderBy('cc.client_name')
+            ->orderBy('cc.client_code')
+            ->orderBy('d.super_contract_number')
+            ->orderBy('d.code')
         ;
 
         if (Input::get('sort') && Input::get('order')) {
@@ -131,7 +136,7 @@ class DealController extends Controller
             $oDB->orderBy('cc.client_name');
         }
 
-        $total = $oDB->count();
+        $total = $oDB->count(DB::raw('DISTINCT cc.client_code'));
 
         $offset = Input::get('offset', 0);
 
@@ -143,7 +148,10 @@ class DealController extends Controller
 
         $aRows = [];
 
+        $aClientCodes = [];
+
         if (count($a) > 0) {
+            $i = 0;
             foreach ($a as $o) {
                 $rowstyle = null;
 
@@ -151,25 +159,53 @@ class DealController extends Controller
                     $rowstyle = 'success';
                 }
 
-                $aRows[] = [
-                    'id' => $o->id,
-                    'campaign' => $o->campaign,
-                    'client_name' => $o->client_name,
-                    'client_code' => $o->client_code,
+                if (!array_key_exists($o->client_code, $aClientCodes)) {
+                    $aClientCodes[$o->client_code] = $i;
+
+                    $aRows[$i] = [
+                        'id' => $o->id,
+                        'campaign' => $o->campaign,
+                        'client_name' => $o->client_name,
+                        'client_code' => $o->client_code,
+                        'email_commercieel' => $o->email_commercieel,
+                        'telnr_commercieel' => $o->telnr_commercieel,
+                        'aanhef_commercieel' => $o->aanhef_commercieel,
+                        'fadr_street' => $o->fadr_street,
+                        'fadr_nr' => $o->fadr_nr,
+                        'fadr_nr_conn' => $o->fadr_nr_conn,
+                        'fadr_zip' => $o->fadr_zip,
+                        'fadr_city' => $o->fadr_city,
+                        'auto_renewal' => $o->auto_renewal,
+                        'accountmanager' => $o->accountmanager,
+                        'klantsegment' => $o->klantsegment,
+                        'category1' => $o->category1,
+                        'category2' => $o->category2,
+                        'category3' => $o->category3,
+                        'consument' => $o->consument,
+                        'estimate_total_price_1_year' => number_format($o->estimate_total_price_1_year,2,',','.'),
+                        'estimate_total_saving_1_year' => number_format($o->estimate_total_saving_1_year,2,',','.'),
+                        'estimate_total_price_2_year' => number_format($o->estimate_total_price_2_year,2,',','.'),
+                        'estimate_total_saving_2_year' => number_format($o->estimate_total_saving_2_year,2,',','.'),
+                        'estimate_total_price_3_year' => number_format($o->estimate_total_price_3_year,2,',','.'),
+                        'estimate_total_saving_3_year' => number_format($o->estimate_total_saving_3_year,2,',','.'),
+                        'status' => $o->status,
+                        'status_format' => ModelCampaignCustomer::statusFormatter($o->status),
+                        'rowstyle' => $rowstyle
+                    ];
+
+                    $i++;
+                }
+
+                $j = $aClientCodes[$o->client_code];
+
+                $aRows[$j]['deals'][] = [
+                    'deal_id' => $o->deal_id,
                     'ean' => $o->ean,
                     'code' => $o->code,
                     'super_contract_number' => $o->super_contract_number,
-                    'syu_normal' => round($o->syu_normal),
-                    'syu_low' => round($o->syu_low),
+                    'syu_normal' => ($o->syu_normal != 0 ? round($o->syu_normal) : ''),
+                    'syu_low' => ($o->syu_low != 0 ? round($o->syu_low) : ''),
                     'end_agreement' => ($o->end_agreement ? date(Auth::user()->date_format, strtotime($o->end_agreement)) : ''),
-                    'email_commercieel' => $o->email_commercieel,
-                    'telnr_commercieel' => $o->telnr_commercieel,
-                    'aanhef_commercieel' => $o->aanhef_commercieel,
-                    'fadr_street' => $o->fadr_street,
-                    'fadr_nr' => $o->fadr_nr,
-                    'fadr_nr_conn' => $o->fadr_nr_conn,
-                    'fadr_zip' => $o->fadr_zip,
-                    'fadr_city' => $o->fadr_city,
                     'cadr_street' => $o->cadr_street,
                     'cadr_nr' => $o->cadr_nr,
                     'cadr_nr_conn' => $o->cadr_nr_conn,
@@ -177,30 +213,14 @@ class DealController extends Controller
                     'cadr_city' => $o->cadr_city,
                     'vastrecht' => number_format($o->vastrecht,5,',','.'),
                     'new_vastrecht' => number_format($o->new_vastrecht,5,',','.'),
-                    'auto_renewal' => $o->auto_renewal,
-                    'accountmanager' => $o->accountmanager,
-                    'klantsegment' => $o->klantsegment,
-                    'category1' => $o->category1,
-                    'category2' => $o->category2,
-                    'category3' => $o->category3,
-                    'consument' => $o->consument,
-                    'price_normal' => number_format($o->price_normal,4,',','.'),
-                    'price_low' => number_format($o->price_low,4,',','.'),
+                    'price_normal' => ($o->price_normal != '0.0000' ? number_format($o->price_normal,4,',','.') : ''),
+                    'price_low' => ($o->price_low != '0.0000' ? number_format($o->price_low,4,',','.') : ''),
                     'estimate_price_1_year' => number_format($o->estimate_price_1_year,2,',','.'),
                     'estimate_saving_1_year' => number_format($o->estimate_price_1_year,2,',','.'),
-                    'estimate_price_2_year' => number_format($o->estimate_price_1_year,2,',','.'),
-                    'estimate_saving_2_year' => number_format($o->estimate_price_1_year,2,',','.'),
-                    'estimate_price_3_year' => number_format($o->estimate_price_1_year,2,',','.'),
-                    'estimate_saving_3_year' => number_format($o->estimate_price_1_year,2,',','.'),
-                    'estimate_total_price_1_year' => number_format($o->estimate_total_price_1_year,2,',','.'),
-                    'estimate_total_saving_1_year' => number_format($o->estimate_total_saving_1_year,2,',','.'),
-                    'estimate_total_price_2_year' => number_format($o->estimate_total_price_2_year,2,',','.'),
-                    'estimate_total_saving_2_year' => number_format($o->estimate_total_saving_2_year,2,',','.'),
-                    'estimate_total_price_3_year' => number_format($o->estimate_total_price_3_year,2,',','.'),
-                    'estimate_total_saving_3_year' => number_format($o->estimate_total_saving_3_year,2,',','.'),
-                    'status' => $o->status,
-                    'status_format' => ModelCampaignCustomer::statusFormatter($o->status),
-                    'rowstyle' => $rowstyle
+                    'estimate_price_2_year' => number_format($o->estimate_price_2_year,2,',','.'),
+                    'estimate_saving_2_year' => number_format($o->estimate_price_2_year,2,',','.'),
+                    'estimate_price_3_year' => number_format($o->estimate_price_3_year,2,',','.'),
+                    'estimate_saving_3_year' => number_format($o->estimate_price_3_year,2,',','.')
                 ];
             }
         }

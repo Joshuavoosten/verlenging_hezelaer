@@ -26,6 +26,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="/contracts">
+                        <i class="fa fa-list"></i>
+                        {{ __('Contracts') }}
+                    </a>
+                </li>
+                <li>
                     <a href="/i18n">
                         <i class="fa fa-flag"></i>
                         {{ __('Translations') }}

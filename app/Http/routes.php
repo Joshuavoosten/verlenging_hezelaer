@@ -60,6 +60,11 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/prices/json', ['middleware' => 'auth', 'uses' => 'PriceController@json']);
     Route::match(['get', 'post'], '/prices/import', ['middleware' => 'auth', 'uses' => 'PriceController@import']);
 
+    // Contracts
+    Route::get('/contracts', ['middleware' => 'auth', 'uses' => 'ContractController@index']);
+    Route::get('/contracts/json', ['middleware' => 'auth', 'uses' => 'ContractController@json']);
+    Route::match(['get', 'post'], '/contracts/import', ['middleware' => 'auth', 'uses' => 'ContractController@import']);
+
     // Users
     Route::get('/users', ['middleware' => 'auth', 'uses' => 'UserController@index']);
     Route::get('/users/json', ['middleware' => 'auth', 'uses' => 'UserController@json']);

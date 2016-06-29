@@ -4,6 +4,14 @@
 <script src="{{ URL::asset('assets/js/content/campaigns/add.js') }}"></script>
 @endsection
 
+@section('stylesheets')
+<style>
+#content_current_under_an_agent {
+    display: none;
+}
+</style>
+@endsection
+
 @section('content')
 <ol class="breadcrumb">
     <li>
@@ -64,7 +72,11 @@
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('current_under_an_agent') ? 'has-error' : '') }}">
                         {{ Form::label('current_under_an_agent', __('Under an agent')) }}
-                        {{ Form::select('current_under_an_agent[]', $aCurrentUnderAnAgent, old('current_under_an_agent'), ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'multiple']) }}
+                        {{ Form::select('current_under_an_agent', $aCurrentUnderAnAgent, old('current_under_an_agent'), ['id' => 'current_under_an_agent', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                        <div id="content_current_agents">
+                            <div style="height: 10px"></div>
+                            {{ Form::select('current_agents[]', $aCurrentAgents, $aData['current_agents'], ['id' => 'current_agents', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options'), 'multiple']) }}
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3">

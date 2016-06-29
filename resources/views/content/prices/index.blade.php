@@ -47,7 +47,6 @@
                     <th data-field="rate" data-sortable="true">{{ __('Rate') }}</th>
                     <th data-field="codes" data-formatter="profileCodesFormatter" data-sortable="false">{{ __('Profile Codes') }}</th>
                     <th data-field="price" data-align="right" data-sortable="true" class="col-md-2">{{ __('Price') }}</th>
-                    <th data-field="created_at" data-align="center" data-sortable="true" class="col-md-2">{{ __('Created') }}</th>
                 </tr>
             </thead>
         </table>

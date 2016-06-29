@@ -90,7 +90,7 @@ class Campaign extends Model
      * @return string
      */
     public function currentUnderAnAgentFormatter() {
-        if ($this->current_under_an_agent){
+        if (in_array($this->current_under_an_agent, ['Y', 'S'])) {
             return __('Yes');
         } else {
             return __('No');

@@ -130,6 +130,8 @@ class PriceController extends Controller
             }
         }
 
+        // Response
+
         $aResponse = [
             'total' => $total,
             'rows' => $aRows,
@@ -188,14 +190,22 @@ class PriceController extends Controller
      */
     private function getPricesFromCsv($sFilename) {
         $aPrices = [];
+
         $aColumnIndex = [];
-        $aRequiredColumns = ['startdatum', 'einddatum', 'tarief', 'profielen', 'prijs'];
-        $aPrices = [];
+
+        $aRequiredColumns = [
+            'startdatum',
+            'einddatum',
+            'tarief',
+            'profielen',
+            'prijs'
+        ];
+
         $sDirectory = storage_path('ftp');
 
         if (($handle = fopen($sDirectory.'/'.$sFilename, "r")) !== false) {
             $i = 0;
-            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ";")) !== false) {
                 if ($i == 0) {
                     // Column Index
                     foreach ($data as $k => $v) {
@@ -229,16 +239,28 @@ class PriceController extends Controller
      * @return boolean true
      */
     private function importPrices($aPrices) {
+        ini_set('memory_limit', -1);
+        ignore_user_abort(true);
+        set_time_limit(0);
+        
         // Prices
 
         DB::table('prices')->truncate();
 
-        DB::table('prices')->insert($aPrices);
+        DB::connection()->disableQueryLog();
+
+        DB::transaction(function() use($aPrices) {
+            foreach ($aPrices as $aPrice) {
+                DB::table('prices')->insert($aPrice);
+            }
+        });
+
+        DB::connection()->enableQueryLog();
 
         // Profile Codes
-
         DB::table('price_codes')->truncate();
 
+        // Convert column prices.codes to price_codes table.
         Artisan::call('prices:codes');
 
         return true;
