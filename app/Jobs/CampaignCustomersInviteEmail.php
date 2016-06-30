@@ -59,7 +59,8 @@ class CampaignCustomersInviteEmail extends Job implements ShouldQueue
 
         // $to_address = $oCampaignCustomer->email_commercieel;
         // $to_address = 'david@floro.nl'; // @todo
-        $to_address = 'test@shifft.com';
+        // $to_address = 'test@shifft.com';
+        $to_address = 'bjorn@hezelaer.nl';
         $to_name = $oCampaignCustomer->client_name;
 
         $subject = 'Verleng nu uw leveringsovereenkomst(en)';
