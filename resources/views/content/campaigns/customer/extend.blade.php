@@ -34,9 +34,9 @@
                 <h3>{{ sprintf('Uw nieuwe %s contract', $oCampaign->new_agreement) }}</h3>
                 <h4>Snel en makkelijk online verlengen</h4>
             </div>
-            <div class="right">
+            <div class="content_estimate_saving right">
                 @if($oCampaignCustomer->has_saving)
-                    <a href="#">Uw jaarbesparing <b>&euro; <span class="estimate_saving">{{ number_format($oCampaignCustomer->estimate_saving_3_year,2,',','.') }}</span></b></a>
+                    <a href="#">Uw jaarbesparing <b>&euro; <span class="estimate_saving">{{ number_format($oCampaignCustomer->estimate_saving_3_year/$iYears,2,',','.') }}</span></b></a>
                 @endif
             </div>
         </div>
@@ -65,7 +65,7 @@
                 @endif
                 @if($oDeal->isElektricity())
                     <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
-                        <td>Elektriciteit</td>
+                        <td>Elektriciteit @if($bDisplayProfileCodes) ({{ $oDeal->code }}) @endif</td>
                         <td>{{ $oDeal->ean }}</td>
                         <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} kWh</td>
                         <td>-</td>
@@ -94,7 +94,7 @@
                 @endif
                 @if($oDeal->isGas())
                     <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
-                        <td>Gas</td>
+                        <td>Gas @if($bDisplayProfileCodes) ({{ $oDeal->code }}) @endif</td>
                         <td>{{ $oDeal->ean }}</td>
                         <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} m3</td>
                         <td>
@@ -114,25 +114,40 @@
                 {{--*/ $cadrChecksum = $oDeal->cadrChecksum() /*--}}
             @endforeach
             <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899; font-size: 11px">
-                <td colspan="7">&nbsp;
-            </td>
+                <td colspan="7">&nbsp;</td>
+            </tr>
+            <tr style="border-left: 1px solid #999899; border-right: 1px solid #999899">
+                <td colspan="3" class="hezOranje"><b>Nieuwe tarieven</b></td>
+                <td class="hezOranje"><b>Tarief (gas)</b></td>
+                <td class="hezOranje"><b>Tarief (normaal)</b></td>
+                <td class="hezOranje"><b>Tarief (laag)</b></td>
+                <td></td>
+            </tr>
             @foreach ($aCampaignPrices as $sCode => $o)
-                <tr class="hezOranje nieuwe_tarieven" style="border: 1px solid #f29421">
+                <tr class="hezOranje nieuwe_tarieven" style="border: 1px solid #f29421; font-size: 11px">
                     @if($o[3]->type == \App\Models\CampaignPrice::TYPE_GAS)
-                        <td class="morePad" colspan="7">
-                            <span class="newPrices"><b>Nieuwe tarieven ({{ $sCode }})</b></span>
-                            <span class="newPrices"><b>Gas</b> {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/m3</span>
+                        <td colspan="3">Gas @if($bDisplayProfileCodes) ({{ $sCode }}) @endif</td>
+                        <td class="morePad">
+                            {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/m3
                         </td>
+                        <td class="morePad">-</td>
+                        <td class="morePad">-</td>
+                        <td class="morePad"></td>
                     @endif
                     @if($o[3]->type == \App\Models\CampaignPrice::TYPE_ELEKTRICITY)
-                        <td class="morePad" colspan="7">
-                            <span class="newPrices"><b>Nieuwe tarieven ({{ $sCode }})</b></span>
-                            <span class="newPrices"><b>Normaal</b> {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/kWh</span>
-                            <span class="newPrices"><b>Laag</b> {{ number_format($o[3]->price_low/100,6,',','.') }} &euro; ct/kWh</span>
+                        <td colspan="3">Elektriciteit @if($bDisplayProfileCodes) ({{ $sCode }}) @endif</td>
+                        <td class="morePad">-</td>
+                        <td class="morePad">
+                            {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/kWh
+                        </td>
+                        <td class="morePad">
                             @if($o[3]->price_enkel > 0)
-                                <span class="newPrices"><b>Enkel</b> {{ number_format($o[3]->price_enkel/100,6,',','.') }} &euro; ct/kWh</span>
+                                {{ number_format($o[3]->price_enkel/100,6,',','.') }} &euro; ct/kWh
+                            @else
+                                -
                             @endif
                         </td>
+                        <td class="morePad"></td>
                     @endif
                 </tr>
             @endforeach
@@ -147,6 +162,7 @@
             </tr>
         </table>
         {!! Form::open(['url' => '/verleng/'.$token, 'method' => 'post', 'class' => 'contractVerlenging clearfix']) !!}
+            {{ Form::hidden('token', $token, array('id' => 'token')) }}
             <ul class="selectLooptijdBron clearfix">
                 <li class="clearfix left">
                     <h4>Selecteer de looptijd</h4>
@@ -155,15 +171,15 @@
                         <span class="errorSpan">Dit is een verplichte keuze</span>
                     @endif
                     <label class="clearfix">
-                        {{ Form::radio('form_end_agreement', 1, ($aData['form_end_agreement'] == 1 ? true : false)) }}
+                        {{ Form::radio('form_end_agreement', 1, ($aData['form_end_agreement'] == 1 ? true : false), ['class' => 'form_end_agreement']) }}
                         <span>Verleng u contract(en) tot {{ date('d-m-Y', strtotime('+1 year', strtotime($oDeal->end_agreement))) }}</span>
                     </label>
                     <label class="clearfix">
-                        {{ Form::radio('form_end_agreement', 2, ($aData['form_end_agreement'] == 2 ? true : false)) }}
+                        {{ Form::radio('form_end_agreement', 2, ($aData['form_end_agreement'] == 2 ? true : false), ['class' => 'form_end_agreement']) }}
                         <span>Verleng u contract(en) tot {{ date('d-m-Y', strtotime('+2 year', strtotime($oDeal->end_agreement))) }}</span>
                     </label>
                     <label class="clearfix">
-                        {{ Form::radio('form_end_agreement', 3, ($aData['form_end_agreement'] == 3 ? true : false)) }}
+                        {{ Form::radio('form_end_agreement', 3, ($aData['form_end_agreement'] == 3 ? true : false), ['class' => 'form_end_agreement']) }}
                         <span>Verleng u contract(en) tot {{ date('d-m-Y', strtotime('+3 year', strtotime($oDeal->end_agreement))) }}</span>
                     </label>
                 </li>
@@ -175,15 +191,15 @@
                             <span class="errorSpan">Dit is een verplichte keuze</span>
                         @endif
                         <label class="clearfix">
-                            {{ Form::radio('form_renewable_resource', 1, ($aData['form_renewable_resource'] == 1 ? true : false)) }}
+                            {{ Form::radio('form_renewable_resource', 1, ($aData['form_renewable_resource'] == 1 ? true : false), ['class' => 'form_renewable_resource']) }}
                             <span>100% opgewekt door Nederlandse windmolens <i class="hezGrijs">(+0.30 ct/kWh)</i></span>
                         </label>
                         <label class="clearfix">
-                            {{ Form::radio('form_renewable_resource', 2, ($aData['form_renewable_resource'] == 2 ? true : false)) }}
+                            {{ Form::radio('form_renewable_resource', 2, ($aData['form_renewable_resource'] == 2 ? true : false), ['class' => 'form_renewable_resource']) }}
                             <span>100% opgewekt door windmolens</span>
                         </label>
                         <label class="clearfix">
-                            {{ Form::radio('form_renewable_resource', 3, ($aData['form_renewable_resource'] == 3 ? true : false)) }}
+                            {{ Form::radio('form_renewable_resource', 3, ($aData['form_renewable_resource'] == 3 ? true : false), ['class' => 'form_renewable_resource']) }}
                             <span>niet hernieuwbaar <i class="hezGrijs">(-0.05 ct/kWh)</i></span>
                         </label>
                     </li>

@@ -15,6 +15,80 @@ use Validator;
 
 class CustomerController extends Controller
 {
+    // Show Profile Codes
+    const SHOW_PROFILE_CODES = true;
+
+    public function jsonEstimateSaving(Request $request, $token) {
+        // Campaign -> Customer
+
+        $oCampaignCustomer = new ModelCampaignCustomer();
+
+        $oCampaignCustomer = ModelCampaignCustomer::where('token', '=', $token)->first();
+
+        if (!$oCampaignCustomer) {
+            App::abort('500', 'Token Error');
+        }
+
+        if (!Input::get('years')) {
+            App::abort('500', 'Parameter Error');
+        }
+
+        // Estimate Saving
+
+        $fEstimateSaving = 0;
+
+        switch (Input::get('years')) {
+            case 1:
+                $fEstimateSaving = $oCampaignCustomer->estimate_saving_1_year / 1;
+                break;
+            case 2:
+                $fEstimateSaving = $oCampaignCustomer->estimate_saving_2_year / 2;
+                break;
+            case 3:
+                $fEstimateSaving = $oCampaignCustomer->estimate_saving_3_year / 3;
+                break;
+        }
+
+        // Renewable Resource
+
+        if (Input::get('renewable_resource')) {
+
+            // Total Annual Consumption
+ 
+            $oDB = DB::table('deals')
+                ->select(DB::raw('sum(syu_normal + syu_low) AS total_annual_consumption'))
+                ->where('campaign_customer_id', '=', $oCampaignCustomer->id)
+                ->where('type', '=', ModelDeal::TYPE_ELEKTRICITY)
+            ;
+
+            $o = $oDB->first();
+
+            $fTotalAnnualConsumption = $o->total_annual_consumption;
+
+            switch (Input::get('renewable_resource')) {
+                case 1:
+                    // 100% produced by dutch windmills: Total annual consumption * 0.30 ct/kWh
+                    $fEstimateSaving -= ($fTotalAnnualConsumption * 0.30);
+                    break;
+                case 3:
+                    // Not renewable: Total annual consumption * -0.05 ct/kWh
+                    $fEstimateSaving -= ($fTotalAnnualConsumption * -0.05);
+                    break;
+            }
+        }
+
+        if ($fEstimateSaving < 0) {
+            $fEstimateSaving = 0;
+        }
+
+        $aResponse = [
+            'estimate_saving' => $fEstimateSaving,
+            'estimate_saving_format' => number_format($fEstimateSaving,2,',','.')
+        ];
+
+        return response()->json($aResponse);
+    }
+
     public function extend(Request $request, $token) {
         // Default Contract Period
         $iYears = 3;
@@ -85,6 +159,14 @@ class CustomerController extends Controller
             }
         }
 
+        uasort($aDeals, function($a, $b) {
+            return $b->cadrChecksum() - $a->cadrChecksum();
+        });
+
+        // Profile Codes
+
+        $aProfileCodes = array_pluck($aDeals, 'code');
+
         // Campaign Prices
 
         $aCampaignPrices = [];
@@ -104,6 +186,7 @@ class CustomerController extends Controller
                 'calculation'
             )
             ->where('campaign_id', '=', $oCampaign->id)
+            ->whereIn('code', $aProfileCodes)
         ;
 
         $a = $oDB->get();
@@ -114,7 +197,7 @@ class CustomerController extends Controller
 
         // Data
         $aData = [
-            'form_end_agreement' => null,
+            'form_end_agreement' => 3,
             'form_renewable_resource' => 2, // 100% opgewekt door windmolens
             'form_email_billing' => $oCampaignCustomer->email_commercieel,
             'form_email_contract_extension' => null,
@@ -248,6 +331,7 @@ class CustomerController extends Controller
             'aData' => $aData,
             'aDeals' => $aDeals,
             'aCampaignPrices' => $aCampaignPrices,
+            'bDisplayProfileCodes' => self::SHOW_PROFILE_CODES,
             'hasElektricity' => $hasElektricity,
             'hasGas' => $hasGas,
             'iYears' => $iYears,

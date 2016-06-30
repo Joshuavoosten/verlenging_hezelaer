@@ -49,6 +49,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/campaign/customer/active/{id}', ['middleware' => 'auth', 'uses' => 'Campaign\CustomerController@active']);
     Route::post('/campaign/customer/toggle/{campaign_id}', ['middleware' => 'auth', 'uses' => 'Campaign\CustomerController@toggle']);
     Route::match(['get', 'post'], '/verleng/{token}', ['uses' => 'Campaign\CustomerController@extend']);
+    Route::match(['get', 'post'], '/verleng/jaarbesparing/{token}', ['uses' => 'Campaign\CustomerController@jsonEstimateSaving']);
 
     // Deals
     Route::get('/deals', ['middleware' => 'auth', 'uses' => 'DealController@index']);

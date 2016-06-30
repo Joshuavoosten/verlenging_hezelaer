@@ -466,6 +466,7 @@ class CampaignController extends Controller
 
                 if (Input::get('current_under_an_agent') == 'Y') {
                     $oDB->whereNotNull('category2');
+                    $oDB->where('category2', '!=', '');
                     $oDB->where('category2', '!=', 'NA');
                 }
 
@@ -475,6 +476,7 @@ class CampaignController extends Controller
 
                 if (Input::get('current_under_an_agent') == 'N') {
                     $oDB->whereNull('category2');
+                    $oDB->orWhere('category2', '=', '');
                     $oDB->orWhere('category2', '=', 'NA');
                 }
 
@@ -482,11 +484,13 @@ class CampaignController extends Controller
 
                 if (Input::get('current_in_a_group') == 'Y') {
                     $oDB->whereNotNull('category3');
+                    $oDB->where('category3', '!=', '');
                     $oDB->where('category3', '!=', 'NA');
                 }
 
                 if (Input::get('current_in_a_group') == 'N') {
                     $oDB->whereNull('category3');
+                    $oDB->orWhere('category3', '=', '');
                     $oDB->orWhere('category3', '=', 'NA');
                 }
 
