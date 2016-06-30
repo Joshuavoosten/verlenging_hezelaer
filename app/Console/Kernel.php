@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Campaign Customers Invite Email Scheduler
-        $schedule->command('campaign_customers:invite_email_scheduler ')
+        $schedule->command('campaign_customers:invite_email_scheduler')
                  ->everyFiveMinutes();
 
         // Import prices from the latest CSV.
