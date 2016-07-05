@@ -73,14 +73,14 @@
                             @if($oDeal->price_normal == 0)
                                 -
                             @else
-                                {{ number_format($oDeal->price_normal,6,',','.') }} &euro; ct/kWh
+                                {{ number_format($oDeal->price_normal,4,',','.') }} &euro; EUR/kWh
                             @endif
                         </td>
                         <td>
                             @if($oDeal->price_low == 0)
                                 -
                             @else
-                                {{ number_format($oDeal->price_low,6,',','.') }} &euro; ct/kWh
+                                {{ number_format($oDeal->price_low,4,',','.') }} &euro; EUR/kWh
                             @endif
                         </td>
                         <td>
@@ -98,7 +98,7 @@
                         <td>{{ $oDeal->ean }}</td>
                         <td>{{ number_format($oDeal->totalAnnualConsumption(),0,',','.') }} m3</td>
                         <td>
-                            {{ number_format($oDeal->price_normal,6,',','.') }} &euro; ct/m3
+                            {{ number_format($oDeal->price_normal,4,',','.') }} &euro; EUR/m3
                         </td>
                         <td>-</td>
                         <td>-</td>
@@ -128,7 +128,7 @@
                     @if($o[3]->type == \App\Models\CampaignPrice::TYPE_GAS)
                         <td colspan="3">Gas @if($bDisplayProfileCodes) ({{ $sCode }}) @endif</td>
                         <td class="morePad">
-                            {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/m3
+                            {{ number_format($o[3]->price_normal/100,4,',','.') }} &euro; EUR/m3
                         </td>
                         <td class="morePad">-</td>
                         <td class="morePad">-</td>
@@ -138,11 +138,11 @@
                         <td colspan="3">Elektriciteit @if($bDisplayProfileCodes) ({{ $sCode }}) @endif</td>
                         <td class="morePad">-</td>
                         <td class="morePad">
-                            {{ number_format($o[3]->price_normal/100,6,',','.') }} &euro; ct/kWh
+                            {{ number_format($o[3]->price_normal/100,4,',','.') }} &euro; EUR/kWh
                         </td>
                         <td class="morePad">
                             @if($o[3]->price_enkel > 0)
-                                {{ number_format($o[3]->price_enkel/100,6,',','.') }} &euro; ct/kWh
+                                {{ number_format($o[3]->price_enkel/100,4,',','.') }} &euro; EUR/kWh
                             @else
                                 -
                             @endif
@@ -192,7 +192,7 @@
                         @endif
                         <label class="clearfix">
                             {{ Form::radio('form_renewable_resource', 1, ($aData['form_renewable_resource'] == 1 ? true : false), ['class' => 'form_renewable_resource']) }}
-                            <span>100% opgewekt door Nederlandse windmolens <i class="hezGrijs">(+0.30 ct/kWh)</i></span>
+                            <span>100% opgewekt door Nederlandse windmolens <i class="hezGrijs">(+0,0030 EUR/kWh)</i></span>
                         </label>
                         <label class="clearfix">
                             {{ Form::radio('form_renewable_resource', 2, ($aData['form_renewable_resource'] == 2 ? true : false), ['class' => 'form_renewable_resource']) }}
@@ -200,7 +200,7 @@
                         </label>
                         <label class="clearfix">
                             {{ Form::radio('form_renewable_resource', 3, ($aData['form_renewable_resource'] == 3 ? true : false), ['class' => 'form_renewable_resource']) }}
-                            <span>niet hernieuwbaar <i class="hezGrijs">(-0.05 ct/kWh)</i></span>
+                            <span>niet hernieuwbaar <i class="hezGrijs">(-0,0005 EUR/kWh)</i></span>
                         </label>
                     </li>
                 @endif

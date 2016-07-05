@@ -13,16 +13,16 @@ function dealDetailFormatter(index, row) {
     html += '<th data-field="cadr_nr_conn">'+__('Address Addition')+'</th>';
     html += '<th data-field="cadr_zip">'+__('Zipcode')+'</th>';
     html += '<th data-field="cadr_city">'+__('City')+'</th>';
+    html += '<th data-field="vastrecht" data-align="right">'+__('Standing Charge')+'</th>';
+    html += '<th data-field="new_vastrecht" data-align="right">'+__('Standing Charge')+' ('+__('new')+')</th>';
     html += '<th data-field="price_normal" data-align="right">'+__('Price')+' '+__('normal')+'</th>';
     html += '<th data-field="price_low" data-align="right">'+__('Price')+' '+__('low')+'</th>';
-    /*
     html += '<th data-field="estimate_price_1_year" data-align="right">'+__('Estimate Price')+' 1 ('+__('year')+')</th>';
     html += '<th data-field="estimate_saving_1_year" data-align="right">'+__('Estimate Saving')+' 1 ('+__('year')+')</th>';
     html += '<th data-field="estimate_price_2_year" data-align="right">'+__('Estimate Price')+' 2 ('+__('year')+')</th>';
     html += '<th data-field="estimate_saving_2_year" data-align="right">'+__('Estimate Saving')+' 2 ('+__('year')+')</th>';
     html += '<th data-field="estimate_price_3_year" data-align="right">'+__('Estimate Price')+' 3 ('+__('year')+')</th>';
     html += '<th data-field="estimate_saving_3_year" data-align="right">'+__('Estimate Saving')+' 3 ('+__('year')+')</th>';
-    */
     html += '</tr>';
     $.each(row.deals, function (key, value) {
         html += '<tr>';
@@ -37,16 +37,16 @@ function dealDetailFormatter(index, row) {
         html += '<td>'+value.cadr_nr_conn+'</td>';
         html += '<td>'+value.cadr_zip+'</td>';
         html += '<td>'+value.cadr_city+'</td>';
+        html += '<td>'+value.vastrecht+'</td>';
+        html += '<td>'+value.new_vastrecht+'</td>';
         html += '<td>'+value.price_normal+'</td>';
         html += '<td>'+value.price_low+'</td>';
-        /*
         html += '<td>'+value.estimate_price_1_year+'</td>';
         html += '<td>'+value.estimate_saving_1_year+'</td>';
         html += '<td>'+value.estimate_price_2_year+'</td>';
         html += '<td>'+value.estimate_saving_2_year+'</td>';
         html += '<td>'+value.estimate_price_3_year+'</td>';
         html += '<td>'+value.estimate_saving_3_year+'</td>';
-        */
         html += '</tr>';
     });
     html += '<table>';

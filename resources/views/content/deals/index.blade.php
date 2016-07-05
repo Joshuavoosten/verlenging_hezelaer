@@ -44,8 +44,6 @@
                     <th data-field="fadr_nr_conn" data-sortable="true">{{ __('Address Addition') }}</th>
                     <th data-field="fadr_zip" data-sortable="true">{{ __('Zipcode') }}</th>
                     <th data-field="fadr_city" data-sortable="true">{{ __('City') }}</th>
-                    <th data-field="vastrecht" data-sortable="true" data-align="right">{{ __('Standing Charge') }}</th>
-                    <th data-field="new_vastrecht" data-sortable="true" data-align="right">{{ __('Standing Charge') }} ({{ __('new') }})</th>
                     <th data-field="auto_renewal" data-formatter="booleanFormatter" data-align="center" data-sortable="true">{{ __('Auto Renewal') }}</th>
                     <th data-field="accountmanager" data-sortable="true">{{ __('Account Manager') }}</th>
                     <th data-field="klantsegment" data-sortable="true">{{ __('Customer Segment') }}</th>

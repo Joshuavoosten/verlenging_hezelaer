@@ -35,34 +35,42 @@
                     <div class="col-md-6">{{ __('Label') }}</div>
                     <div class="col-md-6">{{ $oCampaign->current_label }}</div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">{{ __('Auto renewal') }}</div>
-                    <div class="col-md-6">{{ $oCampaign->currentAutoRenewalFormatter() }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ __('Holding') }}</div>
-                    <div class="col-md-6">{{ $oCampaign->currentHoldingFormatter() }}</div>
-                </div>
+                @if($oCampaign->current_auto_renewal)
+                    <div class="row">
+                        <div class="col-md-6">{{ __('Auto renewal') }}</div>
+                        <div class="col-md-6">{{ $oCampaign->currentAutoRenewalFormatter() }}</div>
+                    </div>
+                @endif
+                @if($oCampaign->current_holding)
+                    <div class="row">
+                        <div class="col-md-6">{{ __('Holding') }}</div>
+                        <div class="col-md-6">{{ $oCampaign->currentHoldingFormatter() }}</div>
+                    </div>
+                @endif
                 <div class="row">
                     <div class="col-md-6">{{ __('Segment') }}</div>
                     <div class="col-md-6">{{ $oCampaign->currentSegementFormatter() }}</div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">{{ __('Under an agent') }}</div>
-                    <div class="col-md-6">
-                        {{ $oCampaign->currentUnderAnAgentFormatter() }}
-                        @if($oCampaign->current_under_an_agent == 'S')
-                            <div style="height: 5px"></div>
-                            @foreach(explode(',', $oCampaign->current_agents) as $sAgent)
-                                <span class="label label-custom">{{ $sAgent }}</span>
-                            @endforeach
-                        @endif
+                @if($oCampaign->current_under_an_agent)
+                    <div class="row">
+                        <div class="col-md-6">{{ __('Under an agent') }}</div>
+                        <div class="col-md-6">
+                            {{ $oCampaign->currentUnderAnAgentFormatter() }}
+                            @if($oCampaign->current_under_an_agent == 'S')
+                                <div style="height: 5px"></div>
+                                @foreach(explode(',', $oCampaign->current_agents) as $sAgent)
+                                    <span class="label label-custom">{{ $sAgent }}</span>
+                                @endforeach
+                            @endif
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">{{ __('In a group') }}</div>
-                    <div class="col-md-6">{{ $oCampaign->currentCurrentInAGroupFormatter() }}</div>
-                </div>
+                @endif
+                @if($oCampaign->current_in_a_group)
+                    <div class="row">
+                        <div class="col-md-6">{{ __('In a group') }}</div>
+                        <div class="col-md-6">{{ $oCampaign->currentCurrentInAGroupFormatter() }}</div>
+                    </div>
+                @endif
                 <div class="row">
                     <div class="col-md-6">{{ __('Agreement') }}</div>
                     <div class="col-md-6">{{ $oCampaign->current_agreement }}</div>
@@ -93,6 +101,10 @@
                 <div class="row">
                     <div class="col-md-6">{{ __('Prijs opslag percentage') }}</div>
                     <div class="col-md-6">{{ $oCampaign->new_percentage }} %</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">{{ __('Prijs opslag percentage na looptijd aanbieding') }}</div>
+                    <div class="col-md-6">{{ $oCampaign->new_percentage_after_term_offer }} %</div>
                 </div>
                 <div style="height: 15px"></div>
                 <div class"row">

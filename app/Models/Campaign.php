@@ -51,7 +51,7 @@ class Campaign extends Model
      * @return string
      */
     public function currentSegementFormatter() {
-        if ($this->current_segment == 'FALSE'){
+        if ($this->current_segment == 'Zakelijk'){
             return __('Business');
         } else {
             return __('Consumer');
@@ -64,7 +64,7 @@ class Campaign extends Model
      * @return string
      */
     public function currentAutoRenewalFormatter() {
-        if ($this->current_auto_renewal){
+        if ($this->current_auto_renewal == 'Y'){
             return __('Yes');
         } else {
             return __('No');
@@ -77,7 +77,7 @@ class Campaign extends Model
      * @return string
      */
     public function currentHoldingFormatter() {
-        if ($this->current_holding){
+        if ($this->current_holding == 'Y'){
             return __('Yes');
         } else {
             return __('No');
@@ -103,7 +103,7 @@ class Campaign extends Model
      * @return string
      */
     public function currentCurrentInAGroupFormatter() {
-        if ($this->current_in_a_group){
+        if ($this->current_in_a_group == 'Y'){
             return __('Yes');
         } else {
             return __('No');

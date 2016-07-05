@@ -233,20 +233,20 @@ class CampaignController extends Controller
         $aErrors = [];
 
         // Labels
-        $aLabels = [
+        $aCurrentLabels = [
             'Hezelaer Energy' => 'Hezelaer Energy',
             // 'VvE Energie Select' => 'VvE Energie Select' 
         ];
 
         // Auto renewal
-        $aAutoRenewal = [
+        $aCurrentAutoRenewals = [
             null => '',
             'Y' => __('Yes'),
             'N' => __('No') 
         ];
 
         // Holding
-        $aHolding = [
+        $aCurrentHoldings = [
             null => '',
             'Y' => __('Yes'),
             'N' => __('No') 
@@ -254,8 +254,8 @@ class CampaignController extends Controller
 
         // Segments (current)
         $aCurrentSegments = [
-            'FALSE' => __('Zakelijk'),
-            'TRUE' => __('Consument')
+            'Zakelijk' => __('Zakelijk'),
+            'Consument' => __('Consument')
         ];
 
         // In a group (current)
@@ -315,6 +315,7 @@ class CampaignController extends Controller
 
         // Percentages (new)
         $aNewPercentages = [
+            10 => '10 %',
             15 => '15 %',
             20 => '20 %',
             25 => '25 %',
@@ -331,7 +332,7 @@ class CampaignController extends Controller
 
             $aMessages = [
                 'name.required' => sprintf(__('%s is required.'), __('Name')),
-                'label.required' => sprintf(__('%s is required.'), __('Label')),
+                'current_label.required' => sprintf(__('%s is required.'), __('Label')),
                 'current_segment.required' => sprintf(__('%s is required.'), __('Segment')),
                 'current_agreement.required' => sprintf(__('%s is required.'), __('Agreement')),
                 'new_agreement.required' => sprintf(__('%s is required.'), __('Agreement')),
@@ -341,7 +342,7 @@ class CampaignController extends Controller
 
             $oValidator = Validator::make(Input::all(), [
                 'name' => 'required',
-                'label' => 'required',
+                'current_label' => 'required',
                 'current_segment' => 'required',
                 'current_agreement' => 'required',
                 'new_agreement' => 'required',
@@ -363,30 +364,6 @@ class CampaignController extends Controller
             }
 
             if (count($aErrors) == 0) {
-
-                // Auto renewal
-
-                $iAutoRenewal = null; 
-
-                if (in_array(Input::get('auto_renewal'), ['Y','N'])) { 
-                    $iAutoRenewal = (Input::get('auto_renewal') == 'Y' ? 1 : 0);
-                }
-
-                // Holding
-
-                $iHolding = null; 
-
-                if (in_array(Input::get('holding'), ['Y','N'])) { 
-                    $iHolding = (Input::get('holding') == 'Y' ? 1 : 0);
-                }
-
-                // In a group
-
-                $iCurrentInAGroup = null; 
-
-                if (in_array(Input::get('current_in_a_group'), ['Y','N'])) { 
-                    $iCurrentInAGroup = (Input::get('current_in_a_group') == 'Y' ? 1 : 0);
-                }
 
                 // Current Expiration Date
 
@@ -410,6 +387,8 @@ class CampaignController extends Controller
                         'syu_normal',
                         'syu_low',
                         'end_agreement',
+                        'email_factuur',
+                        'email_meter',
                         'email_commercieel',
                         'telnr_commercieel',
                         'aanhef_commercieel',
@@ -425,6 +404,7 @@ class CampaignController extends Controller
                         'cadr_city',
                         'vastrecht',
                         'auto_renewal',
+                        'iban',
                         'accountmanager',
                         'klantsegment',
                         'category1',
@@ -438,36 +418,43 @@ class CampaignController extends Controller
 
                 // Label
 
-                if (Input::get('label') == 'Hezelaer Energy') {
+                if (Input::get('current_label') == 'Hezelaer Energy') {
                     $oDB->whereIn('category1', ['1. Hezelaer', '1.Hezelaer']);
                 }
 
-                if (Input::get('label') == 'VvE Energie Select') {
+                if (Input::get('current_label') == 'VvE Energie Select') {
                     $oDB->where('category1', '=', '1. VvE Energie Select');
                 }
 
                 // Auto renewal
 
-                if (Input::get('auto_renewal') == 'Y') {
+                if (Input::get('current_auto_renewal') == 'Y') {
                     $oDB->where('auto_renewal', '=', 'TRUE');
                 }
 
-                if (Input::get('auto_renewal') == 'N') {
+                if (Input::get('current_auto_renewal') == 'N') {
                     $oDB->where('auto_renewal', '=', 'FALSE');
                 }
 
                 // Segment
 
-                if (Input::get('current_segment')) {
-                    $oDB->where('consument', '=', Input::get('current_segment'));
+                if (Input::get('current_segment') == 'Zakelijk') {
+                    $oDB->where('consument', '=', 'FALSE');
+                }
+
+                if (Input::get('current_segment') == 'Consument') {
+                    $oDB->where('consument', '=', 'TRUE');
                 }
 
                 // Under an agent
 
                 if (Input::get('current_under_an_agent') == 'Y') {
-                    $oDB->whereNotNull('category2');
-                    $oDB->where('category2', '!=', '');
-                    $oDB->where('category2', '!=', 'NA');
+                    $oDB->where(function($query) {
+                        $query->whereNotNull('category2')
+                            ->where('category2', '!=', '')
+                            ->where('category2', '!=', 'NA')
+                        ;
+                    });
                 }
 
                 if (Input::get('current_under_an_agent') == 'S') {
@@ -475,23 +462,32 @@ class CampaignController extends Controller
                 }
 
                 if (Input::get('current_under_an_agent') == 'N') {
-                    $oDB->whereNull('category2');
-                    $oDB->orWhere('category2', '=', '');
-                    $oDB->orWhere('category2', '=', 'NA');
+                    $oDB->where(function($query) {
+                        $query->whereNull('category2')
+                            ->orWhere('category2', '=', '')
+                            ->orWhere('category2', '=', 'NA')
+                        ;
+                    });
                 }
 
                 // In a group
 
                 if (Input::get('current_in_a_group') == 'Y') {
-                    $oDB->whereNotNull('category3');
-                    $oDB->where('category3', '!=', '');
-                    $oDB->where('category3', '!=', 'NA');
+                    $oDB->where(function($query) {
+                        $query->whereNotNull('category3')
+                            ->where('category3', '!=', '')
+                            ->where('category3', '!=', 'NA')
+                        ;
+                    });
                 }
 
                 if (Input::get('current_in_a_group') == 'N') {
-                    $oDB->whereNull('category3');
-                    $oDB->orWhere('category3', '=', '');
-                    $oDB->orWhere('category3', '=', 'NA');
+                    $oDB->where(function($query) {
+                        $query->whereNull('category3')
+                            ->orWhere('category3', '=', '')
+                            ->orWhere('category3', '=', 'NA')
+                        ;
+                    });
                 }
 
                 // Agreement
@@ -518,16 +514,16 @@ class CampaignController extends Controller
 
                 // Holding
 
-                $aHoldings = $this->getHoldings();
+                $aCurrentHoldings = $this->getHoldings();
 
                 foreach ($aCurrentDeals as $k => $v) {
-                    if (Input::get('holding') == 'Y') {
-                        if (!array_key_exists($v->email_commercieel, $aHoldings)) {
+                    if (Input::get('current_holding') == 'Y') {
+                        if (!array_key_exists($v->email_commercieel, $aCurrentHoldings)) {
                             unset($aCurrentDeals[$k]);
                         }
                     }
-                    if (Input::get('holding') == 'N') {
-                        if (array_key_exists($v->email_commercieel, $aHoldings)) {
+                    if (Input::get('current_holding') == 'N') {
+                        if (array_key_exists($v->email_commercieel, $aCurrentHoldings)) {
                             unset($aCurrentDeals[$k]);
                         }
                     }
@@ -577,11 +573,11 @@ class CampaignController extends Controller
                 $oCampaign = new ModelCampaign();
 
                 $oCampaign->name = Input::get('name');
-                $oCampaign->current_label = Input::get('label');
-                $oCampaign->current_auto_renewal = $iAutoRenewal;
-                $oCampaign->current_holding = $iHolding;
+                $oCampaign->current_label = Input::get('current_label');
+                $oCampaign->current_auto_renewal = Input::get('current_auto_renewal');
+                $oCampaign->current_holding = Input::get('current_holding');
                 $oCampaign->current_segment = Input::get('current_segment');
-                $oCampaign->current_in_a_group = $iCurrentInAGroup;
+                $oCampaign->current_in_a_group = Input::get('current_in_a_group');
                 $oCampaign->current_under_an_agent = Input::get('current_under_an_agent');
                 $oCampaign->current_agents = $sAgents;
                 $oCampaign->current_profile_codes = implode(',', $aProfileCodes);
@@ -590,6 +586,7 @@ class CampaignController extends Controller
                 $oCampaign->new_agreement = Input::get('new_agreement');
                 $oCampaign->new_term_offer = Input::get('new_term_offer');
                 $oCampaign->new_percentage = Input::get('new_percentage');
+                $oCampaign->new_percentage_after_term_offer = Input::get('new_percentage_after_term_offer');
 
                 $oCampaign->save();
 
@@ -646,6 +643,8 @@ class CampaignController extends Controller
                         $oCampaignCustomer->campaign_id = $oCampaign->id;
                         $oCampaignCustomer->client_name = $o->client_name;
                         $oCampaignCustomer->client_code = $o->client_code;
+                        $oCampaignCustomer->email_factuur = $o->email_factuur;
+                        $oCampaignCustomer->email_meter = $o->email_meter;
                         $oCampaignCustomer->email_commercieel = $o->email_commercieel;
                         $oCampaignCustomer->telnr_commercieel = $o->telnr_commercieel;
                         $oCampaignCustomer->aanhef_commercieel = $o->aanhef_commercieel;
@@ -655,6 +654,7 @@ class CampaignController extends Controller
                         $oCampaignCustomer->fadr_zip = $o->fadr_zip;
                         $oCampaignCustomer->fadr_city = $o->fadr_city;
                         $oCampaignCustomer->auto_renewal = $o->auto_renewal;
+                        $oCampaignCustomer->iban = $o->iban;
                         $oCampaignCustomer->accountmanager = $o->accountmanager;
                         $oCampaignCustomer->klantsegment = $o->klantsegment;
                         $oCampaignCustomer->category1 = $o->category1;
@@ -733,7 +733,7 @@ class CampaignController extends Controller
                         DB::table('campaign_customers')
                             ->where('id', $campaign_customer_id)
                             ->update([
-                                'has_saving' => ($v['estimate_saving_3_year'] > ModelCampaignCustomer::HAS_SAVING_PRICE ? 1 : 0),
+                                'has_saving' => (($v['estimate_saving_3_year'] / 3) > ModelCampaignCustomer::HAS_SAVING_PRICE ? 1 : 0),
                                 'estimate_price_1_year' => $v['estimate_price_1_year'],
                                 'estimate_saving_1_year' => $v['estimate_saving_1_year'],
                                 'estimate_price_2_year' => $v['estimate_price_2_year'],
@@ -758,9 +758,9 @@ class CampaignController extends Controller
 
         return View::make('content.campaigns.add', [
             'aData' => $aData,
-            'aLabels' => $aLabels,
-            'aAutoRenewal' => $aAutoRenewal,
-            'aHolding' => $aHolding,
+            'aCurrentLabels' => $aCurrentLabels,
+            'aCurrentAutoRenewals' => $aCurrentAutoRenewals,
+            'aCurrentHoldings' => $aCurrentHoldings,
             'aCurrentAgents' => $aCurrentAgents,
             'aCurrentSegments' => $aCurrentSegments,
             'aCurrentInAGroup' => $aCurrentInAGroup,
@@ -863,6 +863,7 @@ class CampaignController extends Controller
                 'cc.fadr_zip',
                 'cc.fadr_city',
                 'cc.auto_renewal',
+                'cc.iban',
                 'cc.accountmanager',
                 'cc.klantsegment',
                 'cc.category1',
@@ -907,6 +908,8 @@ class CampaignController extends Controller
         $fields = [
             'client_name',
             'client_code',
+            'email_factuur',
+            'email_meter',
             'email_commercieel',
             'telnr_commercieel',
             'aanhef_commercieel',
@@ -921,6 +924,7 @@ class CampaignController extends Controller
             'cadr_zip',
             'cadr_city',
             'auto_renewal',
+            'iban',
             'accountmanager',
             'klantsegment',
             'category1',
@@ -950,6 +954,8 @@ class CampaignController extends Controller
             $fields = [
                 'client_name' => $v->client_name,
                 'client_code' => $v->client_code,
+                'email_factuur' => $v->email_factuur,
+                'email_meter' => $v->email_meter,
                 'email_commercieel' => $v->email_commercieel,
                 'telnr_commercieel' => $v->telnr_commercieel,
                 'aanhef_commercieel' => $v->aanhef_commercieel,

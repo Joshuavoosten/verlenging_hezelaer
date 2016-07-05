@@ -44,21 +44,21 @@
             <h4>{{ __('Current Contracts') }}</h4>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="form-group {{ ($errors->first('label') ? 'has-error' : '') }}">
-                        {{ Form::label('label', __('Label')) }}
-                        {{ Form::select('label', $aLabels, old('label'), ['id' => 'label', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    <div class="form-group {{ ($errors->first('current_label') ? 'has-error' : '') }}">
+                        {{ Form::label('current_label', __('Label')) }}
+                        {{ Form::select('current_label', $aCurrentLabels, old('current_label'), ['id' => 'current_label', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="form-group {{ ($errors->first('auto_renewal') ? 'has-error' : '') }}">
-                        {{ Form::label('auto_renewal', __('Auto renewal')) }}
-                        {{ Form::select('auto_renewal', $aAutoRenewal, old('auto_renewal'), ['id' => 'auto_renewal', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    <div class="form-group {{ ($errors->first('current_auto_renewal') ? 'has-error' : '') }}">
+                        {{ Form::label('current_auto_renewal', __('Auto renewal')) }}
+                        {{ Form::select('current_auto_renewal', $aCurrentAutoRenewals, old('current_auto_renewal'), ['id' => 'current_auto_renewal', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="form-group {{ ($errors->first('holding') ? 'has-error' : '') }}">
-                        {{ Form::label('holding', __('Holding')) }}
-                        {{ Form::select('holding', $aHolding, old('holding'), ['id' => 'holding', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    <div class="form-group {{ ($errors->first('current_holding') ? 'has-error' : '') }}">
+                        {{ Form::label('current_holding', __('Holding')) }}
+                        {{ Form::select('current_holding', $aCurrentHoldings, old('current_holding'), ['id' => 'current_holding', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
             </div>
@@ -114,10 +114,18 @@
                         {{ Form::select('new_term_offer', $aNewTermOffers, old('new_term_offer'), ['id' => 'new_term_offer', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-3">
                     <div class="form-group {{ ($errors->first('new_percentage') ? 'has-error' : '') }}">
                         {{ Form::label('new_percentage', __('Prijs opslag percentage')) }}
                         {{ Form::select('new_percentage', $aNewPercentages, old('new_percentage'), ['id' => 'new_percentage', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group {{ ($errors->first('new_percentage_after_term_offer') ? 'has-error' : '') }}">
+                        {{ Form::label('new_percentage_after_term_offer', __('Prijs opslag percentage na looptijd aanbieding')) }}
+                        {{ Form::select('new_percentage_after_term_offer', $aNewPercentages, old('new_percentage_after_term_offer'), ['id' => 'new_percentage_after_term_offer', 'class' => 'form-control', 'data-placeholder' => __('Select Some Options')]) }}
                     </div>
                 </div>
             </div>

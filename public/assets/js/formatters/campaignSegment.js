@@ -1,6 +1,6 @@
 function campaignSegmentFormatter(value, row){
     var html = '';
-    if (value == 'FALSE'){
+    if (value == 'Zakelijk'){
         html += __('Business');
     } else {
         html += __('Consumer');

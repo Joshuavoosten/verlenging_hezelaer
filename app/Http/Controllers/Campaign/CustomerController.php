@@ -16,7 +16,7 @@ use Validator;
 class CustomerController extends Controller
 {
     // Show Profile Codes
-    const SHOW_PROFILE_CODES = true;
+    const SHOW_PROFILE_CODES = false;
 
     public function jsonEstimateSaving(Request $request, $token) {
         // Campaign -> Customer
@@ -67,12 +67,12 @@ class CustomerController extends Controller
 
             switch (Input::get('renewable_resource')) {
                 case 1:
-                    // 100% produced by dutch windmills: Total annual consumption * 0.30 ct/kWh
-                    $fEstimateSaving -= ($fTotalAnnualConsumption * 0.30);
+                    // 100% produced by dutch windmills: Total annual consumption * 0,0030 EUR/kWh
+                    $fEstimateSaving += ($fTotalAnnualConsumption * 0.0030);
                     break;
                 case 3:
-                    // Not renewable: Total annual consumption * -0.05 ct/kWh
-                    $fEstimateSaving -= ($fTotalAnnualConsumption * -0.05);
+                    // Not renewable: Total annual consumption * -0,0005 EUR/kWh
+                    $fEstimateSaving -= ($fTotalAnnualConsumption * 0.0005);
                     break;
             }
         }
@@ -199,16 +199,16 @@ class CustomerController extends Controller
         $aData = [
             'form_end_agreement' => 3,
             'form_renewable_resource' => 2, // 100% opgewekt door windmolens
-            'form_email_billing' => $oCampaignCustomer->email_commercieel,
-            'form_email_contract_extension' => null,
-            'form_email_meter_readings' => null,
+            'form_email_billing' => $oCampaignCustomer->email_factuur,
+            'form_email_contract_extension' => $oCampaignCustomer->email_commercieel,
+            'form_email_meter_readings' => $oCampaignCustomer->email_meter,
             'form_payment' => null,
             'form_fadr_street' => $oCampaignCustomer->fadr_street,
             'form_fadr_nr' => $oCampaignCustomer->fadr_nr,
             'form_fadr_nr_conn' => $oCampaignCustomer->fadr_nr_conn,
             'form_fadr_zip' => $oCampaignCustomer->fadr_zip,
             'form_fadr_city' => $oCampaignCustomer->fadr_city,
-            'form_iban' => null,
+            'form_iban' => $oCampaignCustomer->iban,
             'form_terms_and_conditions_1' => null,
             'form_terms_and_conditions_2' => null,
             'form_terms_and_conditions_3' => null,
@@ -262,7 +262,6 @@ class CustomerController extends Controller
                'form_fadr_nr' => 'required',
                'form_fadr_zip' => 'required',
                'form_fadr_city' => 'required',
-               'form_iban' => 'required',
                'form_terms_and_conditions_1' => 'required',
                'form_terms_and_conditions_2' => 'required',
                'form_terms_and_conditions_3' => 'required',
@@ -275,6 +274,12 @@ class CustomerController extends Controller
             if ($hasElektricity) {
                 $aRules = array_merge($aRules, [
                     'form_renewable_resource' => 'required'
+                ]);
+            }
+
+            if (Input::get('form_payment') == ModelForm::PAYMENT_AUTOMATIC_COLLECTION) {
+                $aRules = array_merge($aRules, [
+                    'form_iban' => 'required'
                 ]);
             }
 
